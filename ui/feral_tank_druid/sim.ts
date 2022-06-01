@@ -204,8 +204,9 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 			debuffInputs: [
 				IconInputs.BloodFrenzy,
 				IconInputs.Mangle,
-				IconInputs.JudgementOfLight,
 				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.JudgementOfLight,
+				IconInputs.JudgementOfWisdom,
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,
@@ -232,6 +233,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
 					Flask.FlaskOfFortification,
+					Flask.FlaskOfChromaticWonder,
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,
@@ -273,7 +275,9 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
+					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.SnapshotBsT2,
 					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],

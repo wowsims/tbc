@@ -114,15 +114,15 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, 
 }
 
 func (rogue *Rogue) applyMurder() {
-	if rogue.Talents.Murder == 0 {
-		return
-	}
+	rogue.PseudoStats.DamageDealtMultiplier *= rogue.murderMultiplier()
+}
 
-	damageMultiplier := 1.0 + 0.01*float64(rogue.Talents.Murder)
-
+func (rogue *Rogue) murderMultiplier() float64 {
 	switch rogue.CurrentTarget.MobType {
 	case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-		rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
+		return 1.0 + 0.01*float64(rogue.Talents.Murder)
+	default:
+		return 1
 	}
 }
 

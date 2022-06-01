@@ -106,11 +106,15 @@ func (weapon Weapon) AverageDamage() float64 {
 	return (weapon.BaseDamageMin + weapon.BaseDamageMax) / 2
 }
 
-func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
+func (weapon Weapon) CalculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 
-func (weapon Weapon) calculateNormalizedWeaponDamage(sim *Simulation, attackPower float64) float64 {
+func (weapon Weapon) CalculateAverageWeaponDamage(attackPower float64) float64 {
+	return weapon.AverageDamage() + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
+}
+
+func (weapon Weapon) CalculateNormalizedWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.NormalizedSwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 

@@ -27,21 +27,32 @@ func (prot *ProtectionPaladin) OnGCDReady(sim *core.Simulation) {
 		return
 	}
 
+	var success bool
+
 	if prot.CurrentSeal == nil {
-		prot.SealOfRighteousness.Cast(sim, nil)
+		success = prot.SealOfRighteousness.Cast(sim, nil)
 	} else if prot.Rotation.PrioritizeHolyShield && prot.HolyShield.IsReady(sim) {
-		prot.HolyShield.Cast(sim, nil)
+		success = prot.HolyShield.Cast(sim, nil)
 	} else if prot.Consecration != nil && prot.Consecration.IsReady(sim) {
-		prot.Consecration.Cast(sim, nil)
+		success = prot.Consecration.Cast(sim, nil)
 	} else if prot.JudgementOfRighteousness.IsReady(sim) {
-		prot.JudgementOfRighteousness.Cast(sim, prot.CurrentTarget)
-		prot.SealOfRighteousness.Cast(sim, nil)
+		success = prot.JudgementOfRighteousness.Cast(sim, prot.CurrentTarget)
+		if success {
+			success = prot.SealOfRighteousness.Cast(sim, nil)
+		}
 	} else if prot.shouldExorcism(sim) {
-		prot.Exorcism.Cast(sim, prot.CurrentTarget)
+		success = prot.Exorcism.Cast(sim, prot.CurrentTarget)
 	} else if !prot.Rotation.PrioritizeHolyShield && prot.HolyShield.IsReady(sim) {
-		prot.HolyShield.Cast(sim, nil)
+		success = prot.HolyShield.Cast(sim, nil)
 	} else {
 		prot.WaitUntil(sim, prot.nextCDAt(sim))
+		return
+	}
+
+	if !success {
+		waitTime := time.Second * 5
+		prot.Metrics.MarkOOM(&prot.Unit, waitTime)
+		prot.WaitUntil(sim, sim.CurrentTime+waitTime)
 	}
 }
 

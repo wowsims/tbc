@@ -31,7 +31,6 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 	})
 
 	target := warlock.CurrentTarget
-	spellCoefficient := 0.1
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,
 		Aura: target.RegisterAura(core.Aura{
@@ -43,7 +42,7 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
-			BaseDamage:       core.BaseDamageConfigMagicNoRoll(63, spellCoefficient),
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(63, 0.1),
 			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
 			ProcMask:         core.ProcMaskPeriodicDamage,

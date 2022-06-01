@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const ThreatPerManaGained = 0.5
+
 // TODO: Make this into an object like rageBar or energyBar.
 func (character *Character) EnableManaBar() {
 	// Assumes all units have >= 20 intellect.
@@ -21,6 +23,11 @@ func (character *Character) EnableManaBar() {
 		Modifier: func(intellect float64, mana float64) float64 {
 			return mana + intellect*15
 		},
+	})
+
+	// Not a real spell, just holds metrics from mana gain threat.
+	character.RegisterSpell(SpellConfig{
+		ActionID: ActionID{OtherID: proto.OtherAction_OtherActionManaGain},
 	})
 }
 
@@ -78,6 +85,33 @@ func (unit *Unit) SpendMana(sim *Simulation, amount float64, actionID ActionID) 
 
 	unit.stats[stats.Mana] = newMana
 	unit.Metrics.ManaSpent += amount
+}
+
+func (unit *Unit) doneIterationMana() {
+	if !unit.HasManaBar() {
+		return
+	}
+
+	manaGainSpell := unit.GetSpell(ActionID{OtherID: proto.OtherAction_OtherActionManaGain})
+
+	for resourceKey, resourceMetrics := range unit.Metrics.resources {
+		if resourceKey.Type != proto.ResourceType_ResourceTypeMana {
+			continue
+		}
+		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{OtherID: proto.OtherAction_OtherActionManaRegen}) {
+			continue
+		}
+		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{SpellID: 34917}) {
+			// Vampiric Touch mana threat goes to the priest, so it's handled in the priest code.
+			continue
+		}
+		if resourceMetrics.ActualGain <= 0 {
+			continue
+		}
+
+		manaGainSpell.SpellMetrics[0].Casts += resourceMetrics.EventsForCurrentIteration()
+		manaGainSpell.ApplyAOEThreatIgnoreMultipliers(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerManaGained)
+	}
 }
 
 // Returns the rate of mana regen per second from mp5.

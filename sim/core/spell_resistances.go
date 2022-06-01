@@ -11,6 +11,11 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 	}
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
+		// All physical dots (Bleeds) ignore armor.
+		if spellEffect.IsPeriodic {
+			return
+		}
+
 		// Physical resistance (armor).
 		spellEffect.Damage *= attackTable.ArmorDamageReduction
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
@@ -46,7 +51,7 @@ func (at *AttackTable) UpdateArmorDamageReduction() {
 
 func (at *AttackTable) UpdatePartialResists() {
 	at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50, at.BinaryArcaneHitChance = at.Defender.partialResistRollThresholds(SpellSchoolArcane, at.Attacker)
-	at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50, _ = at.Defender.partialResistRollThresholds(SpellSchoolHoly, at.Attacker)
+	at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50, at.BinaryHolyHitChance = at.Defender.partialResistRollThresholds(SpellSchoolHoly, at.Attacker)
 	at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50, at.BinaryFireHitChance = at.Defender.partialResistRollThresholds(SpellSchoolFire, at.Attacker)
 	at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50, at.BinaryFrostHitChance = at.Defender.partialResistRollThresholds(SpellSchoolFrost, at.Attacker)
 	at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50, at.BinaryNatureHitChance = at.Defender.partialResistRollThresholds(SpellSchoolNature, at.Attacker)
@@ -76,7 +81,7 @@ func (at *AttackTable) GetBinaryHitChance(ss SpellSchool) float64 {
 	case SpellSchoolArcane:
 		return at.BinaryArcaneHitChance
 	case SpellSchoolHoly:
-		return 0
+		return at.BinaryHolyHitChance
 	case SpellSchoolFire:
 		return at.BinaryFireHitChance
 	case SpellSchoolFrost:

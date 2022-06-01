@@ -22,11 +22,11 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
 		BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
-		DamageMultiplier: 1,
+		DamageMultiplier: paladin.WeaponSpecializationMultiplier(),
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
-		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.MeleeCritMultiplier()),
 
 		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
@@ -38,7 +38,6 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 			paladin.AddMana(sim, spellEffect.Damage*0.33*0.1, core.ActionID{SpellID: 33776}, false)
 		},
 	}
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
@@ -152,7 +151,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -198,7 +197,7 @@ func (paladin *Paladin) registerJudgementOfLightSpell(cdTimer *core.Timer) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -220,7 +219,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 	paladin.JudgementOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27157},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		SpellExtras: SpellFlagJudgement | core.SpellExtrasBinary,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -238,13 +237,13 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
-			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
+			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94.0, 0),
 			BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
 			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(225, 246, 0.728),
-			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: paladin.OutcomeFuncMagicHitAndCritBinary(paladin.SpellCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.SealOfRighteousness.DefaultCast.Cost)

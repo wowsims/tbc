@@ -14,13 +14,15 @@ const SealDuration = time.Second * 30
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
 	effect := core.SpellEffect{
-		ProcMask:         core.ProcMaskEmpty,
-		DamageMultiplier: 1 + core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
+		ProcMask: core.ProcMaskEmpty,
+		DamageMultiplier: 1 *
+			paladin.WeaponSpecializationMultiplier() *
+			core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 1.1, 1),
 		ThreatMultiplier: 1,
 
 		// should deal 35% weapon deamage
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
-		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.MeleeCritMultiplier()),
 		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// Add mana from Spiritual Attunement
@@ -29,9 +31,6 @@ func (paladin *Paladin) setupSealOfBlood() {
 			}
 		},
 	}
-
-	// Apply 2 Handed Weapon Specialization talent
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	procActionID := core.ActionID{SpellID: 31893}
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
@@ -60,6 +59,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31892},
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -72,35 +72,34 @@ func (paladin *Paladin) setupSealOfBlood() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(64)
 			paladin.UpdateSeal(sim, paladin.SealOfBloodAura)
 		},
 	})
 }
 
 func (paladin *Paladin) SetupSealOfCommand() {
-	effect := core.SpellEffect{
-		ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		OutcomeApplier:   paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
-	}
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
-
-	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
-	effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-			return weaponBaseDamage(sim, hitEffect, spell) + 0.29*hitEffect.SpellPower(spell.Unit, spell)
-		},
-		TargetSpellCoefficient: 0.29,
-	}
-
 	procActionID := core.ActionID{SpellID: 20424}
+	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
+
 	socProc := paladin.RegisterSpell(core.SpellConfig{
-		ActionID:     procActionID,
-		SpellSchool:  core.SpellSchoolHoly,
-		SpellExtras:  core.SpellExtrasMeleeMetrics,
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ActionID:    procActionID,
+		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: paladin.WeaponSpecializationMultiplier(),
+			ThreatMultiplier: 1,
+			OutcomeApplier:   paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.MeleeCritMultiplier()),
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return weaponBaseDamage(sim, hitEffect, spell) + 0.29*hitEffect.SpellPower(spell.Unit, spell)
+				},
+				TargetSpellCoefficient: 0.29,
+			},
+		}),
 	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
@@ -136,6 +135,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 20375},
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -148,7 +148,8 @@ func (paladin *Paladin) SetupSealOfCommand() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(70)
 			paladin.UpdateSeal(sim, paladin.SealOfCommandAura)
 		},
 	})
@@ -187,6 +188,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -199,7 +201,8 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(61)
 			paladin.UpdateSeal(sim, paladin.SealOfTheCrusaderAura)
 		},
 	})
@@ -221,6 +224,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -233,7 +237,8 @@ func (paladin *Paladin) setupSealOfWisdom() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(68)
 			paladin.UpdateSeal(sim, paladin.SealOfWisdomAura)
 		},
 	})
@@ -252,6 +257,7 @@ func (paladin *Paladin) setupSealOfLight() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfLight = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -264,7 +270,8 @@ func (paladin *Paladin) setupSealOfLight() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(69)
 			paladin.UpdateSeal(sim, paladin.SealOfLightAura)
 		},
 	})
@@ -272,21 +279,43 @@ func (paladin *Paladin) setupSealOfLight() {
 
 func (paladin *Paladin) setupSealOfRighteousness() {
 	procActionID := core.ActionID{SpellID: 27156}
+
+	baseCoeff := 0.85
+	spCoeff := 0.09
+	mhWeapon := paladin.GetMHWeapon()
+	if mhWeapon != nil && mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
+		baseCoeff = 1.2
+		spCoeff = 0.108
+	}
+	spCoeff *= paladin.AutoAttacks.MH.SwingSpeed
+	flatBonusDamage := baseCoeff * 28.72464 * paladin.AutoAttacks.MH.SwingSpeed
+	if mhWeapon != nil {
+		flatBonusDamage += -mhWeapon.QualityModifier * paladin.AutoAttacks.MH.SwingSpeed * 0.03
+	}
+
+	baseDamage := core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+			weaponDamage := spell.Unit.AutoAttacks.MH.CalculateAverageWeaponDamage(hitEffect.MeleeAttackPower(spell.Unit))
+			return flatBonusDamage + 0.03*weaponDamage + spCoeff*hitEffect.SpellPower(spell.Unit, spell)
+		},
+		TargetSpellCoefficient: spCoeff,
+	}
+
 	sorProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    procActionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskEmpty,
 
 			BonusSpellPower: core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
-			DamageMultiplier: 1 +
-				0.03*float64(paladin.Talents.ImprovedSealOfRighteousness) +
-				core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
+			DamageMultiplier: 1 *
+				paladin.WeaponSpecializationMultiplier() *
+				(1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness)) *
+				core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 1.1, 1),
 			ThreatMultiplier: 1,
 
-			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
+			BaseDamage:     baseDamage,
 			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 		}),
 	})
@@ -310,6 +339,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 
 	paladin.SealOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    spellActionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -322,7 +352,8 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(66)
 			paladin.UpdateSeal(sim, paladin.SealOfRighteousnessAura)
 		},
 	})

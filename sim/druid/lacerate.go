@@ -59,13 +59,14 @@ func (druid *Druid) registerLacerateSpell() {
 				},
 				TargetSpellCoefficient: 0,
 			},
-			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHit(),
+			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					if druid.LacerateDot.IsActive() {
 						druid.LacerateDot.Refresh(sim)
 						druid.LacerateDot.AddStack(sim)
+						druid.LacerateDot.TakeSnapshot(sim)
 					} else {
 						druid.LacerateDot.Apply(sim)
 						druid.LacerateDot.SetStacks(sim, 1)
@@ -91,7 +92,7 @@ func (druid *Druid) registerLacerateSpell() {
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ThreatMultiplier: 0.5,
 			IsPeriodic:       true,
 			BaseDamage: core.MultiplyByStacks(core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {

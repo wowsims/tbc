@@ -278,6 +278,7 @@ enum Flask {
 	FlaskOfRelentlessAssault = 4;
 	FlaskOfSupremePower = 5;
 	FlaskOfFortification = 6;
+	FlaskOfChromaticWonder = 7;
 }
 
 enum BattleElixir {
@@ -292,6 +293,7 @@ enum BattleElixir {
 	ElixirOfMastery = 10;
 	ElixirOfTheMongoose = 8;
 	FelStrengthElixir = 9;
+	GreaterArcaneElixir = 11;
 }
 
 enum GuardianElixir {
@@ -633,6 +635,8 @@ enum OtherAction {
 	OtherActionManaRegen = 2;
 	OtherActionEnergyRegen = 5;
 	OtherActionFocusRegen = 6;
+	OtherActionManaGain = 10; // For threat generated from mana gains.
+	OtherActionRageGain = 11; // For threat generated from rage gains.
 	OtherActionAttack = 3; // A white hit, can be main hand or off hand.
 	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
 	OtherActionPet = 7; // Represents a grouping of all pet actions. Only used by the UI.

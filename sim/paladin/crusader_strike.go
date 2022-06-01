@@ -40,7 +40,7 @@ func (paladin *Paladin) registerCrusaderStrikeSpell() {
 
 			// maybe this isn't the one that should be set to 1.1
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 31033, 36, 0), 1.1, true),
-			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.MeleeCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

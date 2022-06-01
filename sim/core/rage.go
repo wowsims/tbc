@@ -5,8 +5,8 @@ import (
 )
 
 const MaxRage = 100.0
-
 const RageFactor = 274.7
+const ThreatPerRageGained = 5
 
 // OnRageGain is called any time rage is increased.
 type OnRageGain func(sim *Simulation)
@@ -73,6 +73,11 @@ func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, on
 		},
 	})
 
+	// Not a real spell, just holds metrics from rage gain threat.
+	unit.RegisterSpell(SpellConfig{
+		ActionID: ActionID{OtherID: proto.OtherAction_OtherActionRageGain},
+	})
+
 	unit.rageBar = rageBar{
 		unit:         unit,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),
@@ -125,4 +130,37 @@ func (rb *rageBar) reset(sim *Simulation) {
 	}
 
 	rb.currentRage = rb.startingRage
+}
+
+func (rb *rageBar) doneIteration() {
+	if rb.unit == nil {
+		return
+	}
+
+	rageGainSpell := rb.unit.GetSpell(ActionID{OtherID: proto.OtherAction_OtherActionRageGain})
+
+	for resourceKey, resourceMetrics := range rb.unit.Metrics.resources {
+		if resourceKey.Type != proto.ResourceType_ResourceTypeRage {
+			continue
+		}
+		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{OtherID: proto.OtherAction_OtherActionDamageTaken}) {
+			continue
+		}
+		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{OtherID: proto.OtherAction_OtherActionRefund}) {
+			continue
+		}
+		if resourceMetrics.ActualGain <= 0 {
+			continue
+		}
+
+		// Need to exclude rage gained from white hits. Rather than have a manual list of all IDs that would
+		// apply here (autos, WF attack, sword spec procs, etc), just check if the effect caused any damage.
+		sourceSpell := rb.unit.GetSpell(resourceKey.ActionID)
+		if sourceSpell != nil && sourceSpell.SpellMetrics[0].TotalDamage > 0 {
+			continue
+		}
+
+		rageGainSpell.SpellMetrics[0].Casts += resourceMetrics.EventsForCurrentIteration()
+		rageGainSpell.ApplyAOEThreatIgnoreMultipliers(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerRageGained)
+	}
 }

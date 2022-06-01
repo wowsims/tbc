@@ -44,6 +44,19 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.Health:  500,
 				stats.Defense: 10,
 			})
+		case proto.Flask_FlaskOfChromaticWonder:
+			character.AddStats(stats.Stats{
+				stats.Stamina:          18,
+				stats.Strength:         18,
+				stats.Agility:          18,
+				stats.Intellect:        18,
+				stats.Spirit:           18,
+				stats.ArcaneResistance: 35,
+				stats.FireResistance:   35,
+				stats.FrostResistance:  35,
+				stats.NatureResistance: 35,
+				stats.ShadowResistance: 35,
+			})
 		}
 	} else {
 		switch consumes.BattleElixir {
@@ -96,6 +109,10 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.AttackPower:       90,
 				stats.RangedAttackPower: 90,
 				stats.Stamina:           -10,
+			})
+		case proto.BattleElixir_GreaterArcaneElixir:
+			character.AddStats(stats.Stats{
+				stats.SpellPower: 35,
 			})
 		}
 

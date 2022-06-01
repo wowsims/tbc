@@ -75,6 +75,19 @@ func (unit *Unit) OutcomeFuncMagicHitAndCritBinary(critMultiplier float64) Outco
 	}
 }
 
+func (unit *Unit) OutcomeFuncCritFixedChance(critChance float64, critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, attackTable *AttackTable) {
+		if spellEffect.fixedCritCheck(sim, critChance) {
+			spellEffect.Outcome = OutcomeCrit
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
+			spellEffect.Damage *= critMultiplier
+		} else {
+			spellEffect.Outcome = OutcomeHit
+			spell.SpellMetrics[spellEffect.Target.Index].Hits++
+		}
+	}
+}
+
 func (unit *Unit) OutcomeFuncMagicHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, attackTable *AttackTable) {
 		if spellEffect.magicHitCheck(sim, spell, attackTable) {
@@ -170,12 +183,12 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
 				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) {
-				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+				if spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
+				} else {
 					if !spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) {
 						spellEffect.applyAttackTableHit(spell)
 					}
-				} else {
-					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
 				}
 			}
 		}
@@ -191,6 +204,27 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 				spellEffect.applyAttackTableHit(spell)
 			}
 		}
+	}
+}
+
+// Like OutcomeFuncMeleeSpecialHitAndCrit, but blocks prevent crits.
+func (unit *Unit) OutcomeFuncMeleeWeaponSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
+	if unit.PseudoStats.InFrontOfTarget {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, attackTable *AttackTable) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
+				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
+				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) &&
+				!spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) &&
+				!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+				spellEffect.applyAttackTableHit(spell)
+			}
+		}
+	} else {
+		return unit.OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier)
 	}
 }
 
@@ -235,12 +269,12 @@ func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApp
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) {
-				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+				if spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
+				} else {
 					if !spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) {
 						spellEffect.applyAttackTableHit(spell)
 					}
-				} else {
-					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
 				}
 			}
 		}
@@ -288,6 +322,10 @@ func (spellEffect *SpellEffect) magicHitCheckBinary(sim *Simulation, spell *Spel
 	missChance = MaxFloat(missChance, 0.01) // can't get away from the 1% miss
 
 	return sim.RandomFloat("Magical Hit Roll") > missChance
+}
+
+func (spellEffect *SpellEffect) fixedCritCheck(sim *Simulation, critChance float64) bool {
+	return sim.RandomFloat("Fixed Crit Roll") < critChance
 }
 
 func (spellEffect *SpellEffect) magicCritCheck(sim *Simulation, spell *Spell, attackTable *AttackTable) bool {

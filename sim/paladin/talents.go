@@ -84,8 +84,7 @@ func (paladin *Paladin) ApplyTalents() {
 	paladin.applyRedoubt()
 	paladin.applyReckoning()
 	paladin.applyCrusade()
-	paladin.applyOneHandedWeaponSpecialization()
-	paladin.applyTwoHandedWeaponSpecialization()
+	paladin.applyWeaponSpecialization()
 	paladin.applyVengeance()
 }
 
@@ -180,49 +179,50 @@ func (paladin *Paladin) applyReckoning() {
 }
 
 func (paladin *Paladin) applyCrusade() {
-	if paladin.Talents.Crusade == 0 {
-		return
+	// TODO: This doesn't account for multiple targets
+	paladin.PseudoStats.DamageDealtMultiplier *= paladin.crusadeMultiplier()
+}
+
+func (paladin *Paladin) crusadeMultiplier() float64 {
+	if paladin.CurrentTarget == nil {
+		return 1
 	}
-
-	damageMultiplier := 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
-
-	// TO-DO: This doesn't account for multiple targets
 	switch paladin.CurrentTarget.MobType {
 	case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeDemon, proto.MobType_MobTypeUndead, proto.MobType_MobTypeElemental:
-		paladin.PseudoStats.DamageDealtMultiplier *= damageMultiplier
+		return 1 + (0.01 * float64(paladin.Talents.Crusade))
+	default:
+		return 1
 	}
+}
+
+func (paladin *Paladin) MeleeCritMultiplier() float64 {
+	return paladin.Character.MeleeCritMultiplier(paladin.crusadeMultiplier(), 0)
+}
+func (paladin *Paladin) SpellCritMultiplier() float64 {
+	return paladin.Character.SpellCritMultiplier(paladin.crusadeMultiplier(), 0)
 }
 
 // Affects all physical damage or spells that can be rolled as physical
 // It affects white, Windfury, Crusader Strike, Seals, and Judgement of Command / Blood
-func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
-	if paladin.Talents.TwoHandedWeaponSpecialization == 0 {
-		return
-	}
-
+func (paladin *Paladin) applyWeaponSpecialization() {
 	// This impacts Crusader Strike, Melee Attacks, WF attacks
 	// Seals + Judgements need to be implemented separately
-	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
-		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-	}
-}
+	paladin.PseudoStats.PhysicalDamageDealtMultiplier *= paladin.WeaponSpecializationMultiplier()
 
-func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
 	mhWeapon := paladin.GetMHWeapon()
-	if mhWeapon != nil && mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
-		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
+	if mhWeapon != nil && mhWeapon.HandType != proto.HandType_HandTypeTwoHand {
+		paladin.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*float64(paladin.Talents.OneHandedWeaponSpecialization)
 	}
 }
-
-func (paladin *Paladin) applyOneHandedWeaponSpecialization() {
-	if paladin.Talents.OneHandedWeaponSpecialization == 0 {
-		return
+func (paladin *Paladin) WeaponSpecializationMultiplier() float64 {
+	mhWeapon := paladin.GetMHWeapon()
+	if mhWeapon == nil {
+		return 1
 	}
-	if paladin.Equip[proto.ItemSlot_ItemSlotMainHand].HandType == proto.HandType_HandTypeTwoHand {
-		return
+	if mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
+		return 1 + 0.02*float64(paladin.Talents.TwoHandedWeaponSpecialization)
 	}
-
-	paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.01*float64(paladin.Talents.OneHandedWeaponSpecialization)
+	return 1
 }
 
 // I don't know if the new stack of vengeance applies to the crit that triggered it or not

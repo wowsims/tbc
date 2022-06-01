@@ -104,7 +104,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 	if normalized {
 		if hand == MainHand {
 			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
-				damage := spell.Unit.AutoAttacks.MH.calculateNormalizedWeaponDamage(
+				damage := spell.Unit.AutoAttacks.MH.CalculateNormalizedWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spell.Unit)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
 				if includeBonusWeaponDamage {
@@ -114,7 +114,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 			}
 		} else {
 			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
-				damage := spell.Unit.AutoAttacks.OH.calculateNormalizedWeaponDamage(
+				damage := spell.Unit.AutoAttacks.OH.CalculateNormalizedWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spell.Unit)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
 				if includeBonusWeaponDamage {
@@ -126,7 +126,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 	} else {
 		if hand == MainHand {
 			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
-				damage := spell.Unit.AutoAttacks.MH.calculateWeaponDamage(
+				damage := spell.Unit.AutoAttacks.MH.CalculateWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spell.Unit)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
 				if includeBonusWeaponDamage {
@@ -136,7 +136,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 			}
 		} else {
 			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
-				damage := spell.Unit.AutoAttacks.OH.calculateWeaponDamage(
+				damage := spell.Unit.AutoAttacks.OH.CalculateWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spell.Unit)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
 				if includeBonusWeaponDamage {
@@ -158,7 +158,7 @@ func BaseDamageConfigMeleeWeapon(hand Hand, normalized bool, flatBonus float64, 
 
 func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 	return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
-		return spell.Unit.AutoAttacks.Ranged.calculateWeaponDamage(sim, hitEffect.RangedAttackPower(spell.Unit)+hitEffect.RangedAttackPowerOnTarget()) +
+		return spell.Unit.AutoAttacks.Ranged.CalculateWeaponDamage(sim, hitEffect.RangedAttackPower(spell.Unit)+hitEffect.RangedAttackPowerOnTarget()) +
 			flatBonus +
 			hitEffect.BonusWeaponDamage(spell.Unit)
 	}

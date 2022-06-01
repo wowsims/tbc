@@ -58,6 +58,14 @@ func (dot *Dot) RecomputeAuraDuration() {
 	}
 }
 
+// Takes a new snapshot of this Dot's effects.
+//
+// In most cases this will be called automatically, and should only be called
+// to force a new snapshot to be taken.
+func (dot *Dot) TakeSnapshot(sim *Simulation) {
+	dot.tickFn = dot.TickEffects(sim, dot.Spell)
+}
+
 func NewDot(config Dot) *Dot {
 	dot := &Dot{}
 	*dot = config
@@ -87,7 +95,7 @@ func NewDot(config Dot) *Dot {
 	dot.Aura.Duration = dot.TickLength * time.Duration(dot.NumberOfTicks)
 
 	dot.Aura.OnGain = func(aura *Aura, sim *Simulation) {
-		dot.tickFn = dot.TickEffects(sim, dot.Spell)
+		dot.TakeSnapshot(sim)
 
 		periodicOptions := basePeriodicOptions
 		periodicOptions.Period = dot.tickPeriod

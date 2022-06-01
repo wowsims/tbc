@@ -16,6 +16,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -43,6 +44,15 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			cssClass: 'protection-warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecProtectionWarrior>) => {
+					return {
+						updateOn: new TypedEvent(),
+						shouldDisplay: () => true,
+						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -188,6 +198,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				IconInputs.Mangle,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.JudgementOfLight,
+				IconInputs.JudgementOfWisdom,
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,
@@ -215,6 +226,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
 					Flask.FlaskOfFortification,
+					Flask.FlaskOfChromaticWonder,
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,
@@ -282,6 +294,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
+					Presets.StandardTalents,
+					Presets.ImpDemoTalents,
 					Presets.ImpaleProtTalents,
 				],
 				// Preset gear configurations that the user can quickly select.

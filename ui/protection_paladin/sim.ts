@@ -67,7 +67,7 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 				Stat.StatResilience,
 			],
 			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-			epReferenceStat: Stat.StatAttackPower,
+			epReferenceStat: Stat.StatSpellPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatHealth,
@@ -234,11 +234,12 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					Flask.FlaskOfFortification,
 					Flask.FlaskOfBlindingLight,
 					Flask.FlaskOfRelentlessAssault,
+					Flask.FlaskOfChromaticWonder,
 				],
 				battleElixirs: [
+					BattleElixir.GreaterArcaneElixir,
 					BattleElixir.ElixirOfMastery,
 					BattleElixir.ElixirOfDemonslaying,
-					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
 				],
@@ -304,8 +305,9 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.SanctityTalents,
+					Presets.ArdentDefenderTalents,
 					Presets.AvengersShieldTalents,
+					Presets.SanctityTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

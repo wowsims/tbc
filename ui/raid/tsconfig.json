@@ -15,10 +15,12 @@
 		{ "path": "../hunter" },
 		{ "path": "../mage" },
 		{ "path": "../rogue" },
+		{ "path": "../retribution_paladin" },
+		{ "path": "../protection_paladin" },
 		{ "path": "../shadow_priest" },
 		{ "path": "../smite_priest" },
 		{ "path": "../warrior" },
-		{ "path": "../retribution_paladin" },
+		{ "path": "../protection_warrior" },
 		{ "path": "../warlock" }
 	],
 }

@@ -216,8 +216,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-DarkmoonCard:Vengeance-31858"
  value: {
-  dps: 1512.9447463955587
-  tps: 1074.1907699408468
+  dps: 1522.6304493549023
+  tps: 1081.0676190419804
  }
 }
 dps_results: {

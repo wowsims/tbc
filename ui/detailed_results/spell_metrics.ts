@@ -84,6 +84,12 @@ export class SpellMetricsTable extends MetricsTable<ActionMetrics> {
 		]);
 	}
 
+	customizeRowElem(action: ActionMetrics, rowElem: HTMLElement) {
+		if (action.hitAttempts == 0 && action.dps == 0) {
+			rowElem.classList.add('threat-metrics');
+		}
+	}
+
 	getGroupedMetrics(resultData: SimResultData): Array<Array<ActionMetrics>> {
 		const players = resultData.result.getPlayers(resultData.filter);
 		if (players.length != 1) {
