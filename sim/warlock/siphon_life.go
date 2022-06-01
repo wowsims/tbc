@@ -10,7 +10,7 @@ import (
 
 func (warlock *Warlock) registerSiphonLifeSpell() {
 	actionID := core.ActionID{SpellID: 30911}
-	baseCost := 370.0
+	baseCost := 410.0
 
 	warlock.SiphonLife = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     actionID,
@@ -19,9 +19,8 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 		BaseCost:     baseCost,
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost:     baseCost,
-				GCD:      core.GCDDefault,
-				CastTime: time.Millisecond * 2000,
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
