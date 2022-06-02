@@ -1,6 +1,7 @@
 import { Class } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 export const raceNames = {
@@ -183,3 +184,7 @@ export function stringToResourceType(str) {
     }
     return ResourceType.ResourceTypeNone;
 }
+export const shattFactionNames = {
+    [ShattrathFaction.ShattrathFactionAldor]: 'Aldor',
+    [ShattrathFaction.ShattrathFactionScryer]: 'Scryer',
+};

@@ -17,7 +17,7 @@ export const ArmsSlamTalents = {
 };
 export const ArmsDWTalents = {
     name: 'Arms DW',
-    data: '32003301352010500221-0550000520501203',
+    data: '33005301302010510321-0550000520501203',
 };
 export const FuryTalents = {
     name: 'Fury',

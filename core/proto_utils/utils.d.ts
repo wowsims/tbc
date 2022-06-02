@@ -1,5 +1,4 @@
 import { Player } from '/tbc/core/proto/api.js';
-import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -81,7 +80,6 @@ export declare enum Faction {
 export declare const raceToFaction: Record<Race, Faction>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
-export declare const nameToShattFaction: Record<string, ShattrathFaction>;
 export declare function isDualWieldSpec(spec: Spec): boolean;
 export declare function isTankSpec(spec: Spec): boolean;
 export declare const specToLocalStorageKey: Record<Spec, string>;

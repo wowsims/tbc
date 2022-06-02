@@ -1,6 +1,7 @@
 import { Class } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 export declare const raceNames: Record<Race, string>;
@@ -13,3 +14,4 @@ export declare const slotNames: Record<ItemSlot, string>;
 export declare const resourceNames: Record<ResourceType, string>;
 export declare const resourceColors: Record<ResourceType, string>;
 export declare function stringToResourceType(str: string): ResourceType;
+export declare const shattFactionNames: Record<ShattrathFaction, string>;

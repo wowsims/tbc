@@ -29,8 +29,8 @@ import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { SimUI } from './sim_ui.js';
-import { nameToShattFaction } from '/tbc/core/proto_utils/utils.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { shattFactionNames } from '/tbc/core/proto_utils/names.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
@@ -460,10 +460,10 @@ export class IndividualSimUI extends SimUI {
             setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
         });
         const shattFactionPicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0], this.player, {
-            values: ["Scryer", "Aldor"].map(faction => {
+            values: [ShattrathFaction.ShattrathFactionAldor, ShattrathFaction.ShattrathFactionScryer].map(faction => {
                 return {
-                    name: faction,
-                    value: nameToShattFaction[faction],
+                    name: shattFactionNames[faction],
+                    value: faction,
                 };
             }),
             changedEvent: sim => sim.gearChangeEmitter,
