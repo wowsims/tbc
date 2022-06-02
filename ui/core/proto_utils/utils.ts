@@ -6,7 +6,7 @@ import { maxIndex } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
-import { ArmorType, ShattrathFaction } from '/tbc/core/proto/common.js';
+import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EnchantType } from '/tbc/core/proto/common.js';
@@ -935,11 +935,6 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 	[Spec.SpecProtectionWarrior]: warriorRaces,
 	[Spec.SpecSmitePriest]: priestRaces,
 };
-
-export const nameToShattFaction: Record<string, ShattrathFaction> = {
-	"Scryer": ShattrathFaction.ShattrathFactionScryer,
-	"Aldor": ShattrathFaction.ShattrathFactionAldor,
-}
 
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.

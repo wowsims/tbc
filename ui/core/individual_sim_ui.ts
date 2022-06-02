@@ -52,11 +52,12 @@ import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { nameToShattFaction, SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { shattFactionNames } from '/tbc/core/proto_utils/names.js';
 import { Target } from './target.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
@@ -686,10 +687,10 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
 		});
 		const shattFactionPicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0] as HTMLElement, this.player, {
-			values: ["Scryer", "Aldor"].map(faction => {
+			values: [ShattrathFaction.ShattrathFactionAldor, ShattrathFaction.ShattrathFactionScryer].map(faction => {
 				return {
-					name: faction,
-					value: nameToShattFaction[faction],
+					name: shattFactionNames[faction],
+					value: faction,
 				};
 			}),
 			changedEvent: sim => sim.gearChangeEmitter,

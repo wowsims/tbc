@@ -55,6 +55,7 @@ var Enchants = []Enchant{
 	{ID: 27905, EffectID: 1891, Name: "Bracer - Stats", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Stamina: 4, stats.Intellect: 4, stats.Spirit: 4, stats.Strength: 4, stats.Agility: 4}, ItemType: proto.ItemType_ItemTypeWrist},
 
 	// Hands
+	{ID: 20727, EffectID: 2614, Name: "Gloves - Shadow Power", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.ShadowSpellPower: 20}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 28271, EffectID: 2935, Name: "Gloves - Spell Strike", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellHit: 15}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 28272, EffectID: 2937, Name: "Gloves - Major Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 20}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 33995, EffectID: 684, Name: "Gloves - Major Strength", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 15}, ItemType: proto.ItemType_ItemTypeHands},
