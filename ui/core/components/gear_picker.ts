@@ -6,6 +6,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Enchant, Gem, GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
+import { WeaponType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -500,10 +501,10 @@ class SelectorModal extends Popup {
 
 				if (label == 'Items') {
 					const listItem = listItemData.item as unknown as Item;
-					if (!this.player.sim.getShow1hWeapons() && listItem.handType != HandType.HandTypeTwoHand) {
+					if (!this.player.sim.getShow1hWeapons() && listItem.weaponType != WeaponType.WeaponTypeUnknown && listItem.handType != HandType.HandTypeTwoHand) {
 						return false;
 					}
-					if (!this.player.sim.getShow2hWeapons() && listItem.handType == HandType.HandTypeTwoHand) {
+					if (!this.player.sim.getShow2hWeapons() && listItem.weaponType != WeaponType.WeaponTypeUnknown && listItem.handType == HandType.HandTypeTwoHand) {
 						return false;
 					}
 				} else if (label == 'Enchants') {
