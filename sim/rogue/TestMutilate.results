@@ -791,14 +791,14 @@ dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongMultiTarget"
  value: {
   dps: 532.9663341483157
-  tps: 378.40609724530407
+  tps: 378.40609724530395
  }
 }
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTarget"
  value: {
   dps: 532.9663341483157
-  tps: 378.40609724530407
+  tps: 378.40609724530395
  }
 }
 dps_results: {

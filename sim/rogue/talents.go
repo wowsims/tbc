@@ -215,14 +215,14 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 	}
 
 	// https://tbc.wowhead.com/spell=13964/sword-specialization, proc mask = 20.
-	swordSpecMask := core.ProcMaskEmpty
+	swordSpecMask := core.ProcMaskUnknown
 	if rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeSword {
 		swordSpecMask |= core.ProcMaskMeleeMH
 	}
 	if rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeSword {
 		swordSpecMask |= core.ProcMaskMeleeOH
 	}
-	if rogue.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskEmpty {
+	if rogue.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskUnknown {
 		var swordSpecializationSpell *core.Spell
 		icd := core.Cooldown{
 			Timer:    rogue.NewTimer(),
