@@ -50,13 +50,16 @@ export class RaidTargetPicker extends Input {
     }
     updateOptions(eventID) {
         this.currentOptions = this.makeTargetOptions();
+        this.dropdownElem.innerHTML = '';
+        this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
         const prevRaidTarget = this.curRaidTarget;
         this.curRaidTarget = this.getInputValue();
         if (!RaidTarget.equals(prevRaidTarget, this.curRaidTarget)) {
             this.inputChanged(eventID);
         }
-        this.dropdownElem.innerHTML = '';
-        this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+        else {
+            this.setInputValue(this.curRaidTarget);
+        }
     }
     makeOption(data) {
         const option = RaidTargetPicker.makeOptionElem(data);
