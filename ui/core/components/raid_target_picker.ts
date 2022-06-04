@@ -92,16 +92,16 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	private updateOptions(eventID: EventID) {
 		this.currentOptions = this.makeTargetOptions();
 
+		this.dropdownElem.innerHTML = '';
+		this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+
 		const prevRaidTarget = this.curRaidTarget;
 		this.curRaidTarget = this.getInputValue();
 		if (!RaidTarget.equals(prevRaidTarget, this.curRaidTarget)) {
 			this.inputChanged(eventID);
+		} else {
+			this.setInputValue(this.curRaidTarget);
 		}
-
-		this.dropdownElem.innerHTML = '';
-		this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
-
-		this.setInputValue(this.curRaidTarget);
 	}
 
 	private makeOption(data: RaidTargetOption): HTMLElement {
