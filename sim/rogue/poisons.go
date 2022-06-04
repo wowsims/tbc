@@ -69,7 +69,7 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 		!hasWFTotem && rogue.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison,
 		rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison)
 
-	if procMask == core.ProcMaskEmpty {
+	if procMask == core.ProcMaskUnknown {
 		return
 	}
 
@@ -115,7 +115,7 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 		!hasWFTotem && rogue.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison,
 		rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison)
 
-	if procMask == core.ProcMaskEmpty {
+	if procMask == core.ProcMaskUnknown {
 		return
 	}
 

@@ -135,8 +135,8 @@ func (warrior *Warrior) applyOneHandedWeaponSpecialization() {
 }
 
 func (warrior *Warrior) applyWeaponSpecializations() {
-	maceSpecMask := core.ProcMaskEmpty
-	swordSpecMask := core.ProcMaskEmpty
+	maceSpecMask := core.ProcMaskUnknown
+	swordSpecMask := core.ProcMaskUnknown
 	if weapon := warrior.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe || weapon.WeaponType == proto.WeaponType_WeaponTypePolearm {
 			warrior.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(warrior.Talents.PoleaxeSpecialization)
@@ -156,7 +156,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 		}
 	}
 
-	if warrior.Talents.MaceSpecialization > 0 && maceSpecMask != core.ProcMaskEmpty {
+	if warrior.Talents.MaceSpecialization > 0 && maceSpecMask != core.ProcMaskUnknown {
 		ppmm := warrior.AutoAttacks.NewPPMManager(1.5)
 
 		warrior.RegisterAura(core.Aura{
@@ -188,7 +188,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 		})
 	}
 
-	if warrior.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskEmpty {
+	if warrior.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskUnknown {
 		var swordSpecializationSpell *core.Spell
 		icd := core.Cooldown{
 			Timer:    warrior.NewTimer(),
