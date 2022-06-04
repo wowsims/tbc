@@ -131,11 +131,37 @@ func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Enco
 	}
 	env.postFinalizeEffects = nil
 
-	for _, target := range env.Encounter.Targets {
-		target.setupAttackTables()
-	}
+	env.setupAttackTables()
 
 	env.State = Finalized
+}
+
+func (env *Environment) setupAttackTables() {
+	raidUnits := env.Raid.AllUnits
+	if len(raidUnits) == 0 {
+		return
+	}
+
+	for _, target := range env.Encounter.Targets {
+		target.AttackTables = make([]*AttackTable, len(raidUnits))
+		target.DefenseTables = make([]*AttackTable, len(raidUnits))
+
+		for attackerIndex, attacker := range raidUnits {
+			if attacker.AttackTables == nil {
+				attacker.AttackTables = make([]*AttackTable, env.GetNumTargets())
+				attacker.DefenseTables = make([]*AttackTable, env.GetNumTargets())
+			}
+
+			attackTable := NewAttackTable(attacker, &target.Unit)
+			defenseTable := NewAttackTable(&target.Unit, attacker)
+
+			attacker.AttackTables[target.Index] = attackTable
+			attacker.DefenseTables[target.Index] = defenseTable
+
+			target.AttackTables[attackerIndex] = defenseTable
+			target.DefenseTables[attackerIndex] = attackTable
+		}
+	}
 }
 
 func (env *Environment) IsFinalized() bool {

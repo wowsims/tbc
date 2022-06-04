@@ -110,32 +110,6 @@ func (target *Target) finalize() {
 	target.Unit.finalize()
 }
 
-func (target *Target) setupAttackTables() {
-	raidUnits := target.Env.Raid.AllUnits
-	if len(raidUnits) == 0 {
-		return
-	}
-	numTables := raidUnits[len(raidUnits)-1].Index + 1
-	target.AttackTables = make([]*AttackTable, numTables)
-	target.DefenseTables = make([]*AttackTable, numTables)
-
-	for _, attacker := range raidUnits {
-		if attacker.AttackTables == nil {
-			attacker.AttackTables = make([]*AttackTable, target.Env.GetNumTargets())
-			attacker.DefenseTables = make([]*AttackTable, target.Env.GetNumTargets())
-		}
-
-		attackTable := NewAttackTable(attacker, &target.Unit)
-		defenseTable := NewAttackTable(&target.Unit, attacker)
-
-		attacker.AttackTables[target.Index] = attackTable
-		attacker.DefenseTables[target.Index] = defenseTable
-
-		target.AttackTables[attacker.Index] = defenseTable
-		target.DefenseTables[attacker.Index] = attackTable
-	}
-}
-
 func (target *Target) init(sim *Simulation) {
 	target.Unit.init(sim)
 }

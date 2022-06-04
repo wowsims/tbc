@@ -6,6 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	balanceDruid "github.com/wowsims/tbc/sim/druid/balance"
 	hunter "github.com/wowsims/tbc/sim/hunter"
@@ -145,3 +146,21 @@ func TestBasicRaid(t *testing.T) {
 
 	core.RaidSimTest("P1 ST", t, rsr, 6260.88)
 }
+
+func testRaidString(t *testing.T, raidString string) {
+	rsr := &proto.RaidSimRequest{}
+
+	data := []byte(raidString)
+	if err := protojson.Unmarshal(data, rsr); err != nil {
+		panic(err)
+	}
+
+	core.RunRaidSim(rsr)
+	//core.RaidSimTest("Fixed Raid", t, rsr, 10000.00)
+}
+
+// To quickly debug raid sim issues, uncomment this test and copy in a request string.
+// func TestFixedRaid(t *testing.T) {
+// 	testRaidString(t, `
+// 	`)
+// }
