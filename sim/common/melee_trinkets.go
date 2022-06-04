@@ -425,7 +425,7 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 	if procChanceOnHitDealt > 0 {
 		onSpellHitDealt = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) && sim.RandomFloat("DMC Vengeance") < procChanceOnHitDealt {
-				procSpell.Cast(sim, spell.Unit)
+				procSpell.Cast(sim, spellEffect.Target)
 			}
 		}
 	}
