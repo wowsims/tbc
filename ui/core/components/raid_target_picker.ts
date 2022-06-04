@@ -100,6 +100,8 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 
 		this.dropdownElem.innerHTML = '';
 		this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+
+		this.setInputValue(this.curRaidTarget);
 	}
 
 	private makeOption(data: RaidTargetOption): HTMLElement {
