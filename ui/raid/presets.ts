@@ -21,6 +21,7 @@ import { Player } from '/tbc/core/player.js';
 import { BuffBot } from './buff_bot.js';
 
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
+import * as FeralTankDruidPresets from '/tbc/feral_tank_druid/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
 import * as HunterPresets from '/tbc/hunter/presets.js';
@@ -36,6 +37,7 @@ import * as WarlockPresets from '/tbc/warlock/presets.js';
 
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
+import { FeralTankDruidSimUI } from '/tbc/feral_tank_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { HunterSimUI } from '/tbc/hunter/sim.js';
@@ -51,6 +53,7 @@ import { WarlockSimUI } from '/tbc/warlock/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
+	[Spec.SpecFeralTankDruid]: (parentElem: HTMLElement, player: Player<any>) => new FeralTankDruidSimUI(parentElem, player),
 	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
 	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
 	[Spec.SpecHunter]: (parentElem: HTMLElement, player: Player<any>) => new HunterSimUI(parentElem, player),
@@ -132,6 +135,38 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		},
 		tooltip: specNames[Spec.SpecBalanceDruid],
 		iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
+	},
+	{
+		spec: Spec.SpecFeralTankDruid,
+		rotation: FeralTankDruidPresets.DefaultRotation,
+		talents: FeralTankDruidPresets.StandardTalents.data,
+		specOptions: FeralTankDruidPresets.DefaultOptions,
+		consumes: FeralTankDruidPresets.DefaultConsumes,
+		defaultName: 'Bear Druid',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceNightElf,
+			[Faction.Horde]: Race.RaceTauren,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: FeralTankDruidPresets.P1_PRESET.gear,
+				2: FeralTankDruidPresets.P2_PRESET.gear,
+				3: FeralTankDruidPresets.P3_PRESET.gear,
+				4: FeralTankDruidPresets.P4_PRESET.gear,
+				5: FeralTankDruidPresets.P5_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: FeralTankDruidPresets.P1_PRESET.gear,
+				2: FeralTankDruidPresets.P2_PRESET.gear,
+				3: FeralTankDruidPresets.P3_PRESET.gear,
+				4: FeralTankDruidPresets.P4_PRESET.gear,
+				5: FeralTankDruidPresets.P5_PRESET.gear,
+			},
+		},
+		tooltip: specNames[Spec.SpecFeralTankDruid],
+		iconUrl: specIconsLarge[Spec.SpecFeralTankDruid],
 	},
 	{
 		spec: Spec.SpecHunter,
@@ -749,6 +784,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 	{
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Bear',
+		deprecated: true,
 		spec: Spec.SpecBalanceDruid,
 		name: 'Bear',
 		tooltip: 'Bear: Adds Gift of the Wild, an Innervate, Faerie Fire, and Leader of the Pack.',
