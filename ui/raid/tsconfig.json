@@ -10,6 +10,7 @@
 	"references": [
 		{ "path": "../core" },
 		{ "path": "../balance_druid" },
+		{ "path": "../feral_tank_druid" },
 		{ "path": "../elemental_shaman" },
 		{ "path": "../enhancement_shaman" },
 		{ "path": "../hunter" },

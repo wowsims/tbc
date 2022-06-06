@@ -513,7 +513,7 @@ message Target {
 		bool dual_wield_penalty = 10;
 		bool can_crush = 11;
 		bool parry_haste = 12;
-		bool suppress_dodge = 16;
+		bool suppress_dodge = 16; // Sunwell Radiance
 		SpellSchool spell_school = 13; // Allows elemental attacks.
 
 		// Index in Raid.tanks indicating the player tanking this mob.
