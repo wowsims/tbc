@@ -39,7 +39,7 @@ export const DefaultConsumes = Consumes.create({
     battleElixir: BattleElixir.ElixirOfMajorAgility,
     guardianElixir: GuardianElixir.GiftOfArthas,
     food: Food.FoodGrilledMudfish,
-    defaultPotion: Potions.HastePotion,
+    defaultPotion: Potions.IronshieldPotion,
     defaultConjured: Conjured.ConjuredFlameCap,
     scrollOfAgility: 5,
     scrollOfStrength: 5,
@@ -105,11 +105,11 @@ export const P1_PRESET = {
 		},
 		{
 			"id": 29279,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 28792,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 28830
@@ -196,11 +196,11 @@ export const P2_PRESET = {
 		},
 		{
 			"id": 29279,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 28792,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 28579
@@ -287,11 +287,11 @@ export const P3_PRESET = {
 		},
 		{
 			"id": 29279,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 32266,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 32501
@@ -378,11 +378,11 @@ export const P4_PRESET = {
 		},
 		{
 			"id": 29279,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 29301,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 32501
@@ -471,11 +471,11 @@ export const P5_PRESET = {
 		},
 		{
 			"id": 34213,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 34361,
-			"enchant": 22535
+			"enchant": 22538
 		},
 		{
 			"id": 32501
