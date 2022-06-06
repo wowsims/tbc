@@ -31,8 +31,14 @@ func (druid *Druid) registerInnervateCD() {
 	druid.RegisterResetEffect(func(sim *core.Simulation) {
 		expectedManaPerInnervate = innervateTarget.SpiritManaRegenPerSecond() * 5 * 20
 		if innervateTarget == druid.GetCharacter() {
-			// Threshold can be lower when casting on self because its never mid-cast.
-			innervateManaThreshold = 500
+			if druid.StartingForm.Matches(Cat) {
+				// double shift + innervate cost.
+				// Prevents not having enough mana to shift back into form if more powershift are executed
+				innervateManaThreshold = druid.CatForm.DefaultCast.Cost*2 + baseCost
+			} else {
+				// Threshold can be lower when casting on self because its never mid-cast.
+				innervateManaThreshold = 500
+			}
 		} else {
 			innervateManaThreshold = core.InnervateManaThreshold(innervateTarget)
 		}
@@ -76,7 +82,9 @@ func (druid *Druid) registerInnervateCD() {
 			if character.CurrentMana() < baseCost {
 				return false
 			}
-
+			if druid.InForm(Bear) || druid.InForm(Cat) {
+				return false
+			}
 			// If target already has another innervate, don't cast.
 			if innervateTarget.HasActiveAuraWithTag(core.InnervateAuraTag) {
 				return false

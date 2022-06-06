@@ -14,12 +14,12 @@ func (druid *Druid) ApplyTalents() {
 	druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
 	druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
 
-	if druid.Form.Matches(Bear | Cat) {
+	if druid.InForm(Bear | Cat) {
 		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*float64(core.CharacterLevel))
 		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
 		druid.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*2*float64(druid.Talents.FeralSwiftness))
 	}
-	if druid.Form.Matches(Bear) {
+	if druid.InForm(Bear) {
 		druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.5/3)*float64(druid.Talents.ThickHide))
 	} else {
 		druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.1/3)*float64(druid.Talents.ThickHide))
@@ -57,7 +57,7 @@ func (druid *Druid) ApplyTalents() {
 			},
 		})
 
-		if druid.Form.Matches(Cat) {
+		if druid.InForm(Cat) {
 			druid.AddStatDependency(stats.StatDependency{
 				SourceStat:   stats.AttackPower,
 				ModifiedStat: stats.AttackPower,
@@ -65,7 +65,7 @@ func (druid *Druid) ApplyTalents() {
 					return attackPower + attackPower*0.5*bonus
 				},
 			})
-		} else if druid.Form.Matches(Bear) {
+		} else if druid.InForm(Bear) {
 			druid.AddStatDependency(stats.StatDependency{
 				SourceStat:   stats.Stamina,
 				ModifiedStat: stats.Stamina,
@@ -232,24 +232,30 @@ func (druid *Druid) applyPrimalFury() {
 	procChance := 0.5 * float64(druid.Talents.PrimalFury)
 	actionID := core.ActionID{SpellID: 37117}
 
-	if druid.Form.Matches(Bear) {
-		druid.RegisterAura(core.Aura{
-			Label:    "Primal Fury",
-			Duration: core.NeverExpires,
-			OnReset: func(aura *core.Aura, sim *core.Simulation) {
-				aura.Activate(sim)
-			},
-			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	druid.RegisterAura(core.Aura{
+		Label:    "Primal Fury",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if druid.InForm(Bear) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					if procChance == 1 || sim.RandomFloat("Primal Fury") < procChance {
 						druid.AddRage(sim, 5, actionID)
 					}
 				}
-			},
-		})
-	} else if druid.Form.Matches(Cat) {
-		// TODO
-	}
+			} else if druid.InForm(Cat) {
+				if spell == druid.Mangle || spell == druid.Shred {
+					if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+						if procChance == 1 || sim.RandomFloat("Primal Fury") < procChance {
+							druid.AddComboPoints(sim, 1, actionID)
+						}
+					}
+				}
+			}
+		},
+	})
 }
 
 func (druid *Druid) applyOmenOfClarity() {

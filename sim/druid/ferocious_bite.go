@@ -43,7 +43,12 @@ func (druid *Druid) registerFerociousBiteSpell() {
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					comboPoints := float64(druid.ComboPoints())
-					excessEnergy := druid.CurrentEnergy() - spell.DefaultCast.Cost
+
+					// Base amount already spent, remove the rest (listed twice in logs, better way to do this?)
+					excessEnergy := druid.CurrentEnergy()
+					druid.SpendEnergy(sim, druid.CurrentEnergy(), actionID)
+					//
+
 					base := 57.0 + dmgPerComboPoint*comboPoints + 4.1*excessEnergy
 					roll := sim.RandomFloat("Ferocious Bite") * 66.0
 					return base + roll + hitEffect.MeleeAttackPower(spell.Unit)*0.05*comboPoints

@@ -39,6 +39,7 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	cat := &FeralDruid{
 		Druid:    druid.New(character, druid.Cat, selfBuffs, *feralOptions.Talents),
 		Rotation: *feralOptions.Rotation,
+		latency:  time.Duration(feralOptions.Options.LatencyMs) * time.Millisecond,
 	}
 
 	// Passive Cat Form threat reduction
@@ -48,7 +49,6 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	cat.HasMHWeaponImbue = true
 
 	cat.EnableEnergyBar(100.0, func(sim *core.Simulation) {
-		cat.TryUseCooldowns(sim)
 		if cat.GCD.IsReady(sim) {
 			cat.doRotation(sim)
 		}
@@ -93,8 +93,10 @@ type FeralDruid struct {
 
 	Rotation proto.FeralDruid_Rotation
 
+	// currently unused
 	readyToShift   bool
 	waitingForTick bool
+	latency        time.Duration
 }
 
 func (cat *FeralDruid) GetDruid() *druid.Druid {

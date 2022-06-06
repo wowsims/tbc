@@ -70,9 +70,9 @@ var ItemSetMalorneHarness = core.ItemSet{
 				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 						if sim.RandomFloat("Malorne 2pc") < procChance {
-							if druid.Form.Matches(Bear) {
+							if druid.InForm(Bear) {
 								druid.AddRage(sim, 10, core.ActionID{SpellID: 37306})
-							} else if druid.Form.Matches(Cat) {
+							} else if druid.InForm(Cat) {
 								druid.AddEnergy(sim, 20, core.ActionID{SpellID: 37311})
 							}
 						}
@@ -82,9 +82,9 @@ var ItemSetMalorneHarness = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			druid := agent.(DruidAgent).GetDruid()
-			if druid.Form.Matches(Bear) {
+			if druid.InForm(Bear) {
 				druid.AddStat(stats.Armor, 1400)
-			} else if druid.Form.Matches(Cat) {
+			} else if druid.InForm(Cat) {
 				druid.AddStat(stats.Strength, 30)
 			}
 		},
@@ -137,11 +137,11 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druid := agent.(DruidAgent).GetDruid()
 
 	var procAura *core.Aura
-	if druid.Form.Matches(Moonkin) {
+	if druid.InForm(Moonkin) {
 		procAura = druid.NewTemporaryStatsAura("Living Root Moonkin Proc", core.ActionID{SpellID: 37343}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
-	} else if druid.Form.Matches(Bear) {
+	} else if druid.InForm(Bear) {
 		procAura = druid.NewTemporaryStatsAura("Living Root Bear Proc", core.ActionID{SpellID: 37340}, stats.Stats{stats.Armor: 4070}, time.Second*15)
-	} else if druid.Form.Matches(Cat) {
+	} else if druid.InForm(Cat) {
 		procAura = druid.NewTemporaryStatsAura("Living Root Cat Proc", core.ActionID{SpellID: 37341}, stats.Stats{stats.Strength: 64}, time.Second*15)
 	} else {
 		return
@@ -154,7 +154,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if druid.Form.Matches(Moonkin) && sim.RandomFloat("Living Root of the Wildheart") < 0.03 {
+			if druid.InForm(Moonkin) && sim.RandomFloat("Living Root of the Wildheart") < 0.03 {
 				procAura.Activate(sim)
 			}
 		},
@@ -180,9 +180,9 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 	actionID := core.ActionID{ItemID: 32486}
 
 	var procAura *core.Aura
-	if druid.Form.Matches(Moonkin) {
+	if druid.InForm(Moonkin) {
 		procAura = druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
-	} else if druid.Form.Matches(Bear | Cat) {
+	} else if druid.InForm(Bear | Cat) {
 		procAura = druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.Strength: 140}, time.Second*8)
 	} else {
 		return

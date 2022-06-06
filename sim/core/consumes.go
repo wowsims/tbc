@@ -374,7 +374,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	var actionID ActionID
-	var cooldownType int32
+	var cooldownType CooldownType
 	if drumsType == proto.Drums_DrumsOfBattle {
 		actionID = DrumsOfBattleActionID
 		cooldownType = CooldownTypeDPS
@@ -390,7 +390,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 
 	mcd := MajorCooldown{
 		Priority: CooldownPriorityDrums,
-		Type:     cooldownType,
+		Type:     cooldownType | CooldownTypeUsableShapeShifted,
 	}
 
 	if drumsSelfCast {
