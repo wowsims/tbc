@@ -2,6 +2,7 @@
 
 Live sims:
  - [Balance Druid](https://wowsims.github.io/tbc/balance_druid/ "https://wowsims.github.io/tbc/balance_druid/")
+ - [Feral Tank Druid](https://wowsims.github.io/tbc/feral_tank_druid/ "https://wowsims.github.io/tbc/feral_tank_druid/")
  - [Hunter](https://wowsims.github.io/tbc/hunter/ "https://wowsims.github.io/tbc/hunter/")
  - [Mage](https://wowsims.github.io/tbc/mage/ "https://wowsims.github.io/tbc/mage/")
  - [Retribution Paladin](https://wowsims.github.io/tbc/retribution_paladin/ "https://wowsims.github.io/tbc/retribution_paladin/")
