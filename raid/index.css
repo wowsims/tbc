@@ -1,29 +1,4 @@
 @charset "UTF-8";
-.balance-druid-sim-ui {
-  --theme-color-primary: #e0a335;
-  --theme-color-background: #1d1510;
-  --theme-color-background-raw: 29, 21, 16;
-  --theme-background-image: url("/tbc/assets/balance_druid_background.jpg");
-  --theme-background-opacity: 0.95;
-  --main-text-color: White;
-}
-
-.balance-druid-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(1, 1fr);
-}
-
-.balance-druid-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.balance-druid-sim-ui .debuffs-section {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.balance-druid-sim-ui .character-stats-table-row {
-  font-size: 14px;
-}
-
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;
@@ -3032,6 +3007,59 @@ input, select {
 
 .saved-talents-manager .saved-data-container, .saved-talents-manager .saved-data-create-container {
   display: inline-block;
+}
+
+.balance-druid-sim-ui {
+  --theme-color-primary: #e0a335;
+  --theme-color-background: #1d1510;
+  --theme-color-background-raw: 29, 21, 16;
+  --theme-background-image: url("/tbc/assets/balance_druid_background.jpg");
+  --theme-background-opacity: 0.95;
+  --main-text-color: White;
+}
+
+.balance-druid-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.balance-druid-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.balance-druid-sim-ui .debuffs-section {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.balance-druid-sim-ui .character-stats-table-row {
+  font-size: 14px;
+}
+
+.feral-tank-druid-sim-ui {
+  --theme-color-primary: #e0a335;
+  --theme-color-background: #1d1510;
+  --theme-color-background-raw: 29, 21, 16;
+  --theme-background-image: url("/tbc/assets/feral_druid_tank_background.jpg");
+  --main-text-color: White;
+}
+
+.feral-tank-druid-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.feral-tank-druid-sim-ui .consumes-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feral-tank-druid-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feral-tank-druid-sim-ui .debuffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feral-tank-druid-sim-ui .character-stats-table-row {
+  font-size: 12px;
 }
 
 .totem-dropdowns-container {
