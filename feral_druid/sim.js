@@ -162,6 +162,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                 IconInputs.ExposeArmor,
                 IconInputs.SunderArmor,
                 IconInputs.GiftOfArthas,
+                IconInputs.Mangle,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {
