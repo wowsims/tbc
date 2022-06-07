@@ -48,11 +48,6 @@ var GemDeclarationOverrides = []GemDeclaration{
 	{ID: 38549, Filter: true},
 	{ID: 38550, Filter: true},
 
-	// BoP version of gems that can be made non-bop
-	{ID: 35487, Filter: true},
-	{ID: 35488, Filter: true},
-	{ID: 35489, Filter: true},
-
 	// Other gems to ignore.
 	{ID: 35315, Filter: true},
 	{ID: 35316, Filter: true},
