@@ -160,8 +160,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1227.7561697715828
-  tps: 859.672329665805
+  dps: 1231.3020698881476
+  tps: 862.189918748566
  }
 }
 dps_results: {
@@ -174,8 +174,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1205.0822966269939
-  tps: 843.5701863651327
+  dps: 1207.134312929221
+  tps: 845.0271179397141
  }
 }
 dps_results: {
@@ -209,8 +209,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1192.8373272634265
-  tps: 834.8544459833522
+  dps: 1197.7403849523619
+  tps: 838.3356169424957
  }
 }
 dps_results: {

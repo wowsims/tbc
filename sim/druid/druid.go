@@ -26,6 +26,7 @@ type Druid struct {
 	Maul             *core.Spell
 	Moonfire         *core.Spell
 	Rebirth          *core.Spell
+	Rake             *core.Spell
 	Rip              *core.Spell
 	Shred            *core.Spell
 	Starfire6        *core.Spell
@@ -39,6 +40,7 @@ type Druid struct {
 	InsectSwarmDot *core.Dot
 	LacerateDot    *core.Dot
 	MoonfireDot    *core.Dot
+	RakeDot        *core.Dot
 	RipDot         *core.Dot
 
 	DemoralizingRoarAura *core.Aura

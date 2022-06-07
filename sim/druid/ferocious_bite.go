@@ -17,6 +17,8 @@ func (druid *Druid) registerFerociousBiteSpell() {
 		dmgPerComboPoint += 14
 	}
 
+	var excessEnergy float64
+
 	druid.FerociousBite = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
@@ -31,6 +33,10 @@ func (druid *Druid) registerFerociousBiteSpell() {
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
+			ModifyCast: func(_ *core.Simulation, spell *core.Spell, cast *core.Cast) {
+				cast.Cost = spell.Unit.CurrentEnergy()
+				excessEnergy = spell.Unit.CurrentEnergy() - spell.BaseCost
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -43,11 +49,6 @@ func (druid *Druid) registerFerociousBiteSpell() {
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					comboPoints := float64(druid.ComboPoints())
-
-					// Base amount already spent, remove the rest (listed twice in logs, better way to do this?)
-					excessEnergy := druid.CurrentEnergy()
-					druid.SpendEnergy(sim, druid.CurrentEnergy(), actionID)
-					//
 
 					base := 57.0 + dmgPerComboPoint*comboPoints + 4.1*excessEnergy
 					roll := sim.RandomFloat("Ferocious Bite") * 66.0
