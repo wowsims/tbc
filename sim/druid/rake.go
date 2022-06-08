@@ -28,7 +28,7 @@ func (druid *Druid) registerRakeSpell() {
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
 				Cost: cost,
-				GCD:  core.GCDDefault,
+				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
 		},
@@ -93,5 +93,5 @@ func (druid *Druid) registerRakeSpell() {
 }
 
 func (druid *Druid) CanRake(sim *core.Simulation) bool {
-	return druid.CurrentRage() >= druid.Rake.DefaultCast.Cost
+	return druid.CurrentEnergy() >= druid.Rake.DefaultCast.Cost
 }
