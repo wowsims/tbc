@@ -170,6 +170,7 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
                 IconInputs.GraceOfAirTotem,
                 IconInputs.BattleShout,
                 IconInputs.CommandingShout,
+                IconInputs.DraeneiRacialCaster,
                 IconInputs.DraeneiRacialMelee,
                 IconInputs.LeaderOfThePack,
                 IconInputs.FerociousInspiration,
