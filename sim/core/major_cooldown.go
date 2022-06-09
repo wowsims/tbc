@@ -358,13 +358,15 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 		if mcd.tryActivateInternal(sim, mcdm.character) {
 			if mcdm.sortOne(mcd, curIdx) {
 				if mcdm.fullSort {
+					// We need to re-sort the whole array
 					mcdm.sort()
-					curIdx = 0
 					mcdm.fullSort = false
+					// Reset back to start because new things could be available to activate now.
+					curIdx = 0
 				} else {
+					// This just means the current MCD was sorted further back and now we need to re-check the current idx.
 					curIdx--
 				}
-
 			}
 			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
@@ -377,6 +379,10 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	mcdm.tryUsing = false
 }
 
+// sortOne will take the given mcd and attempt to sort it towards the back.
+// If it finds a linked CD (like trinkets that share offensive CD) it will sort them backwards first.
+//  If while sorting it finds something further back with lower CD than the previous one (for example, after activating cold snap)
+//  it will mark that the whole slice needs to be re-sorted "mcdm.fullSort" and returns immediately.
 func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) bool {
 	newReadyAt := mcd.ReadyAt()
 	var lastReadAt time.Duration
