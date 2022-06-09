@@ -21,16 +21,6 @@ func (form DruidForm) Matches(other DruidForm) bool {
 	return (form & other) != 0
 }
 
-func (druid *Druid) setForm(form DruidForm, sim *core.Simulation) {
-	if form == druid.form {
-		return
-	}
-
-	druid.form = form
-
-	druid.manageCooldownsEnabled(sim)
-}
-
 func (druid *Druid) GetForm() DruidForm {
 	return druid.form
 }
@@ -39,36 +29,49 @@ func (druid *Druid) InForm(form DruidForm) bool {
 	return druid.form.Matches(form)
 }
 
-func (druid *Druid) PowerShiftCat(sim *core.Simulation) {
+func (druid *Druid) PowerShiftCat(sim *core.Simulation) bool {
 
 	if !druid.GCD.IsReady(sim) {
 		panic("Trying to powershift during gcd")
 	}
-	// Go out of form
-	druid.setForm(Humanoid, sim)
 
-	druid.energyBeforeShift = druid.CurrentEnergy()
-
-	// Try use cds
+	druid.CatFormAura.Deactivate(sim)
 	druid.TryUseCooldowns(sim)
 
-	// If cds did not trigger gcd (innervate), powershift
 	if druid.GCD.IsReady(sim) {
-		druid.CatForm.Cast(sim, nil)
-	} else {
-		druid.AutoAttacks.CancelAutoSwing(sim)
+		return druid.CatForm.Cast(sim, nil)
 	}
+
+	return true
 }
 
 func (druid *Druid) registerCatFormSpell() {
 	actionID := core.ActionID{SpellID: 768}
 	baseCost := druid.BaseMana() * 0.35
 
+	previousEnergy := 0.0
 	finalEnergy := 0.0
 	furorProcChance := 0.2 * float64(druid.Talents.Furor)
 	if druid.Equip[items.ItemSlotHead].ID == 8345 { // Wolfshead Helm
 		finalEnergy += 20.0
 	}
+
+	druid.CatFormAura = druid.GetOrRegisterAura(core.Aura{
+		Label:    "Cat Form",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			druid.form = Humanoid
+			previousEnergy = druid.CurrentEnergy()
+			druid.AutoAttacks.CancelAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+		},
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			druid.form = Cat
+			druid.AutoAttacks.EnableAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+		},
+	})
 
 	druid.CatForm = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
@@ -86,7 +89,7 @@ func (druid *Druid) registerCatFormSpell() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
-			energyDelta := finalEnergy - druid.energyBeforeShift
+			energyDelta := finalEnergy - previousEnergy
 			if furorProcChance == 1 || (furorProcChance > 0 && sim.RandomFloat("Furor") < furorProcChance) {
 				energyDelta += 40.0
 			}
@@ -95,8 +98,7 @@ func (druid *Druid) registerCatFormSpell() {
 			} else if energyDelta < 0 {
 				druid.SpendEnergy(sim, -energyDelta, spell.ActionID)
 			}
-			druid.setForm(Cat, sim)
-			druid.AutoAttacks.EnableAutoSwing(sim)
+			druid.CatFormAura.Activate(sim)
 		},
 	})
 }
@@ -106,29 +108,42 @@ func (druid *Druid) PowerShiftBear(sim *core.Simulation) {
 	if !druid.GCD.IsReady(sim) {
 		panic("Trying to powershift during gcd")
 	}
-	// Go out of form
-	druid.setForm(Humanoid, sim)
 
-	// Try use cds
+	druid.BearFormAura.Deactivate(sim)
 	druid.TryUseCooldowns(sim)
 
-	// If cds did not trigger gcd (innervate), powershift
 	if druid.GCD.IsReady(sim) {
 		druid.BearForm.Cast(sim, nil)
-	} else {
-		druid.AutoAttacks.CancelAutoSwing(sim)
 	}
 }
 
 func (druid *Druid) registerBearFormSpell() {
 	actionID := core.ActionID{SpellID: 9634}
 	baseCost := druid.BaseMana() * 0.35
-
 	furorProcChance := 0.2 * float64(druid.Talents.Furor)
+
+	previousRage := 0.0
 	finalRage := 0.0
 	if druid.Equip[items.ItemSlotHead].ID == 8345 { // Wolfshead Helm
 		finalRage += 5.0
 	}
+
+	druid.BearFormAura = druid.GetOrRegisterAura(core.Aura{
+		Label:    "Bear Form",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			previousRage = druid.CurrentRage()
+			druid.form = Humanoid
+			druid.AutoAttacks.CancelAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+		},
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			druid.form = Bear
+			druid.AutoAttacks.EnableAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+		},
+	})
 
 	druid.BearForm = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
@@ -146,26 +161,26 @@ func (druid *Druid) registerBearFormSpell() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
-			dRage := finalRage - druid.CurrentEnergy()
+			rageDelta := finalRage - previousRage
 			if furorProcChance == 1 || (furorProcChance > 0 && sim.RandomFloat("Furor") < furorProcChance) {
 				finalRage += 10.0
 			}
-			if dRage > 0 {
-				druid.AddRage(sim, dRage, spell.ActionID)
-			} else if dRage < 0 {
-				druid.SpendRage(sim, -dRage, spell.ActionID)
+			if rageDelta > 0 {
+				druid.AddRage(sim, rageDelta, spell.ActionID)
+			} else if rageDelta < 0 {
+				druid.SpendRage(sim, -rageDelta, spell.ActionID)
 			}
-			druid.setForm(Bear, sim)
-			druid.AutoAttacks.EnableAutoSwing(sim)
+			druid.BearFormAura.Activate(sim)
 		},
 	})
 }
 
+// A bit arbitrary
 const cooldownDelayThresHold = time.Second * 10
 
-// Disable cooldowns not usable in form and/or delay others
 func (druid *Druid) manageCooldownsEnabled(sim *core.Simulation) {
 
+	// Disable cooldowns not usable in form and/or delay others
 	if druid.StartingForm.Matches(Cat | Bear) {
 
 		druid.EnableAllCooldowns(druid.disabledMCDs)

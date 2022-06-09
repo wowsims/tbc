@@ -13,6 +13,22 @@ func (cat *FeralDruid) OnGCDReady(sim *core.Simulation) {
 	cat.doRotation(sim)
 }
 
+// Ported from https://github.com/NerdEgghead/TBC_cat_sim
+
+func (cat *FeralDruid) shift(sim *core.Simulation) bool {
+	cat.waitingForTick = false
+
+	// If we have just now decided to shift, then we do not execute the
+	// shift immediately, but instead trigger an input delay for realism.
+	if !cat.readyToShift {
+		cat.readyToShift = true
+		return false
+	}
+
+	cat.readyToShift = false
+	return cat.PowerShiftCat(sim)
+}
+
 func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 
 	// On gcd do nothing
@@ -25,13 +41,11 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		return cat.CatForm.Cast(sim, nil)
 	}
 
-	// Ported from https://github.com/NerdEgghead/TBC_cat_sim
-
 	// If we previously decided to shift, then execute the shift now once
 	// the input delay is over.
-	// if cat.readyToShift {
-	// 	cat.PowerShiftCat(sim)
-	// }
+	if cat.readyToShift {
+		return cat.shift(sim)
+	}
 
 	//strategy = {
 
@@ -66,6 +80,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	rip_end := cat.RipDot.ExpiresAt()
 	mangle_debuff := cat.MangleAura.IsActive()
 	mangle_end := cat.MangleAura.ExpiresAt()
+	rake_debuff := cat.RakeDot.IsActive()
 	next_tick := cat.NextEnergyTickAt()
 	fight_length := sim.Duration
 	wolfshead := cat.Equip[items.ItemSlotHead].ID == 8345
@@ -140,12 +155,12 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		}
 	} else if energy < 10 {
-		cat.PowerShiftCat(sim)
+		cat.shift(sim)
 	} else if rip_now {
 		if (energy >= 30) || omen_proc {
 			cat.Rip.Cast(sim, cat.CurrentTarget)
 		} else if time_to_next_tick > max_wait_time {
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		}
 	} else if (bite_now || bite_at_end) && prio_bite_over_mangle {
 		// Decision tree for Bite usage is more complicated, so there is
@@ -184,12 +199,12 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 			wait = true
 		} else if (!rip_next) && ((energy < 20) || (!mangle_next)) {
 			wait = false
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		} else {
 			wait = true
 		}
 		if wait && (time_to_next_tick > max_wait_time) {
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		}
 	} else if energy >= 35 && energy <= bite_trick_max &&
 		use_bite_trick &&
@@ -197,20 +212,19 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		!omen_proc &&
 		cp >= bite_trick_cp {
 		return cat.FerociousBite.Cast(sim, cat.CurrentTarget)
-		// no rake implemented yet
-		//    } else if (energy >= 35 && energy < mangle_cost &&
-		//          use_rake_trick &&
-		//          (time_to_next_tick > 1 + self.latency) &&
-		//          !self.rake_debuff &&
-		//          !omen_proc) {
-		//        return self.rake(time)
+	} else if energy >= 35 && energy < mangle_cost &&
+		use_rake_trick &&
+		(time_to_next_tick > 1*time.Second+latency) &&
+		!rake_debuff &&
+		!omen_proc {
+		return cat.Rake.Cast(sim, cat.CurrentTarget)
 	} else if mangle_now {
 		if (energy < mangle_cost-20) && (!rip_next) {
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		} else if (energy >= mangle_cost) || omen_proc {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		} else if time_to_next_tick > max_wait_time {
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		}
 	} else if energy >= 22 {
 		if omen_proc {
@@ -236,12 +250,12 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		}
 		if time_to_next_tick > max_wait_time {
-			cat.PowerShiftCat(sim)
+			cat.shift(sim)
 		}
 	} else if (!rip_next) && ((energy < mangle_cost-20) || (!wait_to_mangle)) {
-		cat.PowerShiftCat(sim)
+		cat.shift(sim)
 	} else if time_to_next_tick > max_wait_time {
-		cat.PowerShiftCat(sim)
+		cat.shift(sim)
 	}
 	// Model two types of input latency: (1) When waiting for an energy tick
 	// to execute the next special ability, the special will in practice be
@@ -249,13 +263,12 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	// powershift without clipping the GCD, the shift will in practice be
 	// slightly delayed after the GCD ends.
 
-	// TODO: Model latency
-	//    if self.waiting_for_tick {
-	//        self.player.gcd = time_to_next_tick + self.latency
-	//    }
-	//    if self.player.ready_to_shift  {
-	//        self.player.gcd = self.latency
-	//    }
+	if cat.waitingForTick {
+		cat.SetGCDTimer(sim, sim.CurrentTime+time_to_next_tick+latency)
+	}
+	if cat.readyToShift {
+		cat.SetGCDTimer(sim, sim.CurrentTime+latency)
+	}
 
 	return false
 }
