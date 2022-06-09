@@ -131,9 +131,43 @@ export class Sim {
         await this.waitForInit();
         const request = this.makeRaidSimRequest(false);
         var result = await this.workerPool.raidSimAsync(request, onProgress);
+        if (result.errorResult != "") {
+            this.handleError(result.errorResult);
+            return;
+        }
         const simResult = await SimResult.makeNew(request, result);
         this.simResultEmitter.emit(eventID, simResult);
-        return simResult;
+    }
+    handleError(errorStr) {
+        if (window.confirm("Simulation Failed:\n" + errorStr + "\nPress Ok to file crash report")) {
+            // Splice out just the line numbers
+            var filteredError = errorStr.substring(0, errorStr.indexOf("Stack Trace:"));
+            const rExp = /(.*\.go:\d+)/g;
+            filteredError += errorStr.match(rExp)?.join(" ");
+            var hash = this.hashCode(filteredError);
+            fetch('https://api.github.com/search/issues?q=is:issue+is:open+repo:wowsims/tbc+' + hash).then(resp => {
+                resp.json().then((issues) => {
+                    if (issues.total_count > 0) {
+                        window.open(issues.items[0].html_url, "_blank");
+                    }
+                    else {
+                        window.open("https://github.com/wowsims/tbc/issues/new?assignees=&labels=&title=Crash%20Report%20" + hash + "&body=" + encodeURIComponent(errorStr), '_blank');
+                    }
+                });
+            }).catch(fetchErr => {
+                alert("Failed to file report... try again another time:" + fetchErr);
+            });
+        }
+        return;
+    }
+    hashCode(str) {
+        let hash = 0;
+        for (let i = 0, len = str.length; i < len; i++) {
+            let chr = str.charCodeAt(i);
+            hash = (hash << 5) - hash + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
     }
     async runRaidSimWithLogs(eventID) {
         if (this.raid.isEmpty()) {

@@ -553,6 +553,10 @@ export interface RaidSimResult {
      * @generated from protobuf field: double first_iteration_duration = 4;
      */
     firstIterationDuration: number;
+    /**
+     * @generated from protobuf field: string error_result = 5;
+     */
+    errorResult: string;
 }
 /**
  * RPC GearList

@@ -1269,11 +1269,12 @@ class RaidSimResult$Type extends MessageType {
             { no: 1, name: "raid_metrics", kind: "message", T: () => RaidMetrics },
             { no: 2, name: "encounter_metrics", kind: "message", T: () => EncounterMetrics },
             { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "first_iteration_duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 4, name: "first_iteration_duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "error_result", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { logs: "", firstIterationDuration: 0 };
+        const message = { logs: "", firstIterationDuration: 0, errorResult: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1295,6 +1296,9 @@ class RaidSimResult$Type extends MessageType {
                     break;
                 case /* double first_iteration_duration */ 4:
                     message.firstIterationDuration = reader.double();
+                    break;
+                case /* string error_result */ 5:
+                    message.errorResult = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1320,6 +1324,9 @@ class RaidSimResult$Type extends MessageType {
         /* double first_iteration_duration = 4; */
         if (message.firstIterationDuration !== 0)
             writer.tag(4, WireType.Bit64).double(message.firstIterationDuration);
+        /* string error_result = 5; */
+        if (message.errorResult !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.errorResult);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -63,7 +63,9 @@ export declare class Sim {
     setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     getModifiedRaidProto(): RaidProto;
     private makeRaidSimRequest;
-    runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult>;
+    runRaidSim(eventID: EventID, onProgress: Function): Promise<void>;
+    handleError(errorStr: string): void;
+    hashCode(str: string): number;
     runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
     private updateCharacterStats;
     statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;
