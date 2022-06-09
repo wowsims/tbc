@@ -49,11 +49,11 @@ type Druid struct {
 	MaulQueueAura        *core.Aura
 	NaturesGraceProcAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
+	CatFormAura          *core.Aura
+	BearFormAura         *core.Aura
 
-	form              DruidForm // Make private, ensure it is only called using SetForm
-	disabledMCDs      []*core.MajorCooldown
-	energyBeforeShift float64 // Store when shitfing out, to properly apply and calculate gains from powershifting
-
+	form         DruidForm
+	disabledMCDs []*core.MajorCooldown
 }
 
 type SelfBuffs struct {
@@ -140,12 +140,12 @@ func (druid *Druid) RegisterCatSpells() {
 	druid.registerMangleCatSpell()
 	druid.registerRipSpell()
 	druid.registerShredSpell()
+	druid.registerRakeSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.form = druid.StartingForm
 	druid.disabledMCDs = []*core.MajorCooldown{}
-	druid.energyBeforeShift = 0
 	druid.RebirthUsed = false
 }
 
