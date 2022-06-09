@@ -50,9 +50,6 @@ func (mage *Mage) registerEvocationCD() {
 					mage.AddMana(sim, manaPerTick, actionID, true)
 				},
 			})
-
-			// All MCDs that use the GCD and have a non-zero cast time must call this.
-			mage.UpdateMajorCooldowns()
 		},
 	})
 

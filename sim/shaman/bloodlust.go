@@ -45,9 +45,6 @@ func (shaman *Shaman) registerBloodlustCD() {
 			for _, blAura := range blAuras {
 				blAura.Activate(sim)
 			}
-
-			// All MCDs that use the GCD and have a non-zero cast time must call this.
-			shaman.UpdateMajorCooldowns()
 		},
 	})
 

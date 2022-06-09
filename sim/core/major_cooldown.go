@@ -348,12 +348,44 @@ func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldo
 	}
 }
 
+// func (mcdm *majorCooldownManager) Print() {
+// 	for i, mcd := range mcdm.majorCooldowns {
+// 		fmt.Printf("%d: %s\n", i, mcd.Spell.ActionID.String())
+// 	}
+// }
+
 func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
-	anyCooldownsUsed := false
-	for curIdx := 0; curIdx < len(mcdm.majorCooldowns); curIdx++ {
+	// fmt.Printf("MCDM:\n")
+	// mcdm.Print()
+	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && mcdm.majorCooldowns[curIdx].IsReady(sim); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
-		if mcd.IsReady(sim) && mcd.tryActivateInternal(sim, mcdm.character) {
-			anyCooldownsUsed = true
+		// fmt.Printf("%d: attempting to activate %s\n", curIdx, mcd.Spell.String())
+		if mcd.tryActivateInternal(sim, mcdm.character) {
+			// fmt.Printf("%d: activated %s\n", curIdx, mcd.Spell.String())
+			newReadyAt := mcd.ReadyAt()
+			for sortIdx := curIdx + 1; sortIdx < len(mcdm.majorCooldowns); sortIdx++ {
+				// fmt.Printf("\tComparing to %d: %s for sorting.\n", sortIdx, mcdm.majorCooldowns[sortIdx].Spell.String())
+				otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
+				if otherReady > newReadyAt || (otherReady == newReadyAt && mcdm.majorCooldowns[sortIdx].Priority < mcd.Priority) {
+					// fmt.Printf("\t%d is after current mcd. sorting now.\n", sortIdx)
+					// This means that this sortIDX is the first spot that is *after* the new ready time.
+					// move all CDs before this one forward,
+					if sortIdx-1 > curIdx {
+						copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:sortIdx])
+						mcdm.majorCooldowns[sortIdx] = mcd
+						curIdx--
+					}
+					// mcdm.Print()
+					break
+				} else if sortIdx == len(mcdm.majorCooldowns)-1 {
+					// fmt.Printf("Reached end of list, putting MCD at back...\n")
+					// This means it needs to go to the back
+					copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
+					mcdm.majorCooldowns[sortIdx] = mcd
+					curIdx--
+					// mcdm.Print()
+				}
+			}
 
 			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
@@ -361,13 +393,6 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 				break
 			}
 		}
-	}
-
-	if anyCooldownsUsed {
-		// Re-sort by availability.
-		// TODO: Probably a much faster way to do this, especially since we know which cooldowns need to be re-ordered.
-		// Maybe not because MCDs with shared cooldowns put each other on CD.
-		mcdm.UpdateMajorCooldowns()
 	}
 }
 
