@@ -266,7 +266,7 @@ export abstract class SimUI extends Component {
 	async runSim(onProgress: Function) {
 		this.resultsViewer.setPending();
 		try {
-			const result = await this.sim.runRaidSim(TypedEvent.nextEventID(), onProgress);
+			await this.sim.runRaidSim(TypedEvent.nextEventID(), onProgress);
 		} catch (e) {
 			this.resultsViewer.hideAll();
 			alert(e);
@@ -276,7 +276,7 @@ export abstract class SimUI extends Component {
 	async runSimOnce() {
 		this.resultsViewer.setPending();
 		try {
-			const result = await this.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
+			await this.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
 		} catch (e) {
 			this.resultsViewer.hideAll();
 			alert(e);
