@@ -160,6 +160,8 @@ type majorCooldownManager struct {
 	// the same cooldows as initialMajorCooldowns, but the order will change over
 	// the course of the sim.
 	majorCooldowns []*MajorCooldown
+
+	tryUsing bool
 }
 
 func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
@@ -348,45 +350,12 @@ func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldo
 	}
 }
 
-// func (mcdm *majorCooldownManager) Print() {
-// 	for i, mcd := range mcdm.majorCooldowns {
-// 		fmt.Printf("%d: %s\n", i, mcd.Spell.ActionID.String())
-// 	}
-// }
-
 func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
-	// fmt.Printf("MCDM:\n")
-	// mcdm.Print()
+	mcdm.tryUsing = true
 	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && mcdm.majorCooldowns[curIdx].IsReady(sim); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
-		// fmt.Printf("%d: attempting to activate %s\n", curIdx, mcd.Spell.String())
 		if mcd.tryActivateInternal(sim, mcdm.character) {
-			// fmt.Printf("%d: activated %s\n", curIdx, mcd.Spell.String())
-			newReadyAt := mcd.ReadyAt()
-			for sortIdx := curIdx + 1; sortIdx < len(mcdm.majorCooldowns); sortIdx++ {
-				// fmt.Printf("\tComparing to %d: %s for sorting.\n", sortIdx, mcdm.majorCooldowns[sortIdx].Spell.String())
-				otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
-				if otherReady > newReadyAt || (otherReady == newReadyAt && mcdm.majorCooldowns[sortIdx].Priority < mcd.Priority) {
-					// fmt.Printf("\t%d is after current mcd. sorting now.\n", sortIdx)
-					// This means that this sortIDX is the first spot that is *after* the new ready time.
-					// move all CDs before this one forward,
-					if sortIdx-1 > curIdx {
-						copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:sortIdx])
-						mcdm.majorCooldowns[sortIdx] = mcd
-						curIdx--
-					}
-					// mcdm.Print()
-					break
-				} else if sortIdx == len(mcdm.majorCooldowns)-1 {
-					// fmt.Printf("Reached end of list, putting MCD at back...\n")
-					// This means it needs to go to the back
-					copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
-					mcdm.majorCooldowns[sortIdx] = mcd
-					curIdx--
-					// mcdm.Print()
-				}
-			}
-
+			mcdm.sortOne(mcd, curIdx)
 			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
 				// any remaining MCDs so they aren't wasted.
@@ -394,11 +363,43 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 			}
 		}
 	}
+
+	mcdm.tryUsing = false
+}
+
+func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) {
+	newReadyAt := mcd.ReadyAt()
+	for sortIdx := curIdx + 1; sortIdx < len(mcdm.majorCooldowns); sortIdx++ {
+		otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
+		if mcdm.majorCooldowns[sortIdx].Spell.SharedCD.Timer == mcd.Spell.SharedCD.Timer {
+			mcdm.sortOne(mcdm.majorCooldowns[sortIdx], sortIdx)
+		}
+		if otherReady > newReadyAt || (otherReady == newReadyAt && mcdm.majorCooldowns[sortIdx].Priority < mcd.Priority) {
+			// This means that this sortIDX is the first spot that is *after* the new ready time.
+			// move all CDs before this one forward,
+			if sortIdx-1 > curIdx {
+				copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:sortIdx])
+				mcdm.majorCooldowns[sortIdx-1] = mcd
+			}
+			break
+		} else if sortIdx == len(mcdm.majorCooldowns)-1 {
+			// This means it needs to go to the back
+			copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
+			mcdm.majorCooldowns[sortIdx] = mcd
+		}
+	}
 }
 
 // This function should be called if the CD for a major cooldown changes outside
 // of the TryActivate() call.
 func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
+	if mcdm.tryUsing {
+		panic("Do not call UpdateMajorCooldowns while iterating cooldowns in TryUseCooldowns")
+	}
+	mcdm.sort()
+}
+
+func (mcdm *majorCooldownManager) sort() {
 	sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
 		// Since we're just comparing and don't actually care about the remaining CD, ok to use 0 instead of sim.CurrentTime.
 		cdA := mcdm.majorCooldowns[i].ReadyAt()
