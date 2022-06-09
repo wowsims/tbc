@@ -158,7 +158,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 
 					OutcomeApplier: character.OutcomeFuncAlwaysHit(),
 					OnSpellHitDealt: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-						debuffAuras[spell.Unit.Index].Activate(sim)
+						debuffAuras[spellEffect.Target.Index].Activate(sim)
 					},
 				}),
 			})
@@ -174,7 +174,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 					if spellEffect.Landed() &&
 						spell.SpellSchool == SpellSchoolPhysical &&
 						sim.RandomFloat("Gift of Arthas") < 0.3 {
-						goaProc.Cast(sim, spellEffect.Target)
+						goaProc.Cast(sim, spell.Unit)
 					}
 				},
 			})
