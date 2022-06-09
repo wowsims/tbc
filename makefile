@@ -33,11 +33,11 @@ protection_warrior: $(OUT_DIR)/protection_warrior/index.js $(OUT_DIR)/protection
 
 raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html
 
-ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results $(OUT_DIR)/index.md
+ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results $(OUT_DIR)/index.html
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html
 
-$(OUT_DIR)/index.md:
-	cp ui/index.md $(OUT_DIR)
+$(OUT_DIR)/index.html:
+	cp ui/index.html $(OUT_DIR)
 
 clean:
 	rm -f ui/core/proto/*.ts
