@@ -84,7 +84,6 @@ export class WorkerPool {
 		return (progressData: any) => {
 			var progress = ProgressMetrics.fromBinary(progressData);
 			onProgress(progress);
-
 			// If we are done, stop adding the handler.
 			if (progress.finalRaidResult != null || progress.finalWeightResult != null) {
 				return;

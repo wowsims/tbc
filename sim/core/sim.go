@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -34,7 +35,32 @@ type Simulation struct {
 	executePhaseCallbacks []func(*Simulation)
 }
 
-func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
+func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) (result *proto.RaidSimResult) {
+	defer func() {
+		if err := recover(); err != nil {
+			errStr := ""
+			switch errt := err.(type) {
+			case string:
+				errStr = errt
+			case error:
+				errStr = errt.Error()
+			}
+
+			errStr += "\nStack Trace:\n" + string(debug.Stack())
+			result = &proto.RaidSimResult{
+				ErrorResult: errStr,
+			}
+			if progress != nil {
+				progress <- &proto.ProgressMetrics{
+					FinalRaidResult: result,
+				}
+			}
+		}
+		if progress != nil {
+			close(progress)
+		}
+	}()
+
 	sim := NewSim(rsr)
 	sim.runPresims(rsr)
 	if progress != nil {
@@ -42,7 +68,10 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *pro
 			progress <- progMetric
 		}
 	}
-	return sim.run()
+	// using a variable here allows us to mutate it in the deferred recover, sending out error info
+	result = sim.run()
+
+	return result
 }
 
 func NewSim(rsr proto.RaidSimRequest) *Simulation {

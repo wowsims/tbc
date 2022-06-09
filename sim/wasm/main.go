@@ -97,11 +97,9 @@ func raidSimAsync(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 	reporter := make(chan *proto.ProgressMetrics, 100)
-	core.RunRaidSimAsync(rsr, reporter)
 
-	result := processAsyncProgress(args[1], reporter)
-	close(reporter)
-	return result
+	go core.RunRaidSimAsync(rsr, reporter)
+	return processAsyncProgress(args[1], reporter)
 }
 
 func statWeights(this js.Value, args []js.Value) interface{} {
@@ -134,7 +132,6 @@ func statWeightsAsync(this js.Value, args []js.Value) interface{} {
 	core.StatWeightsAsync(rsr, reporter)
 
 	result := processAsyncProgress(args[1], reporter)
-	close(reporter)
 	return result
 }
 
@@ -159,6 +156,7 @@ reader:
 				log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 				return js.Undefined()
 			}
+
 			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
 			js.CopyBytesToJS(outArray, outbytes)
 			progFunc.Invoke(outArray)

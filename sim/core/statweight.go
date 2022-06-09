@@ -64,6 +64,10 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		SimOptions: simOptions,
 	}
 	baselineResult := RunRaidSim(baseSimRequest)
+	if baselineResult.ErrorResult != "" {
+		// TODO: get stack trace out.
+		return StatWeightsResult{}
+	}
 	baselineDpsMetrics := baselineResult.RaidMetrics.Parties[0].Players[0].Dps
 	baselineTpsMetrics := baselineResult.RaidMetrics.Parties[0].Players[0].Threat
 	baselineDtpsMetrics := baselineResult.RaidMetrics.Parties[0].Players[0].Dtps
@@ -119,6 +123,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 					}
 				}
 				if metrics.FinalRaidResult != nil {
+					// TODO: get stack trace out if final result error is set.
 					break statsim
 				}
 			}
