@@ -162,6 +162,7 @@ type majorCooldownManager struct {
 	majorCooldowns []*MajorCooldown
 
 	tryUsing bool
+	fullSort bool
 }
 
 func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
@@ -356,7 +357,14 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 		mcd := mcdm.majorCooldowns[curIdx]
 		if mcd.tryActivateInternal(sim, mcdm.character) {
 			if mcdm.sortOne(mcd, curIdx) {
-				curIdx--
+				if mcdm.fullSort {
+					mcdm.sort()
+					curIdx = 0
+					mcdm.fullSort = false
+				} else {
+					curIdx--
+				}
+
 			}
 			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
@@ -371,10 +379,19 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 
 func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) bool {
 	newReadyAt := mcd.ReadyAt()
+	var lastReadAt time.Duration
 	for sortIdx := curIdx + 1; sortIdx < len(mcdm.majorCooldowns); sortIdx++ {
-		otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
 		if mcdm.majorCooldowns[sortIdx].Spell.SharedCD.Timer == mcd.Spell.SharedCD.Timer {
 			mcdm.sortOne(mcdm.majorCooldowns[sortIdx], sortIdx)
+			if mcdm.fullSort {
+				return true
+			}
+		}
+		otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
+		if otherReady < lastReadAt {
+			// This means we had some CDs get changed during last activation. We will need a full re-sort.
+			mcdm.fullSort = true
+			return true
 		}
 		if otherReady > newReadyAt || (otherReady == newReadyAt && mcdm.majorCooldowns[sortIdx].Priority < mcd.Priority) {
 			// This means that this sortIDX is the first spot that is *after* the new ready time.
@@ -386,6 +403,7 @@ func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) bool {
 			}
 			return false
 		}
+		lastReadAt = otherReady
 	}
 	// This means it needs to go to the back
 	copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
