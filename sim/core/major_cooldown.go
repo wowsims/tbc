@@ -355,7 +355,9 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && mcdm.majorCooldowns[curIdx].IsReady(sim); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
 		if mcd.tryActivateInternal(sim, mcdm.character) {
-			mcdm.sortOne(mcd, curIdx)
+			if mcdm.sortOne(mcd, curIdx) {
+				curIdx--
+			}
 			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
 				// any remaining MCDs so they aren't wasted.
@@ -367,7 +369,7 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	mcdm.tryUsing = false
 }
 
-func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) {
+func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) bool {
 	newReadyAt := mcd.ReadyAt()
 	for sortIdx := curIdx + 1; sortIdx < len(mcdm.majorCooldowns); sortIdx++ {
 		otherReady := mcdm.majorCooldowns[sortIdx].ReadyAt()
@@ -380,14 +382,15 @@ func (mcdm *majorCooldownManager) sortOne(mcd *MajorCooldown, curIdx int) {
 			if sortIdx-1 > curIdx {
 				copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:sortIdx])
 				mcdm.majorCooldowns[sortIdx-1] = mcd
+				return true
 			}
-			break
-		} else if sortIdx == len(mcdm.majorCooldowns)-1 {
-			// This means it needs to go to the back
-			copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
-			mcdm.majorCooldowns[sortIdx] = mcd
+			return false
 		}
 	}
+	// This means it needs to go to the back
+	copy(mcdm.majorCooldowns[curIdx:], mcdm.majorCooldowns[curIdx+1:])
+	mcdm.majorCooldowns[len(mcdm.majorCooldowns)-1] = mcd
+	return true
 }
 
 // This function should be called if the CD for a major cooldown changes outside
