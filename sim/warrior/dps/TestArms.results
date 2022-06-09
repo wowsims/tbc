@@ -174,8 +174,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 709.0860580435952
-  tps: 601.548265053543
+  dps: 709.3748752473397
+  tps: 601.7737591323474
  }
 }
 dps_results: {
@@ -944,15 +944,15 @@ dps_results: {
 dps_results: {
  key: "TestArms-Average-Default"
  value: {
-  dps: 705.6575525978462
-  tps: 598.745442036126
+  dps: 705.7381222416225
+  tps: 598.8147971343177
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1155.8638561282862
-  tps: 1090.8007683858139
+  dps: 1163.1064729210418
+  tps: 1096.8867059615247
  }
 }
 dps_results: {
@@ -993,8 +993,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1165.3654436841332
-  tps: 1097.1997646955365
+  dps: 1168.243506160362
+  tps: 1099.4923648513861
  }
 }
 dps_results: {
@@ -1014,8 +1014,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 882.5484269912317
-  tps: 858.4063562586565
+  dps: 885.9159944266338
+  tps: 860.8470555705951
  }
 }
 dps_results: {

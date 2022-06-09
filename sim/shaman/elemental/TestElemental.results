@@ -102,15 +102,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-AdamantineFigurine-27891"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-AncientAqirArtifact-33830"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -123,15 +123,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1495.021572449414
-  tps: 1238.7458286248489
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -158,8 +158,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
@@ -200,8 +200,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-BloodlustBrooch-29383"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
@@ -221,8 +221,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-BroochoftheImmortalKing-32534"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -270,22 +270,22 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Coren'sLuckyCoin-38289"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1493.5089693618984
-  tps: 1237.4224314899666
+  dps: 1493.494181184867
+  tps: 1237.427608666565
  }
 }
 dps_results: {
@@ -305,15 +305,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Dabiri'sEnigma-30300"
  value: {
-  dps: 1495.021572449414
-  tps: 1238.7458286248489
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 1545.990091680646
-  tps: 1280.0330993818652
+  dps: 1546.001580561196
+  tps: 1280.0432325745105
  }
 }
 dps_results: {
@@ -396,8 +396,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
@@ -417,8 +417,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-EssenceoftheMartyr-29376"
  value: {
-  dps: 1529.4957970042842
-  tps: 1266.679758037601
+  dps: 1530.014794474797
+  tps: 1267.1113038445144
  }
 }
 dps_results: {
@@ -459,8 +459,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1493.4335268740388
-  tps: 1237.3871950423384
+  dps: 1493.4270719974636
+  tps: 1237.381501841199
  }
 }
 dps_results: {
@@ -473,8 +473,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-GnomereganAuto-Blocker600-29387"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -494,8 +494,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 1561.505648618138
-  tps: 1292.6137945644728
+  dps: 1561.517137498688
+  tps: 1292.6239277571178
  }
 }
 dps_results: {
@@ -508,8 +508,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
@@ -571,8 +571,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Moroes'LuckyPocketWatch-28528"
  value: {
-  dps: 1495.0963752056766
-  tps: 1238.790961454522
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -662,15 +662,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 1495.021572449414
-  tps: 1238.7458286248489
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1539.6835956488553
-  tps: 1276.0731865105306
+  dps: 1539.6786278389802
+  tps: 1276.0688049022208
  }
 }
 dps_results: {
@@ -683,8 +683,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-ShadowmoonInsignia-32501"
  value: {
-  dps: 1495.021572449414
-  tps: 1238.7458286248489
+  dps: 1495.615372676189
+  tps: 1239.2225072614349
  }
 }
 dps_results: {
@@ -753,8 +753,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 1492.6985776166016
-  tps: 1236.8275887098266
+  dps: 1492.7100664971515
+  tps: 1236.837721902472
  }
 }
 dps_results: {
@@ -858,8 +858,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 1540.0523462510203
-  tps: 1275.2179802836329
+  dps: 1540.0638351315702
+  tps: 1275.228113476278
  }
 }
 dps_results: {
@@ -942,8 +942,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1532.743145714585
-  tps: 1270.2313678116552
+  dps: 1532.747350480535
+  tps: 1270.2310872857781
  }
 }
 dps_results: {

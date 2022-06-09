@@ -48,8 +48,8 @@ character_stats_results: {
 dps_results: {
  key: "TestMutilate-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1197.933343896269
-  tps: 838.5170425406286
+  dps: 1197.9566822717686
+  tps: 838.5529010405619
  }
 }
 dps_results: {
@@ -83,8 +83,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 1187.3416019922306
-  tps: 831.0311898090065
+  dps: 1185.1131080035268
+  tps: 829.3817795796554
  }
 }
 dps_results: {
@@ -118,8 +118,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 1210.1820330657551
-  tps: 847.1691871030052
+  dps: 1206.6728354041934
+  tps: 844.7126438913317
  }
 }
 dps_results: {
@@ -132,8 +132,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 1189.9845035265805
-  tps: 832.8792563516884
+  dps: 1183.9651579220726
+  tps: 828.5363739383059
  }
 }
 dps_results: {
@@ -202,15 +202,15 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 1192.8860481230713
-  tps: 834.8890377936993
+  dps: 1189.4619133253063
+  tps: 832.492889215322
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1192.8373272634265
-  tps: 834.8544459833522
+  dps: 1189.4213527651714
+  tps: 832.4640912176259
  }
 }
 dps_results: {
@@ -223,8 +223,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 1170.1639310235373
-  tps: 818.7563346530306
+  dps: 1166.8492360375415
+  tps: 816.4378883410086
  }
 }
 dps_results: {
@@ -272,8 +272,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 1201.6790964456827
-  tps: 841.1321021027537
+  dps: 1198.2124737090985
+  tps: 838.705787087814
  }
 }
 dps_results: {
@@ -307,22 +307,22 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1170.1639310235373
-  tps: 818.7563346530306
+  dps: 1166.8492360375415
+  tps: 816.4378883410086
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1190.001300557853
-  tps: 832.8408670223948
+  dps: 1186.4067029201176
+  tps: 830.3236898276376
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 1201.5385959316147
-  tps: 841.0323467377652
+  dps: 1197.9273836068473
+  tps: 838.5033731152157
  }
 }
 dps_results: {
@@ -349,8 +349,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 1170.1639310235373
-  tps: 818.7563346530306
+  dps: 1166.8492360375415
+  tps: 816.4378883410086
  }
 }
 dps_results: {
@@ -363,15 +363,15 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 1184.7940248157483
-  tps: 829.1772017223301
+  dps: 1183.9285403586105
+  tps: 828.5146788218694
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-IconoftheSilverCrescent-29370"
  value: {
-  dps: 1170.1639310235373
-  tps: 818.7563346530306
+  dps: 1166.8492360375415
+  tps: 816.4378883410086
  }
 }
 dps_results: {
@@ -391,8 +391,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 1194.757669205419
-  tps: 836.283617448264
+  dps: 1193.0529745515669
+  tps: 835.0540666492105
  }
 }
 dps_results: {
@@ -503,8 +503,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1168.762638699648
-  tps: 817.7902117606824
+  dps: 1167.0613533802868
+  tps: 816.5634993898941
  }
 }
 dps_results: {
@@ -552,8 +552,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1169.7016529060709
-  tps: 818.4281171896288
+  dps: 1166.3093407564004
+  tps: 816.054562691398
  }
 }
 dps_results: {
@@ -566,8 +566,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 1198.820974515989
-  tps: 839.1028355326708
+  dps: 1195.366496760311
+  tps: 836.6851434541751
  }
 }
 dps_results: {
@@ -636,15 +636,15 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 1170.1639310235373
-  tps: 818.7563346530306
+  dps: 1166.8492360375415
+  tps: 816.4378883410086
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1167.2293258718898
-  tps: 816.6620372395932
+  dps: 1166.390137497752
+  tps: 816.0724714556653
  }
 }
 dps_results: {
@@ -706,8 +706,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1170.0946754739955
-  tps: 818.7071632128552
+  dps: 1166.379292950667
+  tps: 816.1042287493273
  }
 }
 dps_results: {
@@ -720,8 +720,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-SelfDrums-DPS"
  value: {
-  dps: 1224.3741614457545
-  tps: 857.337772320029
+  dps: 1224.2636196663284
+  tps: 857.2579240457324
  }
 }
 dps_results: {

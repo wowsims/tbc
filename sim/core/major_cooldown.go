@@ -350,9 +350,9 @@ func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldo
 
 func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	anyCooldownsUsed := false
-	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && mcdm.majorCooldowns[curIdx].IsReady(sim); curIdx++ {
+	for curIdx := 0; curIdx < len(mcdm.majorCooldowns); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
-		if mcd.tryActivateInternal(sim, mcdm.character) {
+		if mcd.IsReady(sim) && mcd.tryActivateInternal(sim, mcdm.character) {
 			anyCooldownsUsed = true
 
 			if mcd.Spell.DefaultCast.GCD > 0 {
