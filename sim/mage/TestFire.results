@@ -398,8 +398,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1592.9824099190937
-  tps: 1344.5841821600088
+  dps: 1593.3229297962278
+  tps: 1345.0772290617329
  }
 }
 dps_results: {
@@ -804,15 +804,15 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 483.40553721881895
-  tps: 642.7571222540029
+  dps: 482.6422166606228
+  tps: 641.9674605666049
  }
 }
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongSingleTarget"
  value: {
-  dps: 483.40553721881895
-  tps: 419.3598722540035
+  dps: 482.6422166606228
+  tps: 418.6946605666055
  }
 }
 dps_results: {

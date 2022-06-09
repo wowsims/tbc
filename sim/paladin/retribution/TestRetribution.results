@@ -181,7 +181,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 2081.7012453317416
+  dps: 2081.701245331741
   tps: 1509.753643046014
  }
 }
@@ -811,8 +811,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-TheDecapitator-28767"
  value: {
-  dps: 2149.668066141275
-  tps: 1557.51803363732
+  dps: 2147.782807524031
+  tps: 1556.1978466695562
  }
 }
 dps_results: {
@@ -930,8 +930,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-SelfDrums-DPS"
  value: {
-  dps: 2121.25731239662
-  tps: 1536.9271300774699
+  dps: 2119.4346317218456
+  tps: 1535.6512536051287
  }
 }
 dps_results: {
