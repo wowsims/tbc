@@ -235,20 +235,11 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 	http.HandleFunc("/raidSim", handleAPI)
 	http.HandleFunc("/gearList", handleAPI)
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
-		resp.Header().Add("Cache-Control", "no-cache")
-		if strings.HasSuffix(req.URL.Path, "/tbc/") {
-			resp.Write([]byte(`
-				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
-				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
-				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
-				<a href="/tbc/hunter">Hunter Sim</a"></body><br>
-				<a href="/tbc/mage">Mage Sim</a"><br>
-				<a href="/tbc/rogue">Rogue Sim</a"><br>
-				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
-		    `))
+		if req.URL.Path == "/" {
+			http.Redirect(resp, req, "/tbc/", http.StatusPermanentRedirect)
 			return
 		}
-
+		resp.Header().Add("Cache-Control", "no-cache")
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("Content-Type", "application/wasm")
 		}
