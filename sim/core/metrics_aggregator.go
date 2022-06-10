@@ -195,7 +195,7 @@ func (unitMetrics *UnitMetrics) addSpell(spell *Spell) {
 	actionMetrics, ok := unitMetrics.actions[spell.ActionID]
 
 	if !ok {
-		actionMetrics = &ActionMetrics{IsMelee: spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)}
+		actionMetrics = &ActionMetrics{IsMelee: spell.Flags.Matches(SpellFlagMeleeMetrics)}
 		unitMetrics.actions[spell.ActionID] = actionMetrics
 	}
 

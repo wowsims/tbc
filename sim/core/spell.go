@@ -13,7 +13,7 @@ type SpellConfig struct {
 	// See definition of Spell (below) for comments on these.
 	ActionID
 	SpellSchool  SpellSchool
-	SpellExtras  SpellExtras
+	Flags        SpellFlag
 	ResourceType stats.Stat
 	BaseCost     float64
 
@@ -51,7 +51,7 @@ type Spell struct {
 	SpellSchool SpellSchool
 
 	// Flags
-	SpellExtras SpellExtras
+	Flags SpellFlag
 
 	// Should be stats.Mana, stats.Energy, stats.Rage, or unset.
 	ResourceType stats.Stat
@@ -87,7 +87,7 @@ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
 		ActionID:     config.ActionID,
 		Unit:         unit,
 		SpellSchool:  config.SpellSchool,
-		SpellExtras:  config.SpellExtras,
+		Flags:        config.Flags,
 		ResourceType: config.ResourceType,
 		BaseCost:     config.BaseCost,
 
@@ -149,7 +149,7 @@ func (spell *Spell) reset(sim *Simulation) {
 }
 
 func (spell *Spell) doneIteration() {
-	if !spell.SpellExtras.Matches(SpellExtrasNoMetrics) {
+	if !spell.Flags.Matches(SpellFlagNoMetrics) {
 		spell.Unit.Metrics.addSpell(spell)
 	}
 }
@@ -172,7 +172,7 @@ func (spell *Spell) Cast(sim *Simulation, target *Unit) bool {
 
 // Skips the actual cast and applies spell effects immediately.
 func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Unit) {
-	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+	if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 			spell.ActionID, spell.DefaultCast.Cost, time.Duration(0))
 		spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)

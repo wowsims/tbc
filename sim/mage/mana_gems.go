@@ -39,8 +39,8 @@ func (mage *Mage) registerManaGemsCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID:    core.MageManaGemMCDActionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: core.MageManaGemMCDActionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

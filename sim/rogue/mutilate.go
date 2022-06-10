@@ -58,7 +58,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 	return rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
@@ -74,7 +74,7 @@ func (rogue *Rogue) registerMutilateSpell() {
 	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 34413},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+		Flags:       core.SpellFlagMeleeMetrics | SpellFlagBuilder,
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

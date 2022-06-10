@@ -54,7 +54,7 @@ func (warrior *Warrior) registerWhirlwindSpell() {
 	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 1680},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

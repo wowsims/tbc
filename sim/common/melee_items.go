@@ -400,7 +400,7 @@ func ApplyDespair(agent core.Agent) {
 	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasIgnoreResists,
+		Flags:       core.SpellFlagIgnoreResists,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1,
@@ -439,7 +439,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 	spell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasIgnoreResists | core.SpellExtrasNoOnCastComplete,
+		Flags:       core.SpellFlagIgnoreResists | core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
@@ -853,7 +853,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			blinkstrikeSpell = character.GetOrRegisterSpell(core.SpellConfig{
 				ActionID:     core.ActionID{ItemID: 31332},
 				SpellSchool:  core.SpellSchoolPhysical,
-				SpellExtras:  core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
+				Flags:        core.SpellFlagMeleeMetrics | core.SpellFlagNoOnCastComplete,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 			})
 		},

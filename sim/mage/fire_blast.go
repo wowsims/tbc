@@ -13,7 +13,7 @@ func (mage *Mage) registerFireBlastSpell() {
 	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27079},
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

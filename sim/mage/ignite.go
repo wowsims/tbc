@@ -13,7 +13,7 @@ func (mage *Mage) registerIgniteSpell() {
 	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    IgniteActionID,
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
+		Flags:       SpellFlagMage | core.SpellFlagIgnoreModifiers,
 	})
 }
 

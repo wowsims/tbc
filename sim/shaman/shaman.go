@@ -12,9 +12,9 @@ import (
 const TotemRefreshTime2M = time.Second * 115
 
 const (
-	SpellFlagShock    = core.SpellExtrasAgentReserved1
-	SpellFlagElectric = core.SpellExtrasAgentReserved2
-	SpellFlagTotem    = core.SpellExtrasAgentReserved3
+	SpellFlagShock    = core.SpellFlagAgentReserved1
+	SpellFlagElectric = core.SpellFlagAgentReserved2
+	SpellFlagTotem    = core.SpellFlagAgentReserved3
 )
 
 func NewShaman(character core.Character, talents proto.ShamanTalents, totems proto.ShamanTotems, selfBuffs SelfBuffs) *Shaman {

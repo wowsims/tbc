@@ -17,7 +17,7 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 	procSpell := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID.WithTag(1),
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: core.SpellExtrasBinary,
+		Flags:       core.SpellFlagBinary,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,

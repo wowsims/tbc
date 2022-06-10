@@ -203,7 +203,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 				swordSpecializationSpell = warrior.GetOrRegisterSpell(core.SpellConfig{
 					ActionID:    core.ActionID{SpellID: 12815},
 					SpellSchool: core.SpellSchoolPhysical,
-					SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
+					Flags:       core.SpellFlagMeleeMetrics | core.SpellFlagNoOnCastComplete,
 
 					ApplyEffects: core.ApplyEffectFuncDirectDamage(warrior.AutoAttacks.MHEffect),
 				})

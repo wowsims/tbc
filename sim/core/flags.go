@@ -159,30 +159,30 @@ func (ho HitOutcome) PartialResistString() string {
 }
 
 // Other flags
-type SpellExtras uint16
+type SpellFlag uint16
 
 // Returns whether there is any overlap between the given masks.
-func (se SpellExtras) Matches(other SpellExtras) bool {
+func (se SpellFlag) Matches(other SpellFlag) bool {
 	return (se & other) != 0
 }
 
 const (
-	SpellExtrasNone             SpellExtras = 0
-	SpellExtrasIgnoreResists    SpellExtras = 1 << iota // skip spell resist/armor
-	SpellExtrasCannotBeDodged                           // Ignores dodge in physical hit rolls
-	SpellExtrasBinary                                   // Does not do partial resists and could need a different hit roll.
-	SpellExtrasChanneled                                // Spell is channeled
-	SpellExtrasIgnoreModifiers                          // Only used by Ignite
-	SpellExtrasMeleeMetrics                             // Marks a spell as a melee ability for metrics.
-	SpellExtrasNoOnCastComplete                         // Disables OnCastComplete callbacks.
-	SpellExtrasNoMetrics                                // Disables metrics for a spell.
-	SpellExtrasNoLogs                                   // Disables logs for a spell.
+	SpellFlagNone             SpellFlag = 0
+	SpellFlagIgnoreResists    SpellFlag = 1 << iota // skip spell resist/armor
+	SpellFlagCannotBeDodged                         // Ignores dodge in physical hit rolls
+	SpellFlagBinary                                 // Does not do partial resists and could need a different hit roll.
+	SpellFlagChanneled                              // Spell is channeled
+	SpellFlagIgnoreModifiers                        // Only used by Ignite
+	SpellFlagMeleeMetrics                           // Marks a spell as a melee ability for metrics.
+	SpellFlagNoOnCastComplete                       // Disables OnCastComplete callbacks.
+	SpellFlagNoMetrics                              // Disables metrics for a spell.
+	SpellFlagNoLogs                                 // Disables logs for a spell.
 
 	// Used to let agents categorize their spells.
-	SpellExtrasAgentReserved1
-	SpellExtrasAgentReserved2
-	SpellExtrasAgentReserved3
-	SpellExtrasAgentReserved4
+	SpellFlagAgentReserved1
+	SpellFlagAgentReserved2
+	SpellFlagAgentReserved3
+	SpellFlagAgentReserved4
 )
 
 type SpellSchool byte

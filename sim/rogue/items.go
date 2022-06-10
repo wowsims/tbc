@@ -168,7 +168,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if !spell.SpellExtras.Matches(SpellFlagFinisher) {
+			if !spell.Flags.Matches(SpellFlagFinisher) {
 				return
 			}
 
@@ -183,7 +183,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 			}
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagFinisher) {
+			if !spell.Flags.Matches(SpellFlagFinisher) {
 				return
 			}
 

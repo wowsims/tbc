@@ -24,8 +24,8 @@ func (warrior *Warrior) makeStanceSpell(stance Stance, aura *core.Aura, stanceCD
 	actionID := aura.ActionID
 
 	return warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

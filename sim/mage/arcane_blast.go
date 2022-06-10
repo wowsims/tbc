@@ -29,7 +29,7 @@ func (mage *Mage) newArcaneBlastSpell(numStacks int32) *core.Spell {
 	return mage.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolArcane,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ResourceType: stats.Mana,
 		BaseCost:     ArcaneBlastBaseManaCost,

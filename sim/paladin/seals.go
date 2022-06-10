@@ -36,7 +36,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:     procActionID,
 		SpellSchool:  core.SpellSchoolHoly,
-		SpellExtras:  core.SpellExtrasMeleeMetrics,
+		Flags:        core.SpellFlagMeleeMetrics,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
@@ -60,7 +60,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31892},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -86,7 +86,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	socProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    procActionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
@@ -136,7 +136,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 20375},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -189,7 +189,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -225,7 +225,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -258,7 +258,7 @@ func (paladin *Paladin) setupSealOfLight() {
 	paladin.SealOfLight = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -340,7 +340,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 	paladin.SealOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    spellActionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagSeal,
+		Flags:       SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

@@ -154,7 +154,7 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
-				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
+				(spell.Flags.Matches(SpellFlagCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) {
 				spellEffect.applyAttackTableHit(spell)
 			}
@@ -166,7 +166,7 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
-				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) {
+				(spell.Flags.Matches(SpellFlagCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) {
 				spellEffect.applyAttackTableHit(spell)
 			}
 		}
@@ -181,7 +181,7 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
-				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
+				(spell.Flags.Matches(SpellFlagCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) {
 				if spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
 					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
@@ -199,7 +199,7 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
-				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
+				(spell.Flags.Matches(SpellFlagCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
 				spellEffect.applyAttackTableHit(spell)
 			}
@@ -216,7 +216,7 @@ func (unit *Unit) OutcomeFuncMeleeWeaponSpecialHitAndCrit(critMultiplier float64
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
-				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
+				(spell.Flags.Matches(SpellFlagCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) &&
 				!spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) &&
 				!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {

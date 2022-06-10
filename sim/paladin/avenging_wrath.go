@@ -25,8 +25,8 @@ func (paladin *Paladin) RegisterAvengingWrathCD() {
 	baseCost := 236.0
 
 	spell := paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

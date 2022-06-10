@@ -454,7 +454,7 @@ type PseudoStats struct {
 	NatureDamageDealtMultiplier   float64
 	ShadowDamageDealtMultiplier   float64
 
-	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
+	// Modifiers for spells with the SpellFlagAgentReserved1 flag set.
 	BonusCritRatingAgentReserved1       float64
 	AgentReserved1DamageDealtMultiplier float64
 

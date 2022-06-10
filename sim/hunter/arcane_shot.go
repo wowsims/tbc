@@ -13,7 +13,7 @@ func (hunter *Hunter) registerArcaneShotSpell() {
 	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27019},
 		SpellSchool: core.SpellSchoolArcane,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

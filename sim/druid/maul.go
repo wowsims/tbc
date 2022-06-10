@@ -19,7 +19,7 @@ func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 	druid.Maul = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26996},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
+		Flags:       core.SpellFlagMeleeMetrics | core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

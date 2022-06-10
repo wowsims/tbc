@@ -14,7 +14,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell() {
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27014},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

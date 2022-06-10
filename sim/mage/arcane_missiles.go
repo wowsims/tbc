@@ -20,7 +20,7 @@ func (mage *Mage) registerArcaneMissilesSpell() {
 	mage.ArcaneMissiles = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolArcane,
-		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
+		Flags:       SpellFlagMage | core.SpellFlagChanneled,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

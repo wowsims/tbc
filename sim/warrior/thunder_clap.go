@@ -50,7 +50,7 @@ func (warrior *Warrior) registerThunderClapSpell() {
 	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 25264},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasBinary,
+		Flags:       core.SpellFlagBinary,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

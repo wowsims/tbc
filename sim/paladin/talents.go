@@ -151,7 +151,7 @@ func (paladin *Paladin) applyReckoning() {
 			reckoningSpell = paladin.GetOrRegisterSpell(core.SpellConfig{
 				ActionID:    actionID,
 				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
+				Flags:       core.SpellFlagMeleeMetrics,
 
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(paladin.AutoAttacks.MHEffect),
 			})

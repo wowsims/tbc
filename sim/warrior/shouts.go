@@ -17,8 +17,8 @@ func (warrior *Warrior) makeShoutSpellHelper(actionID core.ActionID) *core.Spell
 	}
 
 	return warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

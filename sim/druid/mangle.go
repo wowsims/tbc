@@ -21,7 +21,7 @@ func (druid *Druid) registerMangleBearSpell() {
 	druid.Mangle = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 33987},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,
@@ -72,7 +72,7 @@ func (druid *Druid) registerMangleCatSpell() {
 	druid.Mangle = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 33983},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Energy,
 		BaseCost:     cost,

@@ -82,7 +82,7 @@ func (wp *WarlockPet) newCleave() *core.Spell {
 	return wp.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 30223},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

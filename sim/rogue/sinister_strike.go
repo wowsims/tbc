@@ -19,7 +19,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell() {
 	rogue.SinisterStrike = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26862},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+		Flags:       core.SpellFlagMeleeMetrics | SpellFlagBuilder,
 
 		ResourceType: stats.Energy,
 		BaseCost:     energyCost,

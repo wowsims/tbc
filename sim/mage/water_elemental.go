@@ -36,9 +36,6 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
-
-			// All MCDs that use the GCD and have a non-zero cast time must call this.
-			mage.UpdateMajorCooldowns()
 		},
 	})
 

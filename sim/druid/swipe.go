@@ -40,7 +40,7 @@ func (druid *Druid) registerSwipeSpell() {
 	druid.Swipe = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26997},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

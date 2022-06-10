@@ -108,7 +108,7 @@ func (shaman *Shaman) applyElementalFocus() {
 		Duration:  time.Second * 15,
 		MaxStacks: 2,
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+			if !spell.Flags.Matches(SpellFlagShock | SpellFlagElectric) {
 				return
 			}
 			if spell.ActionID.Tag != 0 { // Filter LO casts
@@ -125,7 +125,7 @@ func (shaman *Shaman) applyElementalFocus() {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+			if !spell.Flags.Matches(SpellFlagShock | SpellFlagElectric) {
 				return
 			}
 			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
@@ -189,7 +189,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 			shaman.AddStatDynamic(sim, stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+			if !spell.Flags.Matches(SpellFlagShock | SpellFlagElectric) {
 				return
 			}
 			// Remove the buff and put skill on CD
@@ -200,8 +200,8 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    cdTimer,
@@ -245,8 +245,8 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    cdTimer,
@@ -339,7 +339,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		ActionID: core.ActionID{SpellID: 43338},
 		Duration: core.NeverExpires,
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if spell.SpellExtras.Matches(SpellFlagShock) {
+			if spell.Flags.Matches(SpellFlagShock) {
 				aura.Deactivate(sim)
 			}
 		},
