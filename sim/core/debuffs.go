@@ -182,7 +182,10 @@ func JudgementOfWisdomAura(target *Unit) *Aura {
 
 			unit := spell.Unit
 			if unit.HasManaBar() {
-				unit.AddMana(sim, mana, actionID, false)
+				if unit.jowManaMetrics == nil {
+					unit.jowManaMetrics = unit.NewManaMetrics(actionID)
+				}
+				unit.AddMana(sim, mana, unit.jowManaMetrics, false)
 			}
 
 			if spell.ActionID.SpellID == 35395 {

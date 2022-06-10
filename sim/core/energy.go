@@ -28,6 +28,8 @@ type energyBar struct {
 
 	// Multiplies energy regen from ticks.
 	EnergyTickMultiplier float64
+
+	regenMetrics *ResourceMetrics
 }
 
 func (unit *Unit) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
@@ -35,6 +37,7 @@ func (unit *Unit) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) 
 		unit:         unit,
 		maxEnergy:    MaxFloat(100, maxEnergy),
 		onEnergyGain: onEnergyGain,
+		regenMetrics: unit.NewEnergyMetrics(ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen}),
 	}
 }
 
@@ -50,35 +53,35 @@ func (eb *energyBar) NextEnergyTickAt() time.Duration {
 	return eb.tickAction.NextActionAt
 }
 
-func (eb *energyBar) addEnergyInternal(sim *Simulation, amount float64, actionID ActionID) {
+func (eb *energyBar) addEnergyInternal(sim *Simulation, amount float64, metrics *ResourceMetrics) {
 	if amount < 0 {
 		panic("Trying to add negative energy!")
 	}
 
 	newEnergy := MinFloat(eb.currentEnergy+amount, eb.maxEnergy)
-	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, amount, newEnergy-eb.currentEnergy)
+	metrics.AddEvent(amount, newEnergy-eb.currentEnergy)
 
 	if sim.Log != nil {
-		eb.unit.Log(sim, "Gained %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
+		eb.unit.Log(sim, "Gained %0.3f energy from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, eb.currentEnergy, newEnergy)
 	}
 
 	eb.currentEnergy = newEnergy
 }
-func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, actionID ActionID) {
-	eb.addEnergyInternal(sim, amount, actionID)
+func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, metrics *ResourceMetrics) {
+	eb.addEnergyInternal(sim, amount, metrics)
 	eb.onEnergyGain(sim)
 }
 
-func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, actionID ActionID) {
+func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, metrics *ResourceMetrics) {
 	if amount < 0 {
 		panic("Trying to spend negative energy!")
 	}
 
 	newEnergy := eb.currentEnergy - amount
-	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, -amount, -amount)
+	metrics.AddEvent(-amount, -amount)
 
 	if sim.Log != nil {
-		eb.unit.Log(sim, "Spent %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
+		eb.unit.Log(sim, "Spent %0.3f energy from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, eb.currentEnergy, newEnergy)
 	}
 
 	eb.currentEnergy = newEnergy
@@ -88,33 +91,33 @@ func (eb *energyBar) ComboPoints() int32 {
 	return eb.comboPoints
 }
 
-func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, actionID ActionID) {
-	newComboPoints := MinInt32(eb.comboPoints+pointsToAdd, 5)
-	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(pointsToAdd), float64(newComboPoints-eb.comboPoints))
-
-	if sim.Log != nil {
-		eb.unit.Log(sim, "Gained %d combo points from %s (%d --> %d)", pointsToAdd, actionID, eb.comboPoints, newComboPoints)
-	}
-
-	eb.comboPoints = newComboPoints
-}
-
 // Gives an immediate partial energy tick and restarts the tick timer.
 func (eb *energyBar) ResetEnergyTick(sim *Simulation) {
 	timeSinceLastTick := sim.CurrentTime - (eb.NextEnergyTickAt() - EnergyTickDuration)
 	partialTickAmount := (EnergyPerTick * eb.EnergyTickMultiplier) * (float64(timeSinceLastTick) / float64(EnergyTickDuration))
 
-	eb.addEnergyInternal(sim, partialTickAmount, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+	eb.addEnergyInternal(sim, partialTickAmount, eb.regenMetrics)
 	eb.onEnergyGain(sim)
 
 	eb.newTickAction(sim, false)
 }
 
-func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
+func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, metrics *ResourceMetrics) {
+	newComboPoints := MinInt32(eb.comboPoints+pointsToAdd, 5)
+	metrics.AddEvent(float64(pointsToAdd), float64(newComboPoints-eb.comboPoints))
+
 	if sim.Log != nil {
-		eb.unit.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, actionID, eb.comboPoints, 0)
+		eb.unit.Log(sim, "Gained %d combo points from %s (%d --> %d)", pointsToAdd, metrics.ActionID, eb.comboPoints, newComboPoints)
 	}
-	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-eb.comboPoints), float64(-eb.comboPoints))
+
+	eb.comboPoints = newComboPoints
+}
+
+func (eb *energyBar) SpendComboPoints(sim *Simulation, metrics *ResourceMetrics) {
+	if sim.Log != nil {
+		eb.unit.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, metrics.ActionID, eb.comboPoints, 0)
+	}
+	metrics.AddEvent(float64(-eb.comboPoints), float64(-eb.comboPoints))
 	eb.comboPoints = 0
 }
 
@@ -133,7 +136,7 @@ func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
 		Priority:     ActionPriorityRegen,
 	}
 	pa.OnAction = func(sim *Simulation) {
-		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier, eb.regenMetrics)
 		eb.onEnergyGain(sim)
 
 		pa.NextActionAt = sim.CurrentTime + EnergyTickDuration

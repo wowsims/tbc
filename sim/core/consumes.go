@@ -674,6 +674,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 	} else if potionType == proto.Potions_SuperManaPotion {
 		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
 		actionID := ActionID{ItemID: 22832}
+		manaMetrics := character.NewManaMetrics(actionID)
 		return MajorCooldown{
 				Type: CooldownTypeMana,
 				CanActivate: func(sim *Simulation, character *Character) bool {
@@ -704,7 +705,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 					if alchStoneEquipped {
 						manaGain *= 1.4
 					}
-					character.AddMana(sim, manaGain, actionID, true)
+					character.AddMana(sim, manaGain, manaMetrics, true)
 				},
 			})
 	} else if potionType == proto.Potions_HastePotion {
@@ -735,6 +736,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 	} else if potionType == proto.Potions_MightyRagePotion {
 		actionID := ActionID{ItemID: 13442}
 		aura := character.NewTemporaryStatsAura("Mighty Rage Potion", actionID, stats.Stats{stats.Strength: 60}, time.Second*15)
+		rageMetrics := character.NewRageMetrics(actionID)
 		return MajorCooldown{
 				Type: CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {
@@ -760,7 +762,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 					aura.Activate(sim)
 					if character.Class == proto.Class_ClassWarrior {
 						bonusRage := 45.0 + (75.0-45.0)*sim.RandomFloat("Mighty Rage Potion")
-						character.AddRage(sim, bonusRage, actionID)
+						character.AddRage(sim, bonusRage, rageMetrics)
 					}
 				},
 			})
@@ -975,6 +977,8 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (MajorCooldown, *Spell) {
 	if conjuredType == proto.Conjured_ConjuredDarkRune {
 		actionID := ActionID{ItemID: 20520}
+		manaMetrics := character.NewManaMetrics(actionID)
+		damageTakenManaMetrics := character.NewManaMetrics(ActionID{SpellID: 33776})
 		return MajorCooldown{
 				Type: CooldownTypeMana,
 				CanActivate: func(sim *Simulation, character *Character) bool {
@@ -1001,14 +1005,14 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					// Restores 900 to 1500 mana. (2 Min Cooldown)
 					manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
-					character.AddMana(sim, manaGain, actionID, true)
+					character.AddMana(sim, manaGain, manaMetrics, true)
 
 					if character.Class == proto.Class_ClassPaladin {
 						// Paladins gain extra mana from self-inflicted damage
 						// TO-DO: It is possible for damage to be resisted or to crit
 						// This would affect mana returns for Paladins
 						manaFromDamage := manaGain * 2.0 / 3.0 * 0.1
-						character.AddMana(sim, manaFromDamage, ActionID{SpellID: 33776}, false)
+						character.AddMana(sim, manaFromDamage, damageTakenManaMetrics, false)
 					}
 				},
 			})
@@ -1162,6 +1166,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 		}
 	}
 
+	damageTakenManaMetrics := character.NewManaMetrics(ActionID{SpellID: 33776})
 	return SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: school,
@@ -1186,7 +1191,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 				// This affects mana returns for Paladins
 				if character.Class == proto.Class_ClassPaladin && maxSelfDamage > 0 {
 					manaGain := (minSelfDamage + (sim.RandomFloat("sapper paladin") * (maxSelfDamage - minSelfDamage))) * 0.1
-					character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
+					character.AddMana(sim, manaGain, damageTakenManaMetrics, false)
 				}
 			},
 		}),

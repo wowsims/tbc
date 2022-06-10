@@ -142,7 +142,7 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 			if spell.Unit.CurrentRage() < spell.CurCast.Cost {
 				return false
 			}
-			spell.Unit.SpendRage(sim, spell.CurCast.Cost, spell.ActionID)
+			spell.Unit.SpendRage(sim, spell.CurCast.Cost, spell.ResourceMetrics)
 			onCastComplete(sim, target)
 			return true
 		}
@@ -152,7 +152,7 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 			if spell.Unit.CurrentEnergy() < spell.CurCast.Cost {
 				return false
 			}
-			spell.Unit.SpendEnergy(sim, spell.CurCast.Cost, spell.ActionID)
+			spell.Unit.SpendEnergy(sim, spell.CurCast.Cost, spell.ResourceMetrics)
 			onCastComplete(sim, target)
 			return true
 		}
@@ -261,7 +261,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 		oldOnCastComplete2 := onCastComplete
 		onCastComplete = func(sim *Simulation, target *Unit) {
 			if spell.CurCast.Cost > 0 {
-				spell.Unit.SpendMana(sim, spell.CurCast.Cost, spell.ActionID)
+				spell.Unit.SpendMana(sim, spell.CurCast.Cost, spell.ResourceMetrics)
 				spell.Unit.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 			}
 			oldOnCastComplete2(sim, target)

@@ -66,7 +66,7 @@ type UnitMetrics struct {
 	// Aggregate values. These are updated after each iteration.
 	oomTimeSum float64
 	actions    map[ActionID]*ActionMetrics
-	resources  map[ResourceKey]*ResourceMetrics
+	resources  []*ResourceMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
@@ -134,15 +134,17 @@ func (tam *TargetedActionMetrics) ToProto() *proto.TargetedActionMetrics {
 
 func NewUnitMetrics() UnitMetrics {
 	return UnitMetrics{
-		dps:       NewDistributionMetrics(),
-		threat:    NewDistributionMetrics(),
-		dtps:      NewDistributionMetrics(),
-		actions:   make(map[ActionID]*ActionMetrics),
-		resources: make(map[ResourceKey]*ResourceMetrics),
+		dps:     NewDistributionMetrics(),
+		threat:  NewDistributionMetrics(),
+		dtps:    NewDistributionMetrics(),
+		actions: make(map[ActionID]*ActionMetrics),
 	}
 }
 
 type ResourceMetrics struct {
+	ActionID ActionID
+	Type     proto.ResourceType
+
 	Events     int32
 	Gain       float64
 	ActualGain float64
@@ -151,10 +153,10 @@ type ResourceMetrics struct {
 	ActualGainFromPreviousIterations float64
 }
 
-func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType proto.ResourceType) *proto.ResourceMetrics {
+func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
 	return &proto.ResourceMetrics{
-		Id:   actionID.ToProto(),
-		Type: resourceType,
+		Id:   resourceMetrics.ActionID.ToProto(),
+		Type: resourceMetrics.Type,
 
 		Events:     resourceMetrics.Events,
 		Gain:       resourceMetrics.Gain,
@@ -173,21 +175,36 @@ func (resourceMetrics *ResourceMetrics) ActualGainForCurrentIteration() float64 
 	return resourceMetrics.ActualGain - resourceMetrics.ActualGainFromPreviousIterations
 }
 
-func (unitMetrics *UnitMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
-	resourceKey := ResourceKey{
-		ActionID: actionID,
-		Type:     resourceType,
-	}
-	resourceMetrics, ok := unitMetrics.resources[resourceKey]
-
-	if !ok {
-		resourceMetrics = &ResourceMetrics{}
-		unitMetrics.resources[resourceKey] = resourceMetrics
-	}
-
+func (resourceMetrics *ResourceMetrics) AddEvent(gain float64, actualGain float64) {
 	resourceMetrics.Events++
 	resourceMetrics.Gain += gain
 	resourceMetrics.ActualGain += actualGain
+}
+
+func (unitMetrics *UnitMetrics) NewResourceMetrics(actionID ActionID, resourceType proto.ResourceType) *ResourceMetrics {
+	newMetrics := &ResourceMetrics{
+		ActionID: actionID,
+		Type:     resourceType,
+	}
+	unitMetrics.resources = append(unitMetrics.resources, newMetrics)
+	return newMetrics
+}
+
+// Convenience helpers for NewResourceMetrics.
+func (unit *Unit) NewManaMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeMana)
+}
+func (unit *Unit) NewRageMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeRage)
+}
+func (unit *Unit) NewEnergyMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeEnergy)
+}
+func (unit *Unit) NewComboPointMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeComboPoints)
+}
+func (unit *Unit) NewFocusMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeFocus)
 }
 
 // Adds the results of a spell to the character metrics.
@@ -266,8 +283,10 @@ func (unitMetrics *UnitMetrics) ToProto(numIterations int32) *proto.UnitMetrics 
 	for actionID, action := range unitMetrics.actions {
 		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto(actionID))
 	}
-	for rk, resource := range unitMetrics.resources {
-		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto(rk.ActionID, rk.Type))
+	for _, resource := range unitMetrics.resources {
+		if resource.Events > 0 {
+			protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto())
+		}
 	}
 
 	return protoMetrics

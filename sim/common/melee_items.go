@@ -634,6 +634,13 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	actionID := core.ActionID{ItemID: 29996}
 
+	var resourceMetrics *core.ResourceMetrics
+	if character.HasRageBar() {
+		resourceMetrics = character.NewRageMetrics(actionID)
+	} else if character.HasEnergyBar() {
+		resourceMetrics = character.NewEnergyMetrics(actionID)
+	}
+
 	character.GetOrRegisterAura(core.Aura{
 		Label:    "Rod of the Sun King",
 		Duration: core.NeverExpires,
@@ -649,12 +656,12 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Unit.AddRage(sim, 5, actionID)
+				spell.Unit.AddRage(sim, 5, resourceMetrics)
 			} else if spell.Unit.HasEnergyBar() {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Unit.AddEnergy(sim, 10, actionID)
+				spell.Unit.AddEnergy(sim, 10, resourceMetrics)
 			}
 		},
 	})

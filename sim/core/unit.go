@@ -61,6 +61,11 @@ type Unit struct {
 
 	PseudoStats stats.PseudoStats
 
+	// TODO: Put these inside a 'manaBar' object.
+	manaCastingMetrics    *ResourceMetrics
+	manaNotCastingMetrics *ResourceMetrics
+	jowManaMetrics        *ResourceMetrics
+
 	rageBar
 	energyBar
 

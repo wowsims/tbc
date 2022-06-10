@@ -93,6 +93,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			shaman := agent.(ShamanAgent).GetShaman()
+			manaMetrics := shaman.NewManaMetrics(core.ActionID{SpellID: 37237})
 			shaman.RegisterAura(core.Aura{
 				Label:    "Cataclysm Regalia 4pc",
 				Duration: core.NeverExpires,
@@ -106,7 +107,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 					if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cata4p") > 0.25 {
 						return
 					}
-					shaman.AddMana(sim, 120, core.ActionID{SpellID: 37237}, false)
+					shaman.AddMana(sim, 120, manaMetrics, false)
 				},
 			})
 		},
@@ -188,6 +189,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 		Timer:    shaman.NewTimer(),
 		Duration: time.Second * 40,
 	}
+	manaMetrics := shaman.NewManaMetrics(core.ActionID{ItemID: 30663})
 
 	shaman.RegisterAura(core.Aura{
 		Label:    "Fathom Brooch of the Tidewalker",
@@ -206,7 +208,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				return
 			}
 			icd.Use(sim)
-			shaman.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
+			shaman.AddMana(sim, 335, manaMetrics, false)
 		},
 	})
 }

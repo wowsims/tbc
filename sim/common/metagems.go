@@ -55,6 +55,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 		Timer:    character.NewTimer(),
 		Duration: time.Second * 15,
 	}
+	manaMetrics := character.NewManaMetrics(core.ActionID{ItemID: 25901})
 
 	character.RegisterAura(core.Aura{
 		Label:    "Insightful Earthstorm Diamond",
@@ -67,7 +68,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 				return
 			}
 			icd.Use(sim)
-			character.AddMana(sim, 300, core.ActionID{ItemID: 25901}, false)
+			character.AddMana(sim, 300, manaMetrics, false)
 		},
 	})
 }
