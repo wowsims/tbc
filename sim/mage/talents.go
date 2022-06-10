@@ -87,7 +87,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			mage.PseudoStats.NoCost = false
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagMage) {
+			if !spell.Flags.Matches(SpellFlagMage) {
 				return
 			}
 			if curCastIdx == lastCheckedCastIdx {
@@ -111,13 +111,13 @@ func (mage *Mage) applyArcaneConcentration() {
 				mage.AddStatDynamic(sim, stats.SpellCrit, -mage.bonusAMCCCrit)
 				mage.bonusAMCCCrit = 0
 			}
-			if !spell.SpellExtras.Matches(SpellFlagMage) {
+			if !spell.Flags.Matches(SpellFlagMage) {
 				return
 			}
 			curCastIdx++
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagMage) {
+			if !spell.Flags.Matches(SpellFlagMage) {
 				return
 			}
 
@@ -154,8 +154,8 @@ func (mage *Mage) registerPresenceOfMindCD() {
 	actionID := core.ActionID{SpellID: 12043}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.NewTimer(),
@@ -229,8 +229,8 @@ func (mage *Mage) registerArcanePowerCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.NewTimer(),
@@ -327,8 +327,8 @@ func (mage *Mage) registerCombustionCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: cd,
 		},
@@ -368,8 +368,8 @@ func (mage *Mage) registerIcyVeinsCD() {
 	})
 
 	mage.IcyVeins = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Mana,
 		BaseCost:     manaCost,
@@ -415,8 +415,8 @@ func (mage *Mage) registerColdSnapCD() {
 	actionID := core.ActionID{SpellID: 11958}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

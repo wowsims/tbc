@@ -15,7 +15,7 @@ func (shaman *Shaman) registerSearingTotemSpell() {
 	shaman.SearingTotem = shaman.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagTotem,
+		Flags:       SpellFlagTotem,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -69,7 +69,7 @@ func (shaman *Shaman) registerMagmaTotemSpell() {
 	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagTotem,
+		Flags:       SpellFlagTotem,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -123,7 +123,7 @@ func (shaman *Shaman) registerNovaTotemSpell() {
 	shaman.FireNovaTotem = shaman.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagTotem,
+		Flags:       SpellFlagTotem,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

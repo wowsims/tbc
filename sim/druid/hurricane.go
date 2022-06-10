@@ -33,7 +33,7 @@ func (druid *Druid) registerHurricaneSpell() {
 	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
-		SpellExtras: core.SpellExtrasChanneled,
+		Flags:       core.SpellFlagChanneled,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

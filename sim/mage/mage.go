@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	SpellFlagMage = core.SpellExtrasAgentReserved1
+	SpellFlagMage = core.SpellFlagAgentReserved1
 )
 
 func RegisterMage() {

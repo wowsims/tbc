@@ -74,8 +74,8 @@ func (druid *Druid) registerCatFormSpell() {
 	})
 
 	druid.CatForm = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -146,8 +146,8 @@ func (druid *Druid) registerBearFormSpell() {
 	})
 
 	druid.BearForm = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

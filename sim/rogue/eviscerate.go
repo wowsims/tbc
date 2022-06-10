@@ -20,7 +20,7 @@ func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
 	return rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26865, Tag: comboPoints},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
+		Flags:       core.SpellFlagMeleeMetrics | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
 		BaseCost:     cost,

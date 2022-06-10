@@ -19,7 +19,7 @@ func (priest *Priest) newMindFlaySpell(numTicks int) *core.Spell {
 	return priest.RegisterSpell(core.SpellConfig{
 		ActionID:     priest.MindFlayActionID(numTicks),
 		SpellSchool:  core.SpellSchoolShadow,
-		SpellExtras:  core.SpellExtrasBinary | core.SpellExtrasChanneled,
+		Flags:        core.SpellFlagBinary | core.SpellFlagChanneled,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
 

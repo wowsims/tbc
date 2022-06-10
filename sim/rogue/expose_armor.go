@@ -16,7 +16,7 @@ func (rogue *Rogue) registerExposeArmorSpell() {
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26866, Tag: 5},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
+		Flags:       core.SpellFlagMeleeMetrics | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

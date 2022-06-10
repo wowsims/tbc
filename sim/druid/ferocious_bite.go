@@ -22,7 +22,7 @@ func (druid *Druid) registerFerociousBiteSpell() {
 	druid.FerociousBite = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

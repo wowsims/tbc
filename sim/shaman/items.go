@@ -157,8 +157,8 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    shaman.NewTimer(),
@@ -273,7 +273,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 				return
 			}
 
-			if !spell.SpellExtras.Matches(SpellFlagShock) {
+			if !spell.Flags.Matches(SpellFlagShock) {
 				return
 			}
 

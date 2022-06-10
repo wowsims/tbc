@@ -13,7 +13,7 @@ func (mage *Mage) registerFrostboltSpell() {
 	mage.Frostbolt = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27072},
 		SpellSchool: core.SpellSchoolFrost,
-		SpellExtras: SpellFlagMage | core.SpellExtrasBinary,
+		Flags:       SpellFlagMage | core.SpellFlagBinary,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

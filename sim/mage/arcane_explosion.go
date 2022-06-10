@@ -11,7 +11,7 @@ func (mage *Mage) registerArcaneExplosionSpell() {
 	mage.ArcaneExplosion = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 10202},
 		SpellSchool: core.SpellSchoolArcane,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

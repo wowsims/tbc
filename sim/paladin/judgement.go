@@ -43,7 +43,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31898},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		Flags:       SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -83,7 +83,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27159},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		Flags:       SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -129,7 +129,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27164},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		Flags:       SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -175,7 +175,7 @@ func (paladin *Paladin) registerJudgementOfLightSpell(cdTimer *core.Timer) {
 	paladin.JudgementOfLight = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27163},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		Flags:       SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -219,7 +219,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 	paladin.JudgementOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27157},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement | core.SpellExtrasBinary,
+		Flags:       SpellFlagJudgement | core.SpellFlagBinary,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,

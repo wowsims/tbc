@@ -179,8 +179,8 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	actionID := core.ActionID{SpellID: 17116}
 
 	spell := druid.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    druid.NewTimer(),

@@ -18,8 +18,8 @@ func (rogue *Rogue) makeSliceAndDice(comboPoints int32) *core.Spell {
 	duration := rogue.sliceAndDiceDurations[comboPoints]
 
 	return rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: SpellFlagFinisher,
+		ActionID: actionID,
+		Flags:    SpellFlagFinisher,
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

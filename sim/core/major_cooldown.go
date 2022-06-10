@@ -387,7 +387,7 @@ func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempStats stats.Stats, duration time.Duration, config SpellConfig) {
 	aura := character.NewTemporaryStatsAura(auraLabel, config.ActionID, tempStats, duration)
 
-	config.SpellExtras |= SpellExtrasNoOnCastComplete
+	config.Flags |= SpellFlagNoOnCastComplete
 	config.ApplyEffects = func(sim *Simulation, _ *Unit, _ *Spell) {
 		aura.Activate(sim)
 	}

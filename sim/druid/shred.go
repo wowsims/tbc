@@ -20,7 +20,7 @@ func (druid *Druid) registerShredSpell() {
 	druid.Shred = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27002},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

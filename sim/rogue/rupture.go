@@ -18,7 +18,7 @@ func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
 	return rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26867, Tag: comboPoints},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
+		Flags:       core.SpellFlagMeleeMetrics | core.SpellFlagIgnoreResists | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

@@ -10,8 +10,8 @@ import (
 
 func (shaman *Shaman) newTotemSpellConfig(baseCost float64, spellID int32) core.SpellConfig {
 	return core.SpellConfig{
-		ActionID:    core.ActionID{SpellID: spellID},
-		SpellExtras: SpellFlagTotem,
+		ActionID: core.ActionID{SpellID: spellID},
+		Flags:    SpellFlagTotem,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

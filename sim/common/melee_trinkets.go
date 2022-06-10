@@ -91,7 +91,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			handOfJusticeSpell = character.GetOrRegisterSpell(core.SpellConfig{
 				ActionID:     core.ActionID{ItemID: 11815},
 				SpellSchool:  core.SpellSchoolPhysical,
-				SpellExtras:  core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
+				Flags:        core.SpellFlagMeleeMetrics | core.SpellFlagNoOnCastComplete,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 			})
 		},
@@ -182,8 +182,8 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	})
 
 	spell := character.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

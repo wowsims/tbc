@@ -45,7 +45,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 	warrior.Overpower = warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 11585},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

@@ -17,7 +17,7 @@ func (rogue *Rogue) registerShivSpell() {
 	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 5938},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder | core.SpellExtrasCannotBeDodged,
+		Flags:       core.SpellFlagMeleeMetrics | SpellFlagBuilder | core.SpellFlagCannotBeDodged,
 
 		ResourceType: stats.Energy,
 		BaseCost:     cost,

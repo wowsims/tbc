@@ -183,7 +183,7 @@ func (rogue *Rogue) applySealFate() {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SpellExtras.Matches(SpellFlagBuilder) {
+			if !spell.Flags.Matches(SpellFlagBuilder) {
 				return
 			}
 
@@ -237,7 +237,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 				swordSpecializationSpell = rogue.GetOrRegisterSpell(core.SpellConfig{
 					ActionID:    core.ActionID{SpellID: 13964},
 					SpellSchool: core.SpellSchoolPhysical,
-					SpellExtras: core.SpellExtrasMeleeMetrics,
+					Flags:       core.SpellFlagMeleeMetrics,
 
 					ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
 				})
@@ -313,7 +313,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	bfHit := rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
+		Flags:       core.SpellFlagMeleeMetrics | core.SpellFlagNoOnCastComplete,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
 			// No proc mask, so it won't proc itself.
