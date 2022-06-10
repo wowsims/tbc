@@ -267,7 +267,8 @@ message RaidStats {
     repeated PartyStats parties = 1;
 }
 message ComputeStatsResult {
-		RaidStats raid_stats = 1;
+	RaidStats raid_stats = 1;
+	string error_result = 2;
 }
 
 // RPC StatWeights
