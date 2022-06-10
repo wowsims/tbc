@@ -260,7 +260,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.MHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
 		SpellSchool: aa.MH.GetSpellSchool(),
-		SpellExtras: SpellExtrasMeleeMetrics,
+		Flags:       SpellFlagMeleeMetrics,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
 	})
@@ -268,7 +268,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.OHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
 		SpellSchool: aa.OH.GetSpellSchool(),
-		SpellExtras: SpellExtrasMeleeMetrics,
+		Flags:       SpellFlagMeleeMetrics,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
 	})
@@ -277,7 +277,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		aa.RangedAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 			ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 			SpellSchool: SpellSchoolPhysical,
-			SpellExtras: SpellExtrasMeleeMetrics,
+			Flags:       SpellFlagMeleeMetrics,
 
 			Cast: CastConfig{
 				DefaultCast: Cast{

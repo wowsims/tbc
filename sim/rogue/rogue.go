@@ -26,8 +26,8 @@ func RegisterRogue() {
 }
 
 const (
-	SpellFlagBuilder      = core.SpellExtrasAgentReserved1
-	SpellFlagFinisher     = core.SpellExtrasAgentReserved2
+	SpellFlagBuilder      = core.SpellFlagAgentReserved1
+	SpellFlagFinisher     = core.SpellFlagAgentReserved2
 	SpellFlagRogueAbility = SpellFlagBuilder | SpellFlagFinisher
 )
 
@@ -91,10 +91,10 @@ func (rogue *Rogue) GetRogue() *Rogue {
 func (rogue *Rogue) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (rogue *Rogue) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 
-func (rogue *Rogue) finisherFlags() core.SpellExtras {
+func (rogue *Rogue) finisherFlags() core.SpellFlag {
 	flags := SpellFlagFinisher
 	if rogue.Talents.SurpriseAttacks {
-		flags |= core.SpellExtrasCannotBeDodged
+		flags |= core.SpellFlagCannotBeDodged
 	}
 	return flags
 }

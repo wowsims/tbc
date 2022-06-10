@@ -15,7 +15,7 @@ func (warrior *Warrior) registerDevastateSpell() {
 	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 30022},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,

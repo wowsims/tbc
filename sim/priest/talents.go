@@ -156,8 +156,8 @@ func (priest *Priest) registerInnerFocus() {
 	})
 
 	priest.InnerFocus = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
-		SpellExtras: core.SpellExtrasNoOnCastComplete,
+		ActionID: actionID,
+		Flags:    core.SpellFlagNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

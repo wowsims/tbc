@@ -6,7 +6,7 @@ import (
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
 func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, attackTable *AttackTable) {
-	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
+	if spell.Flags.Matches(SpellFlagIgnoreResists) {
 		return
 	}
 
@@ -18,7 +18,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 
 		// Physical resistance (armor).
 		spellEffect.Damage *= attackTable.ArmorDamageReduction
-	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
+	} else if !spell.Flags.Matches(SpellFlagBinary) {
 		// Magical resistance.
 
 		resistanceRoll := sim.RandomFloat("Partial Resist")

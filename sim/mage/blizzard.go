@@ -36,7 +36,7 @@ func (mage *Mage) registerBlizzardSpell() {
 	mage.Blizzard = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFrost,
-		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
+		Flags:       SpellFlagMage | core.SpellFlagChanneled,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

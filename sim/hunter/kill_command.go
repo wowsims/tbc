@@ -69,7 +69,7 @@ func (hp *HunterPet) registerKillCommandSpell() {
 	hp.KillCommand = hp.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 34027},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,

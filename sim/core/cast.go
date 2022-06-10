@@ -125,7 +125,7 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 		return func(sim *Simulation, target *Unit) bool {
 			spell.CurCast.Cost = spell.ApplyCostModifiers(spell.CurCast.Cost)
 			if spell.Unit.CurrentMana() < spell.CurCast.Cost {
-				if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+				if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 					spell.Unit.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
 						spell.ActionID, spell.Unit.CurrentMana(), spell.CurCast.Cost)
 				}
@@ -241,7 +241,7 @@ func (spell *Spell) wrapCastFuncSharedCooldown(config CastConfig, onCastComplete
 }
 
 func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc) CastFunc {
-	if !spell.SpellExtras.Matches(SpellExtrasNoOnCastComplete) {
+	if !spell.Flags.Matches(SpellFlagNoOnCastComplete) {
 		configOnCastComplete := config.OnCastComplete
 		configAfterCast := config.AfterCast
 		oldOnCastComplete1 := onCastComplete
@@ -269,7 +269,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 	}
 
 	if config.DefaultCast.CastTime == 0 {
-		if spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+		if spell.Flags.Matches(SpellFlagNoLogs) {
 			return onCastComplete
 		} else {
 			return func(sim *Simulation, target *Unit) {
@@ -285,10 +285,10 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 			}
 		}
 	} else {
-		if !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+		if !spell.Flags.Matches(SpellFlagNoLogs) {
 			oldOnCastComplete3 := onCastComplete
 			onCastComplete = func(sim *Simulation, target *Unit) {
-				if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+				if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 					// Hunter fake cast has no ID.
 					if !spell.ActionID.SameAction(ActionID{}) {
 						spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
@@ -299,7 +299,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 		}
 
 		return func(sim *Simulation, target *Unit) {
-			if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+			if sim.Log != nil && !spell.Flags.Matches(SpellFlagNoLogs) {
 				spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 					spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
 			}

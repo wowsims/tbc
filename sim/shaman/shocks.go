@@ -20,7 +20,7 @@ func (shaman *Shaman) newShockSpellConfig(spellID int32, spellSchool core.SpellS
 	return core.SpellConfig{
 			ActionID:    actionID,
 			SpellSchool: spellSchool,
-			SpellExtras: SpellFlagShock,
+			Flags:       SpellFlagShock,
 
 			ResourceType: stats.Mana,
 			BaseCost:     baseCost,
@@ -60,7 +60,7 @@ func (shaman *Shaman) newShockSpellConfig(spellID int32, spellSchool core.SpellS
 
 func (shaman *Shaman) registerEarthShockSpell(shockTimer *core.Timer) {
 	config, effect := shaman.newShockSpellConfig(25454, core.SpellSchoolNature, 535.0, shockTimer)
-	config.SpellExtras |= core.SpellExtrasBinary
+	config.Flags |= core.SpellFlagBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
 	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCritBinary(shaman.ElementalCritMultiplier())
@@ -116,7 +116,7 @@ func (shaman *Shaman) registerFlameShockSpell(shockTimer *core.Timer) {
 
 func (shaman *Shaman) registerFrostShockSpell(shockTimer *core.Timer) {
 	config, effect := shaman.newShockSpellConfig(25464, core.SpellSchoolFrost, 525.0, shockTimer)
-	config.SpellExtras |= core.SpellExtrasBinary
+	config.Flags |= core.SpellFlagBinary
 
 	effect.ThreatMultiplier *= 2
 	effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)

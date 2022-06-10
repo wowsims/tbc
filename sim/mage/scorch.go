@@ -50,7 +50,7 @@ func (mage *Mage) registerScorchSpell() {
 	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27074},
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

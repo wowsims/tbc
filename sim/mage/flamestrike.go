@@ -30,7 +30,7 @@ func (mage *Mage) registerFlamestrikeSpell() {
 	mage.Flamestrike = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

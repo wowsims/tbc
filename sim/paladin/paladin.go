@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	SpellFlagSeal      = core.SpellExtrasAgentReserved1
-	SpellFlagJudgement = core.SpellExtrasAgentReserved2
+	SpellFlagSeal      = core.SpellFlagAgentReserved1
+	SpellFlagJudgement = core.SpellFlagAgentReserved2
 )
 
 type Paladin struct {

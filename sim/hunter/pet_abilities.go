@@ -74,7 +74,7 @@ func (hp *HunterPet) newBite(isPrimary bool) PetAbility {
 		Spell: hp.RegisterSpell(core.SpellConfig{
 			ActionID:    core.ActionID{SpellID: 27050},
 			SpellSchool: core.SpellSchoolPhysical,
-			SpellExtras: core.SpellExtrasMeleeMetrics,
+			Flags:       core.SpellFlagMeleeMetrics,
 
 			Cast: core.CastConfig{
 				DefaultCast: core.Cast{
@@ -106,7 +106,7 @@ func (hp *HunterPet) newClaw(isPrimary bool) PetAbility {
 		Spell: hp.RegisterSpell(core.SpellConfig{
 			ActionID:    core.ActionID{SpellID: 27049},
 			SpellSchool: core.SpellSchoolPhysical,
-			SpellExtras: core.SpellExtrasMeleeMetrics,
+			Flags:       core.SpellFlagMeleeMetrics,
 
 			Cast: core.CastConfig{
 				DefaultCast: core.Cast{
@@ -134,7 +134,7 @@ func (hp *HunterPet) newGore(isPrimary bool) PetAbility {
 		Spell: hp.RegisterSpell(core.SpellConfig{
 			ActionID:    core.ActionID{SpellID: 35298},
 			SpellSchool: core.SpellSchoolPhysical,
-			SpellExtras: core.SpellExtrasMeleeMetrics,
+			Flags:       core.SpellFlagMeleeMetrics,
 
 			Cast: core.CastConfig{
 				DefaultCast: core.Cast{
@@ -197,7 +197,7 @@ func (hp *HunterPet) newScreech(isPrimary bool) PetAbility {
 		Spell: hp.RegisterSpell(core.SpellConfig{
 			ActionID:    core.ActionID{SpellID: 27051},
 			SpellSchool: core.SpellSchoolPhysical,
-			SpellExtras: core.SpellExtrasMeleeMetrics,
+			Flags:       core.SpellFlagMeleeMetrics,
 
 			Cast: core.CastConfig{
 				DefaultCast: core.Cast{

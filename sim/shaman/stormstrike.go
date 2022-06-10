@@ -53,7 +53,7 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	return shaman.RegisterSpell(core.SpellConfig{
 		ActionID:    StormstrikeActionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
@@ -78,7 +78,7 @@ func (shaman *Shaman) registerStormstrikeSpell() {
 	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
 		ActionID:    StormstrikeActionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		Flags:       core.SpellFlagMeleeMetrics,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

@@ -30,7 +30,7 @@ func (mage *Mage) registerWintersChillSpell() {
 	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 28595},
 		SpellSchool: core.SpellSchoolFrost,
-		SpellExtras: SpellFlagMage,
+		Flags:       SpellFlagMage,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})

@@ -16,7 +16,7 @@ func (druid *Druid) registerRipSpell() {
 	druid.Rip = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists,
+		Flags:       core.SpellFlagMeleeMetrics | core.SpellFlagIgnoreResists,
 
 		ResourceType: stats.Energy,
 		BaseCost:     baseCost,

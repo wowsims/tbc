@@ -428,8 +428,8 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		// gives just themself the buff, with no cast time.
 		drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
 		mcd.Spell = character.RegisterSpell(SpellConfig{
-			ActionID:    actionID,
-			SpellExtras: SpellExtrasNoMetrics,
+			ActionID: actionID,
+			Flags:    SpellFlagNoMetrics,
 
 			Cast: CastConfig{
 				CD: Cooldown{
@@ -659,8 +659,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -690,8 +690,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -720,8 +720,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -748,8 +748,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -794,8 +794,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -821,8 +821,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -846,8 +846,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -871,8 +871,8 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
@@ -990,8 +990,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    character.GetConjuredCD(),
@@ -1051,8 +1051,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID:    actionID,
-				SpellExtras: SpellExtrasNoOnCastComplete,
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    character.GetConjuredCD(),
@@ -1121,8 +1121,8 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	}
 
 	spell := character.RegisterSpell(SpellConfig{
-		ActionID:    SuperSapperActionID,
-		SpellExtras: SpellExtrasNoOnCastComplete | SpellExtrasNoMetrics | SpellExtrasNoLogs,
+		ActionID: SuperSapperActionID,
+		Flags:    SpellFlagNoOnCastComplete | SpellFlagNoMetrics | SpellFlagNoLogs,
 
 		Cast: CastConfig{
 			CD: Cooldown{

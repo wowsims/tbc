@@ -323,7 +323,7 @@ func RetributionAura(character *Character, points int32) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolHoly,
-		SpellExtras: SpellExtrasBinary,
+		Flags:       SpellFlagBinary,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
@@ -356,7 +356,7 @@ func ThornsAura(character *Character, points int32) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolNature,
-		SpellExtras: SpellExtrasBinary,
+		Flags:       SpellFlagBinary,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
@@ -389,7 +389,7 @@ func BlessingOfSanctuaryAura(character *Character) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolHoly,
-		SpellExtras: SpellExtrasBinary,
+		Flags:       SpellFlagBinary,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
@@ -487,7 +487,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			wfSpell = character.GetOrRegisterSpell(SpellConfig{
 				ActionID:    buffActionID, // temporary buff ("Windfury Attack") spell id
 				SpellSchool: SpellSchoolPhysical,
-				SpellExtras: SpellExtrasMeleeMetrics | SpellExtrasNoOnCastComplete,
+				Flags:       SpellFlagMeleeMetrics | SpellFlagNoOnCastComplete,
 
 				ApplyEffects: ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 			})
@@ -566,8 +566,8 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 	sharedTimer := character.NewTimer()
 
 	spell := character.RegisterSpell(SpellConfig{
-		ActionID:    config.ActionID,
-		SpellExtras: SpellExtrasNoOnCastComplete | SpellExtrasNoMetrics | SpellExtrasNoLogs,
+		ActionID: config.ActionID,
+		Flags:    SpellFlagNoOnCastComplete | SpellFlagNoMetrics | SpellFlagNoLogs,
 
 		Cast: CastConfig{
 			CD: Cooldown{

@@ -134,7 +134,7 @@ func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell, att
 	} else {
 		critRating += unit.PseudoStats.BonusMeleeCritRating
 	}
-	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+	if spell.Flags.Matches(SpellFlagAgentReserved1) {
 		critRating += unit.PseudoStats.BonusCritRatingAgentReserved1
 	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
@@ -175,7 +175,7 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 }
 
 func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, attackTable *AttackTable) {
-	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
+	if !spell.Flags.Matches(SpellFlagIgnoreModifiers) {
 		spellEffect.applyAttackerModifiers(sim, spell)
 		spellEffect.applyResistances(sim, spell, attackTable)
 		spellEffect.applyTargetModifiers(sim, spell)
@@ -230,7 +230,7 @@ func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *S
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		spellEffect.Damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
 	}
-	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+	if spell.Flags.Matches(SpellFlagAgentReserved1) {
 		spellEffect.Damage *= attacker.PseudoStats.AgentReserved1DamageDealtMultiplier
 	}
 
