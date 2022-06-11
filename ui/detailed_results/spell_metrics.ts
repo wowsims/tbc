@@ -97,9 +97,9 @@ export class SpellMetricsTable extends MetricsTable<ActionMetrics> {
 		}
 		const player = players[0];
 
-		const actions = player.getSpellActions();
+		const actions = player.getSpellActions().map(action => action.forTarget(resultData.filter));
 		const actionGroups = ActionMetrics.groupById(actions);
-		const petGroups = player.pets.map(pet => pet.getSpellActions());
+		const petGroups = player.pets.map(pet => pet.getSpellActions().map(action => action.forTarget(resultData.filter)));
 
 		return actionGroups.concat(petGroups);
 	}
