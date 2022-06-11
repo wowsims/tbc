@@ -132,19 +132,14 @@ export class Sim {
         const request = this.makeRaidSimRequest(false);
         var result = await this.workerPool.raidSimAsync(request, onProgress);
         if (result.errorResult != "") {
-            this.handleError(result.errorResult, this.encodeSimReq(request));
+            this.handleError(result.errorResult);
             return;
         }
         const simResult = await SimResult.makeNew(request, result);
         this.simResultEmitter.emit(eventID, simResult);
     }
-    encodeSimReq(req) {
-        const protoBytes = RaidSimRequest.toBinary(req);
-        const deflated = pako.deflate(protoBytes, { to: 'string' });
-        return btoa(String.fromCharCode(...deflated));
-    }
-    handleError(errorStr, extra) {
-        if (window.confirm("Simulation Failure:\n" + errorStr + "\nPress Ok to file crash report")) {
+    handleError(errorStr) {
+        if (window.confirm("Simulation Failed:\n" + errorStr + "\nPress Ok to file crash report")) {
             // Splice out just the line numbers
             var filteredError = errorStr.substring(0, errorStr.indexOf("Stack Trace:"));
             const rExp = /(.*\.go:\d+)/g;
@@ -156,7 +151,7 @@ export class Sim {
                         window.open(issues.items[0].html_url, "_blank");
                     }
                     else {
-                        window.open("https://github.com/wowsims/tbc/issues/new?assignees=&labels=&title=Crash%20Report%20" + hash + "&body=" + encodeURIComponent(errorStr + "\n\nRequest:\n" + extra), '_blank');
+                        window.open("https://github.com/wowsims/tbc/issues/new?assignees=&labels=&title=Crash%20Report%20" + hash + "&body=" + encodeURIComponent(errorStr), '_blank');
                     }
                 });
             }).catch(fetchErr => {
@@ -199,21 +194,13 @@ export class Sim {
         // Capture the current players so we avoid issues if something changes while
         // request is in-flight.
         const players = this.raid.getPlayers();
-        const req = ComputeStatsRequest.create({ raid: this.getModifiedRaidProto() });
-        const result = await this.workerPool.computeStats(req);
-        if (result.errorResult != "") {
-            this.handleError(result.errorResult, this.encodeComputeStatsReq(req));
-            return;
-        }
+        const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
+            raid: this.getModifiedRaidProto(),
+        }));
         TypedEvent.freezeAllAndDo(() => {
             result.raidStats.parties
                 .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
         });
-    }
-    encodeComputeStatsReq(req) {
-        const protoBytes = ComputeStatsRequest.toBinary(req);
-        const deflated = pako.deflate(protoBytes, { to: 'string' });
-        return btoa(String.fromCharCode(...deflated));
     }
     async statWeights(player, epStats, epReferenceStat, onProgress) {
         if (this.raid.isEmpty()) {
