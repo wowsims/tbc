@@ -115,6 +115,7 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	hunter := agent.(HunterAgent).GetHunter()
 	const manaGain = 8.0
+	manaMetrics := hunter.NewManaMetrics(core.ActionID{SpellID: 46939})
 
 	hunter.RegisterAura(core.Aura{
 		Label:    "Black Bow of the Betrayer",
@@ -126,7 +127,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
 				return
 			}
-			hunter.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
+			hunter.AddMana(sim, manaGain, manaMetrics, false)
 		},
 	})
 }

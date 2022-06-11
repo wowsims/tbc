@@ -38,7 +38,7 @@ func (rogue *Rogue) registerShivSpell() {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.MeleeCritMultiplier(false, true)),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, spell.ActionID)
+					rogue.AddComboPoints(sim, 1, spell.ComboPointMetrics())
 
 					switch rogue.Consumes.OffHandImbue {
 					case proto.WeaponImbue_WeaponImbueRogueDeadlyPoison:

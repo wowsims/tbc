@@ -47,10 +47,10 @@ func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
 			OutcomeApplier: rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.MeleeCritMultiplier(true, false)),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.ApplyFinisher(sim, spell.ActionID)
+					rogue.ApplyFinisher(sim, spell)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, rogue.QuickRecoveryMetrics)
 					}
 				}
 			},

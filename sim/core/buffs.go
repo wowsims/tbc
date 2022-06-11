@@ -890,6 +890,11 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 func ManaTideTotemAura(character *Character, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
+	var metrics *ResourceMetrics
+	if character.HasManaBar() {
+		metrics = character.NewManaMetrics(actionID)
+	}
+
 	return character.GetOrRegisterAura(Aura{
 		Label:    "ManaTideTotem-" + actionID.String(),
 		Tag:      ManaTideTotemAuraTag,
@@ -902,8 +907,10 @@ func ManaTideTotemAura(character *Character, actionTag int32) *Aura {
 					Period:   ManaTideTotemDuration / 4,
 					NumTicks: 4,
 					OnAction: func(sim *Simulation) {
-						character.AddMana(sim, manaPerTick, actionID, true)
-						character.ExpectedBonusMana -= manaPerTick
+						if metrics != nil {
+							character.AddMana(sim, manaPerTick, metrics, true)
+							character.ExpectedBonusMana -= manaPerTick
+						}
 					},
 				})
 			}

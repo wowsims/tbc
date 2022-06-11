@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -52,7 +51,7 @@ func (druid *Druid) registerMangleBearSpell() {
 				if spellEffect.Landed() {
 					druid.MangleAura.Activate(sim)
 				} else {
-					druid.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					druid.AddRage(sim, refundAmount, druid.RageRefundMetrics)
 				}
 			},
 		}),
@@ -96,10 +95,10 @@ func (druid *Druid) registerMangleCatSpell() {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					druid.AddComboPoints(sim, 1, spell.ActionID)
+					druid.AddComboPoints(sim, 1, spell.ComboPointMetrics())
 					druid.MangleAura.Activate(sim)
 				} else {
-					druid.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					druid.AddEnergy(sim, refundAmount, druid.EnergyRefundMetrics)
 				}
 			},
 		}),

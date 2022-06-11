@@ -27,6 +27,8 @@ var ItemSetMalorneRegalia = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			druid := agent.(DruidAgent).GetDruid()
+			manaMetrics := druid.NewManaMetrics(core.ActionID{SpellID: 37295})
+
 			druid.RegisterAura(core.Aura{
 				Label:    "Malorne Regalia 2pc",
 				Duration: core.NeverExpires,
@@ -43,7 +45,7 @@ var ItemSetMalorneRegalia = core.ItemSet{
 					if sim.RandomFloat("malorne 2p") > 0.05 {
 						return
 					}
-					spell.Unit.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
+					spell.Unit.AddMana(sim, 120, manaMetrics, false)
 				},
 			})
 		},
@@ -60,6 +62,8 @@ var ItemSetMalorneHarness = core.ItemSet{
 			druid := agent.(DruidAgent).GetDruid()
 
 			procChance := 0.04
+			rageMetrics := druid.NewRageMetrics(core.ActionID{SpellID: 37306})
+			energyMetrics := druid.NewEnergyMetrics(core.ActionID{SpellID: 37311})
 
 			druid.RegisterAura(core.Aura{
 				Label:    "Malorne 4pc",
@@ -71,9 +75,9 @@ var ItemSetMalorneHarness = core.ItemSet{
 					if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 						if sim.RandomFloat("Malorne 2pc") < procChance {
 							if druid.InForm(Bear) {
-								druid.AddRage(sim, 10, core.ActionID{SpellID: 37306})
+								druid.AddRage(sim, 10, rageMetrics)
 							} else if druid.InForm(Cat) {
-								druid.AddEnergy(sim, 20, core.ActionID{SpellID: 37311})
+								druid.AddEnergy(sim, 20, energyMetrics)
 							}
 						}
 					}

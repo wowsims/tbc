@@ -28,7 +28,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 
 		bonusPer5Seconds := hunter.GetStat(stats.Intellect)*scaling + 0.35*70
 		manaGain := bonusPer5Seconds * 2 / 5
-		hunter.AddMana(sim, manaGain, hunter.AspectOfTheViper.ActionID, false)
+		hunter.AddMana(sim, manaGain, hunter.AspectOfTheViper.ResourceMetrics, false)
 	}
 
 	if hunter.IsWaitingForMana() && hunter.DoneWaitingForMana(sim) {

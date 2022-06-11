@@ -13,6 +13,8 @@ func (mage *Mage) registerManaGemsCD() {
 		return
 	}
 
+	manaMetrics := mage.NewManaMetrics(core.MageManaGemMCDActionID)
+
 	var serpentCoilAura *core.Aura
 	if mage.HasTrinketEquipped(SerpentCoilBraidID) {
 		serpentCoilAura = mage.NewTemporaryStatsAura("Serpent Coil Braid", core.ActionID{ItemID: SerpentCoilBraidID}, stats.Stats{stats.SpellPower: 225}, time.Second*15)
@@ -53,11 +55,11 @@ func (mage *Mage) registerManaGemsCD() {
 			if remainingManaGems == 1 {
 				// Mana Ruby: Restores 1073 to 1127 mana. (2 Min Cooldown)
 				manaGain := minManaRubyGain + (sim.RandomFloat("Mana Gem") * manaRubyGainRange)
-				mage.AddMana(sim, manaGain, core.MageManaGemMCDActionID, true)
+				mage.AddMana(sim, manaGain, manaMetrics, true)
 			} else {
 				// Mana Emerald: Restores 2340 to 2460 mana. (2 Min Cooldown)
 				manaGain := minManaEmeraldGain + (sim.RandomFloat("Mana Gem") * manaEmeraldGainRange)
-				mage.AddMana(sim, manaGain, core.MageManaGemMCDActionID, true)
+				mage.AddMana(sim, manaGain, manaMetrics, true)
 			}
 
 			if serpentCoilAura != nil {

@@ -27,7 +27,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 			if spellEffect.Landed() {
 				// Add mana from Spiritual Attunement
 				// 10% of damage is self-inflicted, 10% of self-inflicted damage is returned as mana
-				paladin.AddMana(sim, spellEffect.Damage*0.1*0.1, core.ActionID{SpellID: 33776}, false)
+				paladin.AddMana(sim, spellEffect.Damage*0.1*0.1, paladin.SpiritualAttunementMetrics, false)
 			}
 		},
 	}

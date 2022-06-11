@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -60,7 +59,7 @@ func (druid *Druid) registerRakeSpell() {
 						druid.RakeDot.Apply(sim)
 					}
 				} else {
-					druid.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					druid.AddEnergy(sim, refundAmount, druid.EnergyRefundMetrics)
 				}
 			},
 		}),

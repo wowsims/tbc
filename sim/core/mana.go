@@ -29,6 +29,9 @@ func (character *Character) EnableManaBar() {
 	character.RegisterSpell(SpellConfig{
 		ActionID: ActionID{OtherID: proto.OtherAction_OtherActionManaGain},
 	})
+
+	character.manaCastingMetrics = character.NewManaMetrics(ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 1})
+	character.manaNotCastingMetrics = character.NewManaMetrics(ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2})
 }
 
 func (unit *Unit) HasManaBar() bool {
@@ -51,17 +54,17 @@ func (unit *Unit) CurrentManaPercent() float64 {
 	return unit.CurrentMana() / unit.MaxMana()
 }
 
-func (unit *Unit) AddMana(sim *Simulation, amount float64, actionID ActionID, isBonusMana bool) {
+func (unit *Unit) AddMana(sim *Simulation, amount float64, metrics *ResourceMetrics, isBonusMana bool) {
 	if amount < 0 {
 		panic("Trying to add negative mana!")
 	}
 
 	oldMana := unit.CurrentMana()
 	newMana := MinFloat(oldMana+amount, unit.MaxMana())
-	unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, amount, newMana-oldMana)
+	metrics.AddEvent(amount, newMana-oldMana)
 
 	if sim.Log != nil {
-		unit.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
+		unit.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, oldMana, newMana)
 	}
 
 	unit.stats[stats.Mana] = newMana
@@ -71,16 +74,16 @@ func (unit *Unit) AddMana(sim *Simulation, amount float64, actionID ActionID, is
 	}
 }
 
-func (unit *Unit) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
+func (unit *Unit) SpendMana(sim *Simulation, amount float64, metrics *ResourceMetrics) {
 	if amount < 0 {
 		panic("Trying to spend negative mana!")
 	}
 
 	newMana := unit.CurrentMana() - amount
-	unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, -amount, -amount)
+	metrics.AddEvent(-amount, -amount)
 
 	if sim.Log != nil {
-		unit.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, unit.CurrentMana(), newMana)
+		unit.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, unit.CurrentMana(), newMana)
 	}
 
 	unit.stats[stats.Mana] = newMana
@@ -94,14 +97,14 @@ func (unit *Unit) doneIterationMana() {
 
 	manaGainSpell := unit.GetSpell(ActionID{OtherID: proto.OtherAction_OtherActionManaGain})
 
-	for resourceKey, resourceMetrics := range unit.Metrics.resources {
-		if resourceKey.Type != proto.ResourceType_ResourceTypeMana {
+	for _, resourceMetrics := range unit.Metrics.resources {
+		if resourceMetrics.Type != proto.ResourceType_ResourceTypeMana {
 			continue
 		}
-		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{OtherID: proto.OtherAction_OtherActionManaRegen}) {
+		if resourceMetrics.ActionID.SameActionIgnoreTag(ActionID{OtherID: proto.OtherAction_OtherActionManaRegen}) {
 			continue
 		}
-		if resourceKey.ActionID.SameActionIgnoreTag(ActionID{SpellID: 34917}) {
+		if resourceMetrics.ActionID.SameActionIgnoreTag(ActionID{SpellID: 34917}) {
 			// Vampiric Touch mana threat goes to the priest, so it's handled in the priest code.
 			continue
 		}
@@ -160,10 +163,10 @@ func (unit *Unit) UpdateManaRegenRates() {
 func (unit *Unit) ManaTick(sim *Simulation) {
 	if sim.CurrentTime < unit.PseudoStats.FiveSecondRuleRefreshTime {
 		regen := unit.manaTickWhileCasting
-		unit.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 1}, false)
+		unit.AddMana(sim, regen, unit.manaCastingMetrics, false)
 	} else {
 		regen := unit.manaTickWhileNotCasting
-		unit.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2}, false)
+		unit.AddMana(sim, regen, unit.manaNotCastingMetrics, false)
 	}
 }
 

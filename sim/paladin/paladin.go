@@ -49,6 +49,8 @@ type Paladin struct {
 	SealOfWisdomAura           *core.Aura
 	SealOfLightAura            *core.Aura
 	SealOfRighteousnessAura    *core.Aura
+
+	SpiritualAttunementMetrics *core.ResourceMetrics
 }
 
 // Implemented by each Paladin spec.

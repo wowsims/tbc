@@ -28,7 +28,7 @@ func (spriest *ShadowPriest) OnManaTick(sim *core.Simulation) {
 
 func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
-		spriest.SpendMana(sim, spriest.VampiricTouch.DefaultCast.Cost, spriest.VampiricTouch.ActionID)
+		spriest.SpendMana(sim, spriest.VampiricTouch.DefaultCast.Cost, spriest.VampiricTouch.ResourceMetrics)
 		spriest.VampiricTouch.SkipCastAndApplyEffects(sim, spriest.CurrentTarget)
 	}
 

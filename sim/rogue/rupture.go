@@ -43,10 +43,10 @@ func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
 					rogue.RuptureDot.NumberOfTicks = numTicks
 					rogue.RuptureDot.RecomputeAuraDuration()
 					rogue.RuptureDot.Apply(sim)
-					rogue.ApplyFinisher(sim, spell.ActionID)
+					rogue.ApplyFinisher(sim, spell)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, rogue.QuickRecoveryMetrics)
 					}
 				}
 			},

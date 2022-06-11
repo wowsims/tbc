@@ -37,13 +37,13 @@ func (rogue *Rogue) registerExposeArmorSpell() {
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ExposeArmorAura.Activate(sim)
-					rogue.ApplyFinisher(sim, spell.ActionID)
+					rogue.ApplyFinisher(sim, spell)
 					if sim.GetRemainingDuration() <= time.Second*30 {
 						rogue.doneEA = true
 					}
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, rogue.QuickRecoveryMetrics)
 					}
 				}
 			},

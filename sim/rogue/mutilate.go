@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -93,11 +92,11 @@ func (rogue *Rogue) registerMutilateSpell() {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
-					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					rogue.AddEnergy(sim, refundAmount, rogue.EnergyRefundMetrics)
 					return
 				}
 
-				rogue.AddComboPoints(sim, 2, spell.ActionID)
+				rogue.AddComboPoints(sim, 2, spell.ComboPointMetrics())
 
 				// TODO: while this is the most natural handling, the oh attack might have effects
 				//  from the mh attack applied

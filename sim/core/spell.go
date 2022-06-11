@@ -54,7 +54,9 @@ type Spell struct {
 	Flags SpellFlag
 
 	// Should be stats.Mana, stats.Energy, stats.Rage, or unset.
-	ResourceType stats.Stat
+	ResourceType      stats.Stat
+	ResourceMetrics   *ResourceMetrics
+	comboPointMetrics *ResourceMetrics
 
 	// Base cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base cost.
@@ -96,6 +98,15 @@ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
 		SharedCD:    config.Cast.SharedCD,
 
 		ApplyEffects: config.ApplyEffects,
+	}
+
+	switch spell.ResourceType {
+	case stats.Mana:
+		spell.ResourceMetrics = spell.Unit.NewManaMetrics(spell.ActionID)
+	case stats.Rage:
+		spell.ResourceMetrics = spell.Unit.NewRageMetrics(spell.ActionID)
+	case stats.Energy:
+		spell.ResourceMetrics = spell.Unit.NewEnergyMetrics(spell.ActionID)
 	}
 
 	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
@@ -152,6 +163,13 @@ func (spell *Spell) doneIteration() {
 	if !spell.Flags.Matches(SpellFlagNoMetrics) {
 		spell.Unit.Metrics.addSpell(spell)
 	}
+}
+
+func (spell *Spell) ComboPointMetrics() *ResourceMetrics {
+	if spell.comboPointMetrics == nil {
+		spell.comboPointMetrics = spell.Unit.NewComboPointMetrics(spell.ActionID)
+	}
+	return spell.comboPointMetrics
 }
 
 func (spell *Spell) ReadyAt() time.Duration {

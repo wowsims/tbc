@@ -14,6 +14,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 
 	actionID := core.ActionID{SpellID: 30823}
 	ppmm := shaman.AutoAttacks.NewPPMManager(15)
+	manaMetrics := shaman.NewManaMetrics(actionID)
 	srAura := shaman.RegisterAura(core.Aura{
 		Label:    "Shamanistic Rage",
 		ActionID: actionID,
@@ -27,7 +28,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 				return
 			}
 			mana := shaman.GetStat(stats.AttackPower) * 0.3
-			shaman.AddMana(sim, mana, actionID, true)
+			shaman.AddMana(sim, mana, manaMetrics, true)
 		},
 	})
 
