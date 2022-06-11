@@ -165,7 +165,7 @@ export class UnitMetrics {
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
         this.castLogs = CastLog.fromLogs(this.logs);
         this.threatLogs = ThreatLogGroup.fromLogs(this.logs);
-        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.index, false, this.isPet), resultData.firstIterationDuration);
+        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.index, this.target != null, this.isPet), resultData.firstIterationDuration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
         this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
         AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);

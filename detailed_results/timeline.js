@@ -398,6 +398,34 @@ export class Timeline extends ResultComponent {
         const target = targets[0];
         this.clearRotationChart();
         this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0], duration);
+        const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
+        resourceTypes.forEach(resourceType => this.addResourceRow(resourceType, player.groupedResourceLogs[resourceType], duration));
+        const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.actionId.toString()));
+        buffsById.sort((a, b) => stringComparator(a[0].actionId.name, b[0].actionId.name));
+        const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.actionId.toString()));
+        debuffsById.sort((a, b) => stringComparator(a[0].actionId.name, b[0].actionId.name));
+        const buffsAndDebuffsById = buffsById.concat(debuffsById);
+        const playerCastsByAbility = this.getSortedCastsByAbility(player);
+        playerCastsByAbility.forEach(castLogs => this.addCastRow(castLogs, buffsAndDebuffsById, duration));
+        // Don't add a row for buffs that were already visualized in a cast row.
+        const buffsToShow = buffsById.filter(auraUptimeLogs => playerCastsByAbility.findIndex(casts => casts[0].actionId.equalsIgnoringTag(auraUptimeLogs[0].actionId)));
+        if (buffsToShow.length > 0) {
+            this.addSeparatorRow(duration);
+            buffsToShow.forEach(auraUptimeLogs => this.addAuraRow(auraUptimeLogs, duration));
+        }
+        const targetCastsByAbility = this.getSortedCastsByAbility(target);
+        if (targetCastsByAbility.length > 0) {
+            this.addSeparatorRow(duration);
+            targetCastsByAbility.forEach(castLogs => this.addCastRow(castLogs, buffsAndDebuffsById, duration));
+        }
+        // Add a row for all debuffs, even those which have already been visualized in a cast row.
+        const debuffsToShow = debuffsById;
+        if (debuffsToShow.length > 0) {
+            this.addSeparatorRow(duration);
+            debuffsToShow.forEach(auraUptimeLogs => this.addAuraRow(auraUptimeLogs, duration));
+        }
+    }
+    getSortedCastsByAbility(player) {
         const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
         const spellActionIds = player.getSpellActions().map(action => action.actionId);
         const getActionCategory = (actionId) => {
@@ -436,206 +464,199 @@ export class Timeline extends ResultComponent {
                 return stringComparator(a[0].actionId.name, b[0].actionId.name);
             }
         });
-        const makeLabelElem = (actionId, isHiddenLabel) => {
-            const labelElem = document.createElement('div');
-            labelElem.classList.add('rotation-label', 'rotation-row');
+        return castsByAbility;
+    }
+    makeLabelElem(actionId, isHiddenLabel) {
+        const labelElem = document.createElement('div');
+        labelElem.classList.add('rotation-label', 'rotation-row');
+        if (isHiddenLabel) {
+            labelElem.classList.add('rotation-label-hidden');
+        }
+        const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
+        labelElem.innerHTML = `
+			<span class="fas fa-eye${isHiddenLabel ? '' : '-slash'}"></span>
+			<a class="rotation-label-icon"></a>
+			<span class="rotation-label-text">${labelText}</span>
+		`;
+        const hideElem = labelElem.getElementsByClassName('fas')[0];
+        hideElem.addEventListener('click', event => {
             if (isHiddenLabel) {
-                labelElem.classList.add('rotation-label-hidden');
+                const index = this.hiddenIds.findIndex(hiddenId => hiddenId.equals(actionId));
+                if (index != -1) {
+                    this.hiddenIds.splice(index, 1);
+                }
             }
-            const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
-            labelElem.innerHTML = `
-				<span class="fas fa-eye${isHiddenLabel ? '' : '-slash'}"></span>
-				<a class="rotation-label-icon"></a>
-				<span class="rotation-label-text">${labelText}</span>
-			`;
-            const hideElem = labelElem.getElementsByClassName('fas')[0];
-            hideElem.addEventListener('click', event => {
-                if (isHiddenLabel) {
-                    const index = this.hiddenIds.findIndex(hiddenId => hiddenId.equals(actionId));
-                    if (index != -1) {
-                        this.hiddenIds.splice(index, 1);
-                    }
-                }
-                else {
-                    this.hiddenIds.push(actionId);
-                }
-                this.hiddenIdsChangeEmitter.emit(TypedEvent.nextEventID());
-            });
-            tippy(hideElem, {
-                content: isHiddenLabel ? 'Show Row' : 'Hide Row',
-                allowHTML: true,
-            });
-            const updateHidden = () => {
-                if (isHiddenLabel == Boolean(this.hiddenIds.find(hiddenId => hiddenId.equals(actionId)))) {
-                    labelElem.classList.remove('hide');
-                }
-                else {
-                    labelElem.classList.add('hide');
-                }
-            };
-            this.hiddenIdsChangeEmitter.on(updateHidden);
-            updateHidden();
-            const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0];
-            actionId.setBackgroundAndHref(labelIcon);
-            return labelElem;
-        };
-        const makeRowElem = (actionId, duration) => {
-            const rowElem = document.createElement('div');
-            rowElem.classList.add('rotation-timeline-row', 'rotation-row');
-            rowElem.style.width = this.timeToPx(duration);
-            const updateHidden = () => {
-                if (this.hiddenIds.find(hiddenId => hiddenId.equals(actionId))) {
-                    rowElem.classList.add('hide');
-                }
-                else {
-                    rowElem.classList.remove('hide');
-                }
-            };
-            this.hiddenIdsChangeEmitter.on(updateHidden);
-            updateHidden();
-            return rowElem;
-        };
-        const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
-        resourceTypes.forEach(resourceType => {
-            const resourceLogs = player.groupedResourceLogs[resourceType];
-            if (resourceLogs.length == 0) {
-                return;
+            else {
+                this.hiddenIds.push(actionId);
             }
-            const startValue = resourceLogs[0].valueBefore;
-            const labelElem = document.createElement('div');
-            labelElem.classList.add('rotation-label', 'rotation-row');
-            labelElem.innerHTML = `
-				<a class="rotation-label-icon" style="background-image:url('${resourceTypeToIcon[resourceType]}')"></a>
-				<span class="rotation-label-text">${resourceNames[resourceType]}</span>
-			`;
-            this.rotationLabels.appendChild(labelElem);
-            const rowElem = document.createElement('div');
-            rowElem.classList.add('rotation-timeline-row', 'rotation-row');
-            rowElem.style.width = this.timeToPx(duration);
-            resourceLogs.forEach((resourceLogGroup, i) => {
-                const resourceElem = document.createElement('div');
-                resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
-                resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
-                resourceElem.style.width = this.timeToPx((resourceLogs[i + 1]?.timestamp || duration) - resourceLogGroup.timestamp);
-                if (resourceType == ResourceType.ResourceTypeMana) {
-                    resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
-                }
-                else {
-                    resourceElem.textContent = Math.floor(resourceLogGroup.valueAfter).toFixed(0);
-                }
-                rowElem.appendChild(resourceElem);
-                tippy(resourceElem, {
-                    content: this.resourceTooltip(resourceLogGroup, startValue, false),
-                    allowHTML: true,
-                    placement: 'bottom',
-                });
-            });
-            this.rotationTimeline.appendChild(rowElem);
+            this.hiddenIdsChangeEmitter.emit(TypedEvent.nextEventID());
         });
-        const castRowElems = castsByAbility.map(abilityCasts => {
-            const actionId = abilityCasts[0].actionId;
-            this.rotationLabels.appendChild(makeLabelElem(actionId, false));
-            this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
-            const rowElem = makeRowElem(actionId, duration);
-            abilityCasts.forEach(castLog => {
-                const castElem = document.createElement('div');
-                castElem.classList.add('rotation-timeline-cast');
-                castElem.style.left = this.timeToPx(castLog.timestamp);
-                castElem.style.minWidth = this.timeToPx(castLog.castTime);
-                rowElem.appendChild(castElem);
-                if (castLog.damageDealtLogs.length > 0) {
-                    const ddl = castLog.damageDealtLogs[0];
-                    if (ddl.miss || ddl.dodge || ddl.parry) {
-                        castElem.classList.add('outcome-miss');
-                    }
-                    else if (ddl.glance || ddl.block || ddl.partialResist1_4 || ddl.partialResist2_4 || ddl.partialResist3_4) {
-                        castElem.classList.add('outcome-partial');
-                    }
-                    else if (ddl.crit) {
-                        castElem.classList.add('outcome-crit');
-                    }
-                    else {
-                        castElem.classList.add('outcome-hit');
-                    }
+        tippy(hideElem, {
+            content: isHiddenLabel ? 'Show Row' : 'Hide Row',
+            allowHTML: true,
+        });
+        const updateHidden = () => {
+            if (isHiddenLabel == Boolean(this.hiddenIds.find(hiddenId => hiddenId.equals(actionId)))) {
+                labelElem.classList.remove('hide');
+            }
+            else {
+                labelElem.classList.add('hide');
+            }
+        };
+        this.hiddenIdsChangeEmitter.on(updateHidden);
+        updateHidden();
+        const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0];
+        actionId.setBackgroundAndHref(labelIcon);
+        return labelElem;
+    }
+    makeRowElem(actionId, duration) {
+        const rowElem = document.createElement('div');
+        rowElem.classList.add('rotation-timeline-row', 'rotation-row');
+        rowElem.style.width = this.timeToPx(duration);
+        const updateHidden = () => {
+            if (this.hiddenIds.find(hiddenId => hiddenId.equals(actionId))) {
+                rowElem.classList.add('hide');
+            }
+            else {
+                rowElem.classList.remove('hide');
+            }
+        };
+        this.hiddenIdsChangeEmitter.on(updateHidden);
+        updateHidden();
+        return rowElem;
+    }
+    addSeparatorRow(duration) {
+        let separatorElem = document.createElement('div');
+        separatorElem.classList.add('rotation-timeline-separator');
+        this.rotationLabels.appendChild(separatorElem);
+        separatorElem = document.createElement('div');
+        separatorElem.classList.add('rotation-timeline-separator');
+        separatorElem.style.width = this.timeToPx(duration);
+        this.rotationTimeline.appendChild(separatorElem);
+    }
+    addResourceRow(resourceType, resourceLogs, duration) {
+        if (resourceLogs.length == 0) {
+            return;
+        }
+        const startValue = resourceLogs[0].valueBefore;
+        const labelElem = document.createElement('div');
+        labelElem.classList.add('rotation-label', 'rotation-row');
+        labelElem.innerHTML = `
+			<a class="rotation-label-icon" style="background-image:url('${resourceTypeToIcon[resourceType]}')"></a>
+			<span class="rotation-label-text">${resourceNames[resourceType]}</span>
+		`;
+        this.rotationLabels.appendChild(labelElem);
+        const rowElem = document.createElement('div');
+        rowElem.classList.add('rotation-timeline-row', 'rotation-row');
+        rowElem.style.width = this.timeToPx(duration);
+        resourceLogs.forEach((resourceLogGroup, i) => {
+            const resourceElem = document.createElement('div');
+            resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
+            resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
+            resourceElem.style.width = this.timeToPx((resourceLogs[i + 1]?.timestamp || duration) - resourceLogGroup.timestamp);
+            if (resourceType == ResourceType.ResourceTypeMana) {
+                resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
+            }
+            else {
+                resourceElem.textContent = Math.floor(resourceLogGroup.valueAfter).toFixed(0);
+            }
+            rowElem.appendChild(resourceElem);
+            tippy(resourceElem, {
+                content: this.resourceTooltip(resourceLogGroup, startValue, false),
+                allowHTML: true,
+                placement: 'bottom',
+            });
+        });
+        this.rotationTimeline.appendChild(rowElem);
+    }
+    addCastRow(castLogs, aurasById, duration) {
+        const actionId = castLogs[0].actionId;
+        this.rotationLabels.appendChild(this.makeLabelElem(actionId, false));
+        this.rotationHiddenIdsContainer.appendChild(this.makeLabelElem(actionId, true));
+        const rowElem = this.makeRowElem(actionId, duration);
+        castLogs.forEach(castLog => {
+            const castElem = document.createElement('div');
+            castElem.classList.add('rotation-timeline-cast');
+            castElem.style.left = this.timeToPx(castLog.timestamp);
+            castElem.style.minWidth = this.timeToPx(castLog.castTime);
+            rowElem.appendChild(castElem);
+            if (castLog.damageDealtLogs.length > 0) {
+                const ddl = castLog.damageDealtLogs[0];
+                if (ddl.miss || ddl.dodge || ddl.parry) {
+                    castElem.classList.add('outcome-miss');
                 }
-                const iconElem = document.createElement('a');
-                iconElem.classList.add('rotation-timeline-cast-icon');
-                actionId.setBackground(iconElem);
-                castElem.appendChild(iconElem);
-                tippy(castElem, {
+                else if (ddl.glance || ddl.block || ddl.partialResist1_4 || ddl.partialResist2_4 || ddl.partialResist3_4) {
+                    castElem.classList.add('outcome-partial');
+                }
+                else if (ddl.crit) {
+                    castElem.classList.add('outcome-crit');
+                }
+                else {
+                    castElem.classList.add('outcome-hit');
+                }
+            }
+            const iconElem = document.createElement('a');
+            iconElem.classList.add('rotation-timeline-cast-icon');
+            actionId.setBackground(iconElem);
+            castElem.appendChild(iconElem);
+            tippy(castElem, {
+                content: `
+					<span>${castLog.actionId.name} from ${castLog.timestamp.toFixed(2)}s to ${(castLog.timestamp + castLog.castTime).toFixed(2)}s (${castLog.castTime.toFixed(2)}s)</span>
+					<ul class="rotation-timeline-cast-damage-list">
+						${castLog.damageDealtLogs.map(ddl => `
+								<li>
+									<span>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</span>
+									${ddl.source?.isTarget ? '' : `<span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span>`}
+								</li>`)
+                    .join('')}
+					</ul>
+				`,
+                allowHTML: true,
+                placement: 'bottom',
+            });
+            castLog.damageDealtLogs.filter(ddl => ddl.tick).forEach(ddl => {
+                const tickElem = document.createElement('div');
+                tickElem.classList.add('rotation-timeline-tick');
+                tickElem.style.left = this.timeToPx(ddl.timestamp);
+                rowElem.appendChild(tickElem);
+                tippy(tickElem, {
                     content: `
-						<span>${castLog.actionId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
-						<ul class="rotation-timeline-cast-damage-list">
-							${castLog.damageDealtLogs.map(ddl => `<li><span>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</span><span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span></li>`).join('')}
-						</ul>
+						<span>${ddl.timestamp.toFixed(2)}s - ${ddl.actionId.name} ${ddl.resultString()}</span>
+						${ddl.source?.isTarget ? '' : `<span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span>`}
 					`,
                     allowHTML: true,
                     placement: 'bottom',
                 });
-                castLog.damageDealtLogs.filter(ddl => ddl.tick).forEach(ddl => {
-                    const tickElem = document.createElement('div');
-                    tickElem.classList.add('rotation-timeline-tick');
-                    tickElem.style.left = this.timeToPx(ddl.timestamp);
-                    rowElem.appendChild(tickElem);
-                    tippy(tickElem, {
-                        content: `
-							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.actionId.name} ${ddl.resultString()}</span>
-							<span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span>
-						`,
-                        allowHTML: true,
-                        placement: 'bottom',
-                    });
-                });
             });
-            this.rotationTimeline.appendChild(rowElem);
-            return rowElem;
         });
-        const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.actionId.toString()));
-        buffsById.sort((a, b) => stringComparator(a[0].actionId.name, b[0].actionId.name));
-        const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.actionId.toString()));
-        debuffsById.sort((a, b) => stringComparator(a[0].actionId.name, b[0].actionId.name));
-        const addAurasSection = (aurasById) => {
-            let addedRow = false;
-            aurasById.forEach(auraUptimeLogs => {
-                const actionId = auraUptimeLogs[0].actionId;
-                // If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
-                let rowElem = makeRowElem(actionId, duration);
-                const castRowIndex = castsByAbility.findIndex(casts => casts[0].actionId.equalsIgnoringTag(actionId));
-                if (castRowIndex != -1) {
-                    rowElem = castRowElems[castRowIndex];
-                }
-                else {
-                    if (!addedRow) {
-                        addedRow = true;
-                        let separatorElem = document.createElement('div');
-                        separatorElem.classList.add('rotation-timeline-separator');
-                        this.rotationLabels.appendChild(separatorElem);
-                        separatorElem = document.createElement('div');
-                        separatorElem.classList.add('rotation-timeline-separator');
-                        separatorElem.style.width = this.timeToPx(duration);
-                        this.rotationTimeline.appendChild(separatorElem);
-                    }
-                    this.rotationLabels.appendChild(makeLabelElem(actionId, false));
-                    this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
-                    this.rotationTimeline.appendChild(rowElem);
-                }
-                auraUptimeLogs.forEach(aul => {
-                    const auraElem = document.createElement('div');
-                    auraElem.classList.add('rotation-timeline-aura');
-                    auraElem.style.left = this.timeToPx(aul.gainedAt);
-                    auraElem.style.minWidth = this.timeToPx((aul.fadedAt || duration) - aul.gainedAt);
-                    rowElem.appendChild(auraElem);
-                    tippy(auraElem, {
-                        content: `
-							<span>${aul.actionId.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
-						`,
-                        allowHTML: true,
-                    });
-                });
+        // If there are any auras that correspond to this cast, visualize them in the same row.
+        aurasById
+            .filter(auraUptimeLogs => auraUptimeLogs[0].actionId.equalsIgnoringTag(actionId))
+            .forEach(auraUptimeLogs => this.applyAuraUptimeLogsToRow(auraUptimeLogs, rowElem, duration));
+        this.rotationTimeline.appendChild(rowElem);
+    }
+    addAuraRow(auraUptimeLogs, duration) {
+        const actionId = auraUptimeLogs[0].actionId;
+        let rowElem = this.makeRowElem(actionId, duration);
+        this.rotationLabels.appendChild(this.makeLabelElem(actionId, false));
+        this.rotationHiddenIdsContainer.appendChild(this.makeLabelElem(actionId, true));
+        this.rotationTimeline.appendChild(rowElem);
+        this.applyAuraUptimeLogsToRow(auraUptimeLogs, rowElem, duration);
+    }
+    applyAuraUptimeLogsToRow(auraUptimeLogs, rowElem, duration) {
+        auraUptimeLogs.forEach(aul => {
+            const auraElem = document.createElement('div');
+            auraElem.classList.add('rotation-timeline-aura');
+            auraElem.style.left = this.timeToPx(aul.gainedAt);
+            auraElem.style.minWidth = this.timeToPx((aul.fadedAt || duration) - aul.gainedAt);
+            rowElem.appendChild(auraElem);
+            tippy(auraElem, {
+                content: `
+					<span>${aul.actionId.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
+				`,
+                allowHTML: true,
             });
-        };
-        addAurasSection(buffsById);
-        addAurasSection(debuffsById);
+        });
     }
     timeToPxValue(time) {
         return time * 100;
@@ -694,7 +715,7 @@ export class Timeline extends ResultComponent {
 			<div class="timeline-tooltip-header">
 				${showPlayerLabel ? `
 				<img class="timeline-tooltip-icon" src="${player.iconUrl}">
-				<span class="" style="color: ${colorOverride}">${player.label}</span></span> - </span>
+				<span class="" style="color: ${colorOverride}">${player.label}</span><span> - </span>
 				` : ''}
 				<span class="bold">${log.timestamp.toFixed(2)}s</span>
 			</div>
