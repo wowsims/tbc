@@ -254,6 +254,7 @@ export class DamageDealtLog extends SimLog {
 								: this.crush ? 'Crush'
 									: this.tick ? 'Tick'
 										: 'Hit';
+		result += ' ' + this.target;
 		if (!this.miss && !this.dodge && !this.parry) {
 			result += ` for ${this.amount.toFixed(2)}`;
 			if (this.partialResist1_4) {
@@ -269,7 +270,8 @@ export class DamageDealtLog extends SimLog {
 	}
 
 	toString(): string {
-		return `${this.toStringPrefix()} ${this.actionId!.name} ${this.resultString()} (${this.threat.toFixed(2)} Threat)`;
+		const threatPostfix = this.source?.isTarget ? '' : ` (${this.threat.toFixed(2)} Threat)`;
+		return `${this.toStringPrefix()} ${this.actionId!.name} ${this.resultString()}${threatPostfix}`;
 	}
 
 	static parse(params: SimLogParams): Promise<DamageDealtLog> | null {

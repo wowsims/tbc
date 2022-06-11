@@ -108,8 +108,12 @@ type Unit struct {
 	CurrentTarget *Unit
 }
 
+func (unit *Unit) LogLabel() string {
+	return "[" + unit.Label + "]"
+}
+
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {
-	sim.Log("[%s] "+message, append([]interface{}{unit.Label}, vals...)...)
+	sim.Log(unit.LogLabel()+" "+message, vals...)
 }
 
 func (unit *Unit) GetInitialStat(stat stats.Stat) float64 {
