@@ -1790,11 +1790,12 @@ export const RaidStats = new RaidStats$Type();
 class ComputeStatsResult$Type extends MessageType {
     constructor() {
         super("proto.ComputeStatsResult", [
-            { no: 1, name: "raid_stats", kind: "message", T: () => RaidStats }
+            { no: 1, name: "raid_stats", kind: "message", T: () => RaidStats },
+            { no: 2, name: "error_result", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = {};
+        const message = { errorResult: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1807,6 +1808,9 @@ class ComputeStatsResult$Type extends MessageType {
             switch (fieldNo) {
                 case /* proto.RaidStats raid_stats */ 1:
                     message.raidStats = RaidStats.internalBinaryRead(reader, reader.uint32(), options, message.raidStats);
+                    break;
+                case /* string error_result */ 2:
+                    message.errorResult = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1823,6 +1827,9 @@ class ComputeStatsResult$Type extends MessageType {
         /* proto.RaidStats raid_stats = 1; */
         if (message.raidStats)
             RaidStats.internalBinaryWrite(message.raidStats, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string error_result = 2; */
+        if (message.errorResult !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.errorResult);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

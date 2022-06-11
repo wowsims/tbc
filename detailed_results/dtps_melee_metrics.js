@@ -86,7 +86,7 @@ export class DtpsMeleeMetricsTable extends MetricsTable {
         }
         const player = players[0];
         const targets = resultData.result.getTargets(resultData.filter);
-        const targetActions = targets.map(target => target.getMeleeActions().map(action => action.forTarget(player.index)));
+        const targetActions = targets.map(target => target.getMeleeActions().map(action => action.forTarget(resultData.filter)));
         return targetActions;
     }
     mergeMetrics(metrics) {

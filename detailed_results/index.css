@@ -956,23 +956,23 @@ input, select {
   font-size: 20px;
 }
 
-.player-filter-root {
+.unit-filter-root {
   border: 1px solid white;
   margin: 2px;
   color: white;
   text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
 }
 
-.player-filter-option {
+.unit-filter-option {
   height: 30px;
 }
 
-.player-filter-icon {
+.unit-filter-icon {
   margin: 2px;
   height: 25px;
 }
 
-.player-filter-label {
+.unit-filter-label {
   font-size: 14px;
   margin: 2px;
 }
@@ -1739,7 +1739,7 @@ body.new-tab {
   align-items: center;
 }
 
-.individual-sim .results-filter {
+.individual-sim .player-filter-root {
   display: none !important;
 }
 

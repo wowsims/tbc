@@ -42,12 +42,12 @@ export declare class SimResult {
     getTargets(filter?: SimResultFilter): Array<UnitMetrics>;
     getTargetWithIndex(index: number): UnitMetrics | null;
     getDamageMetrics(filter: SimResultFilter): DistributionMetricsProto;
-    getActionMetrics(filter: SimResultFilter): Array<ActionMetrics>;
-    getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics>;
-    getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics>;
-    getResourceMetrics(filter: SimResultFilter, resourceType: ResourceType): Array<ResourceMetrics>;
-    getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
-    getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
+    getActionMetrics(filter?: SimResultFilter): Array<ActionMetrics>;
+    getSpellMetrics(filter?: SimResultFilter): Array<ActionMetrics>;
+    getMeleeMetrics(filter?: SimResultFilter): Array<ActionMetrics>;
+    getResourceMetrics(resourceType: ResourceType, filter?: SimResultFilter): Array<ResourceMetrics>;
+    getBuffMetrics(filter?: SimResultFilter): Array<AuraMetrics>;
+    getDebuffMetrics(filter?: SimResultFilter): Array<AuraMetrics>;
     toProto(): SimRun;
     static fromProto(proto: SimRun): Promise<SimResult>;
     static makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult>;
@@ -99,7 +99,10 @@ export declare class UnitMetrics {
     readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
     private constructor();
     get label(): string;
+    get isPlayer(): boolean;
+    get isTarget(): boolean;
     get isPet(): boolean;
+    getTargetIndex(filter?: SimResultFilter): number | null;
     get inFrontOfTarget(): boolean;
     get maxThreat(): number;
     get secondsOomAvg(): number;
@@ -193,7 +196,7 @@ export declare class ActionMetrics {
     get blockPercent(): number;
     get glances(): number;
     get glancePercent(): number;
-    forTarget(index: number): ActionMetrics;
+    forTarget(filter?: SimResultFilter): ActionMetrics;
     static makeNew(unit: UnitMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
     static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics;
     static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>>;
@@ -203,6 +206,8 @@ export declare class TargetedActionMetrics {
     private readonly iterations;
     private readonly duration;
     readonly data: TargetedActionMetricsProto;
+    readonly landedHitsRaw: number;
+    readonly hitAttempts: number;
     constructor(iterations: number, duration: number, data: TargetedActionMetricsProto);
     get damage(): number;
     get dps(): number;
@@ -211,9 +216,7 @@ export declare class TargetedActionMetrics {
     get castsPerMinute(): number;
     get avgCast(): number;
     get avgCastThreat(): number;
-    private get landedHitsRaw();
     get landedHits(): number;
-    get hitAttempts(): number;
     get avgHit(): number;
     get avgHitThreat(): number;
     get critPercent(): number;

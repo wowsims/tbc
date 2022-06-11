@@ -680,6 +680,10 @@ export interface ComputeStatsResult {
      * @generated from protobuf field: proto.RaidStats raid_stats = 1;
      */
     raidStats?: RaidStats;
+    /**
+     * @generated from protobuf field: string error_result = 2;
+     */
+    errorResult: string;
 }
 /**
  * RPC StatWeights

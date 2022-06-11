@@ -6,7 +6,7 @@ import { TargetedActionMetrics as TargetedActionMetricsProto } from '/tbc/core/p
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { SimRun } from '/tbc/core/proto/ui.js';
-import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { ActionId, defaultTargetIcon } from '/tbc/core/proto_utils/action_id.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
@@ -74,7 +74,7 @@ export class SimResult {
         return this.raidMetrics.dps;
     }
     getActionMetrics(filter) {
-        return ActionMetrics.joinById(this.getPlayers(filter).map(player => player.getPlayerAndPetActions()).flat());
+        return ActionMetrics.joinById(this.getPlayers(filter).map(player => player.getPlayerAndPetActions().map(action => action.forTarget(filter))).flat());
     }
     getSpellMetrics(filter) {
         return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && !e.isMeleeAction);
@@ -82,7 +82,7 @@ export class SimResult {
     getMeleeMetrics(filter) {
         return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && e.isMeleeAction);
     }
-    getResourceMetrics(filter, resourceType) {
+    getResourceMetrics(resourceType, filter) {
         return ResourceMetrics.joinById(this.getPlayers(filter).map(player => player.resources.filter(resource => resource.type == resourceType)).flat());
     }
     getBuffMetrics(filter) {
@@ -149,8 +149,9 @@ export class UnitMetrics {
         this.name = metrics.name;
         this.spec = player ? playerToSpec(player) : 0;
         this.petActionId = petActionId;
-        this.iconUrl = player ? getTalentTreeIcon(this.spec, player.talentsString) : '';
-        this.classColor = classColors[specToClass[this.spec]];
+        this.iconUrl = this.isPlayer ? getTalentTreeIcon(this.spec, player.talentsString) :
+            (this.isTarget ? defaultTargetIcon : '');
+        this.classColor = this.isTarget ? 'black' : classColors[specToClass[this.spec]];
         this.dps = this.metrics.dps;
         this.tps = this.metrics.threat;
         this.dtps = this.metrics.dtps;
@@ -180,14 +181,31 @@ export class UnitMetrics {
             return this.name;
         }
     }
+    get isPlayer() {
+        return this.player != null;
+    }
+    get isTarget() {
+        return this.target != null;
+    }
     get isPet() {
         return this.petActionId != null;
     }
+    // Returns the index of the target of this unit, as selected by the filter.
+    getTargetIndex(filter) {
+        if (!filter) {
+            return null;
+        }
+        const index = this.isPlayer ? filter.target : filter.player;
+        if (index == null || index == -1) {
+            return null;
+        }
+        return index;
+    }
     get inFrontOfTarget() {
-        if (this.target != null) {
+        if (this.isTarget) {
             return true;
         }
-        else if (this.player != null) {
+        else if (this.isPlayer) {
             return this.player.inFrontOfTarget;
         }
         else {
@@ -460,10 +478,16 @@ export class ActionMetrics {
     get glancePercent() {
         return this.combinedMetrics.glancePercent;
     }
-    forTarget(index) {
-        const targetData = ActionMetricsProto.clone(this.data);
-        targetData.targets = [targetData.targets[index]];
-        return new ActionMetrics(this.unit, this.actionId, targetData, this.resultData);
+    forTarget(filter) {
+        const index = this.unit.getTargetIndex(filter);
+        if (index == null) {
+            return this;
+        }
+        else {
+            const targetData = ActionMetricsProto.clone(this.data);
+            targetData.targets = [targetData.targets[index]];
+            return new ActionMetrics(this.unit, this.actionId, targetData, this.resultData);
+        }
     }
     static async makeNew(unit, resultData, actionMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(actionMetrics.id).fill(playerIndex);
@@ -505,6 +529,15 @@ export class TargetedActionMetrics {
         this.iterations = iterations;
         this.duration = duration;
         this.data = data;
+        this.landedHitsRaw = this.data.hits + this.data.crits + this.data.crushes + this.data.blocks + this.data.glances;
+        this.hitAttempts = this.data.misses
+            + this.data.dodges
+            + this.data.parries
+            + this.data.blocks
+            + this.data.glances
+            + this.data.crits
+            + this.data.crushes
+            + this.data.hits;
     }
     get damage() {
         return this.data.damage;
@@ -516,32 +549,19 @@ export class TargetedActionMetrics {
         return this.data.threat / this.iterations / this.duration;
     }
     get casts() {
-        return this.data.casts / this.iterations;
+        return Math.max(this.data.casts, this.hitAttempts) / this.iterations;
     }
     get castsPerMinute() {
-        return this.data.casts / this.iterations / (this.duration / 60);
+        return this.casts / (this.duration / 60);
     }
     get avgCast() {
-        return this.data.damage / this.data.casts;
+        return (this.data.damage / this.iterations) / (this.casts || 1);
     }
     get avgCastThreat() {
-        return this.data.threat / this.data.casts;
-    }
-    get landedHitsRaw() {
-        return this.data.hits + this.data.crits + this.data.crushes + this.data.blocks + this.data.glances;
+        return (this.data.threat / this.iterations) / (this.casts || 1);
     }
     get landedHits() {
         return this.landedHitsRaw / this.iterations;
-    }
-    get hitAttempts() {
-        return this.data.misses
-            + this.data.dodges
-            + this.data.parries
-            + this.data.blocks
-            + this.data.glances
-            + this.data.crits
-            + this.data.crushes
-            + this.data.hits;
     }
     get avgHit() {
         const lhr = this.landedHitsRaw;

@@ -35,4 +35,5 @@ export declare class ActionId {
     private static getTooltipDataHelper;
     private static getTooltipData;
 }
+export declare const defaultTargetIcon = "https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg";
 export declare const resourceTypeToIcon: Record<ResourceType, string>;
