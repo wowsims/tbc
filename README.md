@@ -151,7 +151,7 @@ Read through the core code and some examples from other classes/specs to get a f
 Don't forget to write unit tests! Again, look at existing tests for examples. Run them with `make test` when you're ready.
 
 # Launch the site
-When everything is ready for release, modify `ui/core/launched_sims.ts` to include the new spec value. This will add the sim to the dropdown menu so anyone can find it from the existing sims. This will also remove the UI warning that the sim is under development. Now tell everyone about your new sim!
+When everything is ready for release, modify `ui/core/launched_sims.ts` and `ui/index.html` to include the new spec value. This will add the sim to the dropdown menu so anyone can find it from the existing sims. This will also remove the UI warning that the sim is under development. Now tell everyone about your new sim!
 
 # Add your spec to the raid sim
 Don't touch the raid sim until the individual sim is ready for launch; anything in the raid sim is publicly accessible. To add your new spec to the raid sim, do the following:
