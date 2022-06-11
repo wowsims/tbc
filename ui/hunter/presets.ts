@@ -1,8 +1,15 @@
 import * as Tooltips from "/tbc/core/constants/tooltips.js";
 import { Player } from "/tbc/core/player.js";
 import { Consumes, EquipmentSpec, Flask, Food, Potions, WeaponImbue } from "/tbc/core/proto/common.js";
-
-import { Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_PetType as PetType, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Rotation as HunterRotation, Hunter_Rotation_WeaveType as WeaveType } from "/tbc/core/proto/hunter.js";
+import {
+	Hunter,
+	Hunter_Rotation as HunterRotation,
+	Hunter_Rotation_WeaveType as WeaveType,
+	Hunter_Options as HunterOptions,
+	Hunter_Options_Ammo as Ammo,
+	Hunter_Options_QuiverBonus as QuiverBonus,
+	Hunter_Options_PetType as PetType,
+} from "/tbc/core/proto/hunter.js";
 
 // Preset options for this spec.
 // Eventually we will import these values for the raid sim too, so its good to
