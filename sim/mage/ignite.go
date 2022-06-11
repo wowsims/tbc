@@ -44,8 +44,8 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Unit, damageFrom
 		mage.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)", IgniteActionID, 0.0, time.Duration(0))
 		mage.Log(sim, "Completed cast %s", IgniteActionID)
 	}
-	mage.Ignite.SpellMetrics[target.Index].Casts++
-	mage.Ignite.SpellMetrics[target.Index].Hits++
+	mage.Ignite.SpellMetrics[target.TableIndex].Casts++
+	mage.Ignite.SpellMetrics[target.TableIndex].Hits++
 
 	// Reassign the effect to apply the new damage value.
 	igniteDot.TickEffects = core.TickFuncSnapshot(target, core.SpellEffect{

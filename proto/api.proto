@@ -99,6 +99,9 @@ message ActionMetrics {
 
 // Metrics for a specific action, when cast at a particular target.
 message TargetedActionMetrics {
+		// Raid/Target Index of the unit these metrics are targeted at.
+		int32 unit_index = 12;
+
 		// # of times this action was used by the agent.
     int32 casts = 1;
 

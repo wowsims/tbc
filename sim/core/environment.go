@@ -142,11 +142,13 @@ func (env *Environment) setupAttackTables() {
 		return
 	}
 
-	for _, target := range env.Encounter.Targets {
+	for targetIndex, target := range env.Encounter.Targets {
+		target.TableIndex = int32(targetIndex)
 		target.AttackTables = make([]*AttackTable, len(raidUnits))
 		target.DefenseTables = make([]*AttackTable, len(raidUnits))
 
 		for attackerIndex, attacker := range raidUnits {
+			attacker.TableIndex = int32(attackerIndex)
 			if attacker.AttackTables == nil {
 				attacker.AttackTables = make([]*AttackTable, env.GetNumTargets())
 				attacker.DefenseTables = make([]*AttackTable, env.GetNumTargets())
@@ -155,11 +157,11 @@ func (env *Environment) setupAttackTables() {
 			attackTable := NewAttackTable(attacker, &target.Unit)
 			defenseTable := NewAttackTable(&target.Unit, attacker)
 
-			attacker.AttackTables[target.Index] = attackTable
-			attacker.DefenseTables[target.Index] = defenseTable
+			attacker.AttackTables[target.TableIndex] = attackTable
+			attacker.DefenseTables[target.TableIndex] = defenseTable
 
-			target.AttackTables[attackerIndex] = defenseTable
-			target.DefenseTables[attackerIndex] = attackTable
+			target.AttackTables[attacker.TableIndex] = defenseTable
+			target.DefenseTables[attacker.TableIndex] = attackTable
 		}
 	}
 }

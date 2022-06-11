@@ -26,6 +26,10 @@ type Unit struct {
 	//  For Pets, this is the same as the owner's index.
 	Index int32
 
+	// Index of this unit as it appears in attack/defense tables.
+	// This is different from Index because there can be gaps in the raid.
+	TableIndex int32
+
 	// Unique label for logging.
 	Label string
 

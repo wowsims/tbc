@@ -190,8 +190,8 @@ func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spe
 }
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
-	spell.SpellMetrics[spellEffect.Target.Index].TotalDamage += spellEffect.Damage
-	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell)
+	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalDamage += spellEffect.Damage
+	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalThreat += spellEffect.calcThreat(spell)
 
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
