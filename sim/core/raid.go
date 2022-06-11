@@ -255,19 +255,18 @@ func (raid Raid) GetPlayerFromRaidTarget(raidTarget proto.RaidTarget) Agent {
 	raidIndex := raidTarget.TargetIndex
 
 	partyIndex := int(raidIndex / 5)
-	playerIndex := int(raidIndex % 5)
-
 	if partyIndex < 0 || partyIndex >= len(raid.Parties) {
 		return nil
 	}
 
 	party := raid.Parties[partyIndex]
-
-	if playerIndex < 0 || playerIndex >= len(party.Players) {
-		return nil
+	for _, player := range party.Players {
+		if player.GetCharacter().Index == raidIndex {
+			return player
+		}
 	}
 
-	return party.Players[playerIndex]
+	return nil
 }
 
 func (raid *Raid) reset(sim *Simulation) {

@@ -239,19 +239,27 @@ export class RaidSimResultsManager {
 					</div>
 				`;
 			} else {
-				const mergedActions = ActionMetrics.merge(simResult.getActionMetrics(filter));
-				const mergedTargetActions = ActionMetrics.merge(simResult.getTargets(filter)[0].actions.map(action => action.forTarget(filter)));
-				content = `
-					<div class="results-sim-dps">
-						<span class="topline-result-avg">${mergedActions.dps.toFixed(2)}</span>
-					</div>
-					<div class="results-sim-tps threat-metrics">
-						<span class="topline-result-avg">${mergedActions.tps.toFixed(2)}</span>
-					</div>
-					<div class="results-sim-dtps threat-metrics">
-						<span class="topline-result-avg">${mergedTargetActions.dps.toFixed(2)}</span>
-					</div>
-				`;
+				const actions = simResult.getActionMetrics(filter);
+				const targetActions = simResult.getTargets(filter)[0].actions.map(action => action.forTarget(filter));
+				if (actions.length > 0) {
+					const mergedActions = ActionMetrics.merge(actions);
+					content += `
+						<div class="results-sim-dps">
+							<span class="topline-result-avg">${mergedActions.dps.toFixed(2)}</span>
+						</div>
+						<div class="results-sim-tps threat-metrics">
+							<span class="topline-result-avg">${mergedActions.tps.toFixed(2)}</span>
+						</div>
+					`;
+				}
+				if (targetActions.length > 0) {
+					const mergedTargetActions = ActionMetrics.merge(targetActions);
+					content += `
+						<div class="results-sim-dtps threat-metrics">
+							<span class="topline-result-avg">${mergedTargetActions.dps.toFixed(2)}</span>
+						</div>
+					`;
+				}
 			}
 		} else {
 			const dpsMetrics = simResult.raidMetrics.dps;

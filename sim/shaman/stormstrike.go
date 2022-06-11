@@ -115,8 +115,8 @@ func (shaman *Shaman) registerStormstrikeSpell() {
 
 				mhHit.Cast(sim, spellEffect.Target)
 				ohHit.Cast(sim, spellEffect.Target)
-				shaman.Stormstrike.SpellMetrics[spellEffect.Target.Index].Casts -= 2
-				shaman.Stormstrike.SpellMetrics[spellEffect.Target.Index].Hits--
+				shaman.Stormstrike.SpellMetrics[spellEffect.Target.TableIndex].Casts -= 2
+				shaman.Stormstrike.SpellMetrics[spellEffect.Target.TableIndex].Hits--
 			},
 		}),
 	})

@@ -102,6 +102,8 @@ func (actionMetrics *ActionMetrics) ToProto(actionID ActionID) *proto.ActionMetr
 }
 
 type TargetedActionMetrics struct {
+	UnitIndex int32
+
 	Casts   int32
 	Hits    int32
 	Crits   int32
@@ -118,6 +120,8 @@ type TargetedActionMetrics struct {
 
 func (tam *TargetedActionMetrics) ToProto() *proto.TargetedActionMetrics {
 	return &proto.TargetedActionMetrics{
+		UnitIndex: tam.UnitIndex,
+
 		Casts:   tam.Casts,
 		Hits:    tam.Hits,
 		Crits:   tam.Crits,
@@ -218,6 +222,10 @@ func (unitMetrics *UnitMetrics) addSpell(spell *Spell) {
 
 	if len(actionMetrics.Targets) == 0 {
 		actionMetrics.Targets = make([]TargetedActionMetrics, len(spell.SpellMetrics))
+		for i, _ := range actionMetrics.Targets {
+			tam := &actionMetrics.Targets[i]
+			tam.UnitIndex = spell.Unit.AttackTables[i].Defender.Index
+		}
 	}
 
 	for i, spellTargetMetrics := range spell.SpellMetrics {
