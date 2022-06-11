@@ -626,7 +626,7 @@ class RaidWCLImporter extends Importer {
 					return;
 				}
 				
-				if (player.innervateTarget && playerSpecName) {
+				if (player.innervateTarget) {
 					raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex
 				} else if (player.powerInfusionTarget) {
 					raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex
