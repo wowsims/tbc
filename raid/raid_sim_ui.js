@@ -1,31 +1,25 @@
-import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
-import { Stat } from '/tbc/core/proto/common.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
-import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { Blessings } from '/tbc/core/proto/paladin.js';
-import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
-import { RaidSimSettings } from '/tbc/core/proto/ui.js';
-import { SavedEncounter } from '/tbc/core/proto/ui.js';
-import { SavedRaid } from '/tbc/core/proto/ui.js';
-import { Class } from '/tbc/core/proto/common.js';
-import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
-import { TristateEffect } from '/tbc/core/proto/common.js';
-import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
-import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
-import { DetailedResults } from '/tbc/core/components/detailed_results.js';
-import { EncounterPicker } from '/tbc/core/components/encounter_picker.js';
-import { LogRunner } from '/tbc/core/components/log_runner.js';
-import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
-import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
-import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
-import { AssignmentsPicker } from './assignments_picker.js';
-import { BlessingsPicker } from './blessings_picker.js';
-import { RaidPicker } from './raid_picker.js';
-import { TanksPicker } from './tanks_picker.js';
-import { implementedSpecs } from './presets.js';
-import { newRaidExporters, newRaidImporters } from './import_export.js';
-import * as Tooltips from '/tbc/core/constants/tooltips.js';
+import { BooleanPicker } from "/tbc/core/components/boolean_picker.js";
+import { DetailedResults } from "/tbc/core/components/detailed_results.js";
+import { EncounterPicker } from "/tbc/core/components/encounter_picker.js";
+import { LogRunner } from "/tbc/core/components/log_runner.js";
+import { addRaidSimAction } from "/tbc/core/components/raid_sim_action.js";
+import { SavedDataManager } from "/tbc/core/components/saved_data_manager.js";
+import { SettingsMenu } from "/tbc/core/components/settings_menu.js";
+import * as Tooltips from "/tbc/core/constants/tooltips.js";
+import { Raid as RaidProto } from "/tbc/core/proto/api.js";
+import { Class, Encounter as EncounterProto, Stat, TristateEffect } from "/tbc/core/proto/common.js";
+import { Blessings } from "/tbc/core/proto/paladin.js";
+import { BlessingsAssignments, RaidSimSettings, SavedEncounter, SavedRaid } from "/tbc/core/proto/ui.js";
+import { playerToSpec } from "/tbc/core/proto_utils/utils.js";
+import { Sim } from "/tbc/core/sim.js";
+import { SimUI } from "/tbc/core/sim_ui.js";
+import { TypedEvent } from "/tbc/core/typed_event.js";
+import { AssignmentsPicker } from "./assignments_picker.js";
+import { BlessingsPicker } from "./blessings_picker.js";
+import { newRaidExporters, newRaidImporters } from "./import_export.js";
+import { implementedSpecs } from "./presets.js";
+import { RaidPicker } from "./raid_picker.js";
+import { TanksPicker } from "./tanks_picker.js";
 const extraKnownIssues = [
     'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
 ];
@@ -305,6 +299,9 @@ export class RaidSimUI extends SimUI {
     setBuffBots(eventID, buffBotProtos) {
         this.raidPicker.setBuffBots(eventID, buffBotProtos);
     }
+    clearBuffBots(eventID) {
+        this.raidPicker.setBuffBots(eventID, []);
+    }
     getPlayersAndBuffBots() {
         const players = this.sim.raid.getPlayers();
         const buffBots = this.getBuffBots();
@@ -343,6 +340,7 @@ export class RaidSimUI extends SimUI {
     }
     clearRaid(eventID) {
         this.sim.raid.clear(eventID);
+        this.clearBuffBots(eventID);
     }
     // Returns the actual key to use for local storage, based on the given key part and the site context.
     getStorageKey(keyPart) {
