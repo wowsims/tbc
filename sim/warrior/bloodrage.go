@@ -8,6 +8,7 @@ import (
 
 func (warrior *Warrior) registerBloodrageCD() {
 	actionID := core.ActionID{SpellID: 2687}
+	rageMetrics := warrior.NewRageMetrics(actionID)
 
 	instantRage := 10.0 + 3*float64(warrior.Talents.ImprovedBloodrage)
 
@@ -22,13 +23,13 @@ func (warrior *Warrior) registerBloodrageCD() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
-			warrior.AddRage(sim, instantRage, actionID)
+			warrior.AddRage(sim, instantRage, rageMetrics)
 
 			core.StartPeriodicAction(sim, core.PeriodicActionOptions{
 				NumTicks: 10,
 				Period:   time.Second * 1,
 				OnAction: func(sim *core.Simulation) {
-					warrior.AddRage(sim, 1, actionID)
+					warrior.AddRage(sim, 1, rageMetrics)
 				},
 			})
 		},

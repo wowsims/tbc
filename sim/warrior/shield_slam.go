@@ -52,7 +52,7 @@ func (warrior *Warrior) registerShieldSlamSpell(cdTimer *core.Timer) {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
-					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					warrior.AddRage(sim, refundAmount, warrior.RageRefundMetrics)
 				}
 			},
 		}),

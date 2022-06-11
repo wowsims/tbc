@@ -8,6 +8,7 @@ import (
 
 func (mage *Mage) registerEvocationCD() {
 	actionID := core.ActionID{SpellID: 12051}
+	manaMetrics := mage.NewManaMetrics(actionID)
 
 	maxTicks := int32(4)
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
@@ -47,7 +48,7 @@ func (mage *Mage) registerEvocationCD() {
 				Period:   period,
 				NumTicks: int(numTicks),
 				OnAction: func(sim *core.Simulation) {
-					mage.AddMana(sim, manaPerTick, actionID, true)
+					mage.AddMana(sim, manaPerTick, manaMetrics, true)
 				},
 			})
 

@@ -34,6 +34,8 @@ var ItemSetAvatar = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			priest := agent.(PriestAgent).GetPriest()
+			manaMetrics := priest.NewManaMetrics(core.ActionID{SpellID: 37600})
+
 			priest.RegisterAura(core.Aura{
 				Label:    "Avatar Regalia 2pc",
 				Duration: core.NeverExpires,
@@ -46,7 +48,7 @@ var ItemSetAvatar = core.ItemSet{
 					}
 					// This is a cheat...
 					// easier than adding another aura the subtracts 150 mana from next cast.
-					priest.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
+					priest.AddMana(sim, 150, manaMetrics, false)
 				},
 			})
 		},

@@ -77,6 +77,8 @@ type Rogue struct {
 	ExposeArmorAura     *core.Aura
 	SliceAndDiceAura    *core.Aura
 
+	QuickRecoveryMetrics *core.ResourceMetrics
+
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 }
 
@@ -99,9 +101,9 @@ func (rogue *Rogue) finisherFlags() core.SpellFlag {
 	return flags
 }
 
-func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
+func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, spell *core.Spell) {
 	numPoints := rogue.ComboPoints()
-	rogue.SpendComboPoints(sim, actionID)
+	rogue.SpendComboPoints(sim, spell.ComboPointMetrics())
 	rogue.finishingMoveEffectApplier(sim, numPoints)
 }
 
@@ -109,6 +111,10 @@ func (rogue *Rogue) Initialize() {
 	// Update auto crit multipliers now that we have the targets.
 	rogue.AutoAttacks.MHEffect.OutcomeApplier = rogue.OutcomeFuncMeleeWhite(rogue.MeleeCritMultiplier(true, false))
 	rogue.AutoAttacks.OHEffect.OutcomeApplier = rogue.OutcomeFuncMeleeWhite(rogue.MeleeCritMultiplier(false, false))
+
+	if rogue.Talents.QuickRecovery > 0 {
+		rogue.QuickRecoveryMetrics = rogue.NewEnergyMetrics(core.ActionID{SpellID: 31245})
+	}
 
 	rogue.registerBackstabSpell()
 	rogue.registerDeadlyPoisonSpell()

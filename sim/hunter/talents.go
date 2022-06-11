@@ -347,7 +347,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	}
 
 	procChance := float64(hunter.Talents.ThrillOfTheHunt) / 3
-	actionID := core.ActionID{SpellID: 34499}
+	manaMetrics := hunter.NewManaMetrics(core.ActionID{SpellID: 34499})
 
 	hunter.RegisterAura(core.Aura{
 		Label:    "Thrill of the Hunt",
@@ -366,7 +366,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 			}
 
 			if procChance == 1 || sim.RandomFloat("ThrillOfTheHunt") < procChance {
-				hunter.AddMana(sim, spell.CurCast.Cost*0.4, actionID, false)
+				hunter.AddMana(sim, spell.CurCast.Cost*0.4, manaMetrics, false)
 			}
 		},
 	})

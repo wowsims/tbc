@@ -231,6 +231,8 @@ func (druid *Druid) applyPrimalFury() {
 
 	procChance := 0.5 * float64(druid.Talents.PrimalFury)
 	actionID := core.ActionID{SpellID: 37117}
+	rageMetrics := druid.NewRageMetrics(actionID)
+	cpMetrics := druid.NewComboPointMetrics(actionID)
 
 	druid.RegisterAura(core.Aura{
 		Label:    "Primal Fury",
@@ -242,14 +244,14 @@ func (druid *Druid) applyPrimalFury() {
 			if druid.InForm(Bear) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					if procChance == 1 || sim.RandomFloat("Primal Fury") < procChance {
-						druid.AddRage(sim, 5, actionID)
+						druid.AddRage(sim, 5, rageMetrics)
 					}
 				}
 			} else if druid.InForm(Cat) {
 				if spell == druid.Mangle || spell == druid.Shred {
 					if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 						if procChance == 1 || sim.RandomFloat("Primal Fury") < procChance {
-							druid.AddComboPoints(sim, 1, actionID)
+							druid.AddComboPoints(sim, 1, cpMetrics)
 						}
 					}
 				}

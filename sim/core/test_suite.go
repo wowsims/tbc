@@ -55,6 +55,10 @@ func (testSuite *IndividualTestSuite) TestDPS(testName string, rsr *proto.RaidSi
 
 	result := RunRaidSim(rsr)
 
+	if result.ErrorResult != "" {
+		panic(result.ErrorResult)
+	}
+
 	testSuite.testResults.DpsResults[testName] = &proto.DpsTestResult{
 		Dps:  result.RaidMetrics.Dps.Avg,
 		Tps:  result.RaidMetrics.Parties[0].Players[0].Threat.Avg,

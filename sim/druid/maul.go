@@ -3,7 +3,6 @@ package druid
 import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -42,7 +41,7 @@ func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
-					druid.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					druid.AddRage(sim, refundAmount, druid.RageRefundMetrics)
 				}
 			},
 		}),

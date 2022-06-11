@@ -29,7 +29,8 @@ type energyBar struct {
 	// Multiplies energy regen from ticks.
 	EnergyTickMultiplier float64
 
-	regenMetrics *ResourceMetrics
+	regenMetrics        *ResourceMetrics
+	EnergyRefundMetrics *ResourceMetrics
 }
 
 func (unit *Unit) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
@@ -37,7 +38,9 @@ func (unit *Unit) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) 
 		unit:         unit,
 		maxEnergy:    MaxFloat(100, maxEnergy),
 		onEnergyGain: onEnergyGain,
-		regenMetrics: unit.NewEnergyMetrics(ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen}),
+
+		regenMetrics:        unit.NewEnergyMetrics(ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen}),
+		EnergyRefundMetrics: unit.NewEnergyMetrics(ActionID{OtherID: proto.OtherAction_OtherActionRefund}),
 	}
 }
 

@@ -254,6 +254,7 @@ func (mage *Mage) applyMasterOfElements() {
 	}
 
 	refundCoeff := 0.1 * float64(mage.Talents.MasterOfElements)
+	manaMetrics := mage.NewManaMetrics(core.ActionID{SpellID: 29076})
 
 	mage.RegisterAura(core.Aura{
 		Label:    "Master of Elements",
@@ -266,7 +267,7 @@ func (mage *Mage) applyMasterOfElements() {
 				return
 			}
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				mage.AddMana(sim, spell.BaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
+				mage.AddMana(sim, spell.BaseCost*refundCoeff, manaMetrics, false)
 			}
 		},
 	})

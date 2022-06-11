@@ -71,7 +71,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
 			OutcomeApplier: priest.OutcomeFuncTick(),
 			OnPeriodicDamageDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				priest.AddMana(sim, spellEffect.Damage*2.5, spell.ActionID, false)
+				priest.AddMana(sim, spellEffect.Damage*2.5, spell.ResourceMetrics, false)
 			},
 		}),
 	})

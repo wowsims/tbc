@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -43,9 +42,9 @@ func (rogue *Rogue) registerSinisterStrikeSpell() {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.MeleeCritMultiplier(true, true)),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, spell.ActionID)
+					rogue.AddComboPoints(sim, 1, spell.ComboPointMetrics())
 				} else {
-					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					rogue.AddEnergy(sim, refundAmount, rogue.EnergyRefundMetrics)
 				}
 			},
 		}),

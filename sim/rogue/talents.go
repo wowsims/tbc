@@ -75,7 +75,10 @@ func (rogue *Rogue) ApplyTalents() {
 
 func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, numPoints int32) {
 	ruthlessnessChance := 0.2 * float64(rogue.Talents.Ruthlessness)
+	ruthlessnessMetrics := rogue.NewComboPointMetrics(core.ActionID{SpellID: 14161})
+
 	relentlessStrikes := rogue.Talents.RelentlessStrikes
+	relentlessStrikesMetrics := rogue.NewEnergyMetrics(core.ActionID{SpellID: 14179})
 
 	var fwAura *core.Aura
 	findWeaknessMultiplier := 1.0 + 0.02*float64(rogue.Talents.FindWeakness)
@@ -94,17 +97,18 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, 
 	}
 
 	netherblade4pc := ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 4)
+	netherblade4pcMetrics := rogue.NewComboPointMetrics(core.ActionID{SpellID: 37168})
 
 	return func(sim *core.Simulation, numPoints int32) {
 		if ruthlessnessChance > 0 && sim.RandomFloat("Ruthlessness") < ruthlessnessChance {
-			rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14161})
+			rogue.AddComboPoints(sim, 1, ruthlessnessMetrics)
 		}
 		if netherblade4pc && sim.RandomFloat("Netherblade 4pc") < 0.15 {
-			rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 37168})
+			rogue.AddComboPoints(sim, 1, netherblade4pcMetrics)
 		}
 		if relentlessStrikes {
 			if numPoints == 5 || sim.RandomFloat("RelentlessStrikes") < 0.2*float64(numPoints) {
-				rogue.AddEnergy(sim, 25, core.ActionID{SpellID: 14179})
+				rogue.AddEnergy(sim, 25, relentlessStrikesMetrics)
 			}
 		}
 		if fwAura != nil {
@@ -175,6 +179,7 @@ func (rogue *Rogue) applySealFate() {
 	}
 
 	procChance := 0.2 * float64(rogue.Talents.SealFate)
+	cpMetrics := rogue.NewComboPointMetrics(core.ActionID{SpellID: 14195})
 
 	rogue.RegisterAura(core.Aura{
 		Label:    "Seal Fate",
@@ -192,7 +197,7 @@ func (rogue *Rogue) applySealFate() {
 			}
 
 			if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
-				rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14195})
+				rogue.AddComboPoints(sim, 1, cpMetrics)
 			}
 		},
 	})
@@ -276,6 +281,7 @@ func (rogue *Rogue) applyCombatPotency() {
 
 	const procChance = 0.2
 	energyBonus := 3.0 * float64(rogue.Talents.CombatPotency)
+	energyMetrics := rogue.NewEnergyMetrics(core.ActionID{SpellID: 35553})
 
 	rogue.RegisterAura(core.Aura{
 		Label:    "Combat Potency",
@@ -297,7 +303,7 @@ func (rogue *Rogue) applyCombatPotency() {
 				return
 			}
 
-			rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
+			rogue.AddEnergy(sim, energyBonus, energyMetrics)
 		},
 	})
 }

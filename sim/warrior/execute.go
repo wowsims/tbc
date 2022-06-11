@@ -2,7 +2,6 @@ package warrior
 
 import (
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -56,7 +55,7 @@ func (warrior *Warrior) registerExecuteSpell() {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
-					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					warrior.AddRage(sim, refundAmount, warrior.RageRefundMetrics)
 				}
 			},
 		}),

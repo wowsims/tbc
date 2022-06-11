@@ -81,11 +81,13 @@ func (warrior *Warrior) applyAngerManagement() {
 		return
 	}
 
+	rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 12296})
+
 	warrior.RegisterResetEffect(func(sim *core.Simulation) {
 		core.StartPeriodicAction(sim, core.PeriodicActionOptions{
 			Period: time.Second * 3,
 			OnAction: func(sim *core.Simulation) {
-				warrior.AddRage(sim, 1, core.ActionID{SpellID: 12296})
+				warrior.AddRage(sim, 1, rageMetrics)
 			},
 		})
 	})
@@ -158,6 +160,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 
 	if warrior.Talents.MaceSpecialization > 0 && maceSpecMask != core.ProcMaskUnknown {
 		ppmm := warrior.AutoAttacks.NewPPMManager(1.5)
+		rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 12704})
 
 		warrior.RegisterAura(core.Aura{
 			Label:    "Mace Specialization",
@@ -183,7 +186,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 					return
 				}
 
-				warrior.AddRage(sim, 7, core.ActionID{SpellID: 12704})
+				warrior.AddRage(sim, 7, rageMetrics)
 			},
 		})
 	}
@@ -246,6 +249,7 @@ func (warrior *Warrior) applyUnbridledWrath() {
 	}
 
 	ppmm := warrior.AutoAttacks.NewPPMManager(3 * float64(warrior.Talents.UnbridledWrath))
+	rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 13002})
 
 	warrior.RegisterAura(core.Aura{
 		Label:    "Unbridled Wrath",
@@ -266,7 +270,7 @@ func (warrior *Warrior) applyUnbridledWrath() {
 				return
 			}
 
-			warrior.AddRage(sim, 1, core.ActionID{SpellID: 13002})
+			warrior.AddRage(sim, 1, rageMetrics)
 		},
 	})
 }
@@ -325,6 +329,8 @@ func (warrior *Warrior) applyShieldSpecialization() {
 	warrior.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(warrior.Talents.ShieldSpecialization))
 
 	procChance := 0.2 * float64(warrior.Talents.ShieldSpecialization)
+	rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 12727})
+
 	warrior.RegisterAura(core.Aura{
 		Label:    "Shield Specialization",
 		Duration: core.NeverExpires,
@@ -334,7 +340,7 @@ func (warrior *Warrior) applyShieldSpecialization() {
 		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeBlock) {
 				if procChance == 1 || sim.RandomFloat("Shield Specialization") < procChance {
-					warrior.AddRage(sim, 1, core.ActionID{SpellID: 12727})
+					warrior.AddRage(sim, 1, rageMetrics)
 				}
 			}
 		},

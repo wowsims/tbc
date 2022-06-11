@@ -6,7 +6,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -72,7 +71,7 @@ func (druid *Druid) registerLacerateSpell() {
 						druid.LacerateDot.SetStacks(sim, 1)
 					}
 				} else {
-					druid.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					druid.AddRage(sim, refundAmount, druid.RageRefundMetrics)
 				}
 			},
 		}),

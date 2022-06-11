@@ -13,6 +13,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 	}
 
 	actionID := core.ActionID{ItemID: 7676}
+	energyMetrics := rogue.NewEnergyMetrics(actionID)
 
 	const energyRegen = 40.0
 
@@ -31,7 +32,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
-			rogue.AddEnergy(sim, energyRegen, actionID)
+			rogue.AddEnergy(sim, energyRegen, energyMetrics)
 		},
 	})
 

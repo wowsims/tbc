@@ -73,6 +73,8 @@ func (druid *Druid) registerCatFormSpell() {
 		},
 	})
 
+	energyMetrics := druid.NewEnergyMetrics(actionID)
+
 	druid.CatForm = druid.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Flags:    core.SpellFlagNoOnCastComplete,
@@ -94,9 +96,9 @@ func (druid *Druid) registerCatFormSpell() {
 				energyDelta += 40.0
 			}
 			if energyDelta > 0 {
-				druid.AddEnergy(sim, energyDelta, spell.ActionID)
+				druid.AddEnergy(sim, energyDelta, energyMetrics)
 			} else if energyDelta < 0 {
-				druid.SpendEnergy(sim, -energyDelta, spell.ActionID)
+				druid.SpendEnergy(sim, -energyDelta, energyMetrics)
 			}
 			druid.CatFormAura.Activate(sim)
 		},
@@ -145,6 +147,8 @@ func (druid *Druid) registerBearFormSpell() {
 		},
 	})
 
+	rageMetrics := druid.NewRageMetrics(actionID)
+
 	druid.BearForm = druid.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Flags:    core.SpellFlagNoOnCastComplete,
@@ -166,9 +170,9 @@ func (druid *Druid) registerBearFormSpell() {
 				finalRage += 10.0
 			}
 			if rageDelta > 0 {
-				druid.AddRage(sim, rageDelta, spell.ActionID)
+				druid.AddRage(sim, rageDelta, rageMetrics)
 			} else if rageDelta < 0 {
-				druid.SpendRage(sim, -rageDelta, spell.ActionID)
+				druid.SpendRage(sim, -rageDelta, rageMetrics)
 			}
 			druid.BearFormAura.Activate(sim)
 		},

@@ -18,6 +18,8 @@ type rageBar struct {
 	currentRage  float64
 
 	onRageGain OnRageGain
+
+	RageRefundMetrics *ResourceMetrics
 }
 
 func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, onRageGain OnRageGain) {
@@ -87,6 +89,8 @@ func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, on
 		unit:         unit,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),
 		onRageGain:   onRageGain,
+
+		RageRefundMetrics: unit.NewRageMetrics(ActionID{OtherID: proto.OtherAction_OtherActionRefund}),
 	}
 }
 

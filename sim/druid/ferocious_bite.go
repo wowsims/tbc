@@ -60,7 +60,7 @@ func (druid *Druid) registerFerociousBiteSpell() {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					druid.SpendComboPoints(sim, spell.ActionID)
+					druid.SpendComboPoints(sim, spell.ComboPointMetrics())
 				}
 			},
 		}),

@@ -111,6 +111,8 @@ var ItemSetLightbringerBattlegear = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			paladin := agent.(PaladinAgent).GetPaladin()
+			manaMetrics := paladin.NewManaMetrics(core.ActionID{SpellID: 38428})
+
 			paladin.RegisterAura(core.Aura{
 				Label:    "Lightbringer Battlegear 2pc",
 				Duration: core.NeverExpires,
@@ -124,7 +126,7 @@ var ItemSetLightbringerBattlegear = core.ItemSet{
 					if sim.RandomFloat("lightbringer 2pc") > 0.2 {
 						return
 					}
-					paladin.AddMana(sim, 50, core.ActionID{SpellID: 38428}, true)
+					paladin.AddMana(sim, 50, manaMetrics, true)
 				},
 			})
 		},

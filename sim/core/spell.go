@@ -54,8 +54,9 @@ type Spell struct {
 	Flags SpellFlag
 
 	// Should be stats.Mana, stats.Energy, stats.Rage, or unset.
-	ResourceType    stats.Stat
-	ResourceMetrics *ResourceMetrics
+	ResourceType      stats.Stat
+	ResourceMetrics   *ResourceMetrics
+	comboPointMetrics *ResourceMetrics
 
 	// Base cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base cost.
@@ -162,6 +163,13 @@ func (spell *Spell) doneIteration() {
 	if !spell.Flags.Matches(SpellFlagNoMetrics) {
 		spell.Unit.Metrics.addSpell(spell)
 	}
+}
+
+func (spell *Spell) ComboPointMetrics() *ResourceMetrics {
+	if spell.comboPointMetrics == nil {
+		spell.comboPointMetrics = spell.Unit.NewComboPointMetrics(spell.ActionID)
+	}
+	return spell.comboPointMetrics
 }
 
 func (spell *Spell) ReadyAt() time.Duration {

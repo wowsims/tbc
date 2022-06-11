@@ -75,14 +75,20 @@ func (priest *Priest) ApplyVampiricTouchManaReturn(sim *core.Simulation, damage 
 		character := partyMember.GetCharacter()
 		if character.HasManaBar() {
 			totalActualGain += core.MinFloat(amount, character.MaxMana()-character.CurrentMana())
-			character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
+			if character.VtManaMetrics == nil {
+				character.VtManaMetrics = character.NewManaMetrics(priest.VampiricTouch.ActionID)
+			}
+			character.AddMana(sim, amount, character.VtManaMetrics, false)
 		}
 	}
 	for _, petAgent := range priest.Party.Pets {
 		pet := petAgent.GetPet()
 		if pet.IsEnabled() && pet.Character.HasManaBar() {
-			totalActualGain += core.MinFloat(amount, pet.Character.MaxMana()-pet.Character.CurrentMana())
-			pet.Character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
+			totalActualGain += core.MinFloat(amount, pet.MaxMana()-pet.CurrentMana())
+			if pet.VtManaMetrics == nil {
+				pet.VtManaMetrics = pet.NewManaMetrics(priest.VampiricTouch.ActionID)
+			}
+			pet.AddMana(sim, amount, pet.VtManaMetrics, false)
 		}
 	}
 
