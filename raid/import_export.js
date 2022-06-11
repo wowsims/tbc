@@ -29,9 +29,6 @@ export function newRaidImporters(simUI) {
         itemElem.textContent = label;
         itemElem.addEventListener('click', onClick);
         menuElem.appendChild(itemElem);
-        if (experimental) {
-            itemElem.classList.add('experimental');
-        }
     };
     addMenuItem('Json', false, () => new RaidJsonImporter(menuElem, simUI));
     addMenuItem('WCL', true, () => new RaidWCLImporter(menuElem, simUI));
@@ -63,7 +60,7 @@ export function newRaidExporters(simUI) {
 }
 class RaidJsonImporter extends Importer {
     constructor(parent, simUI) {
-        super(parent, 'JSON Import');
+        super(parent, 'JSON Import', true);
         this.simUI = simUI;
         this.descriptionElem.innerHTML = `
 			<p>
@@ -92,18 +89,15 @@ class RaidJsonExporter extends Exporter {
 }
 class RaidWCLImporter extends Importer {
     constructor(parent, simUI) {
-        super(parent, 'WCL Import');
+        super(parent, 'WCL Import', false);
         this.queryCounter = 0;
         this.simUI = simUI;
         this.descriptionElem.innerHTML = `
 			<p>
-				WARNING: THIS IS EXPERIMENTAL
-			</p>
-			<p>
 				Import entire raid from a WCL report.<br>
-				The players will be out of order and any specs not implemented will not be imported.<br>
-				If there are blank spots in the raid, just re-import.<br>
-				Do not use the 'IMPORT FROM FILE' button, it won't work.<br>
+				Parties are a best guess based on buffs.<br>
+				Double check innervate/PI and paladin buffs in the settings after import.<br>
+				Does not support fight=last currently (will default any non-numeric fight ID to be 0)<br>
 			</p>
 			<p>
 				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID).<br>
@@ -179,6 +173,14 @@ class RaidWCLImporter extends Importer {
             .then((res) => res['data']['rateLimitData']);
     }
     async onImport(importLink) {
+        this.importButton.disabled = true;
+        this.rootElem.style.cursor = "wait";
+        this.doImport(importLink).then(() => {
+            this.importButton.disabled = false;
+            this.rootElem.style.removeProperty("cursor");
+        });
+    }
+    async doImport(importLink) {
         if (!importLink.length) {
             console.error("No import link provided!");
             return;

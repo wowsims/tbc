@@ -8,7 +8,9 @@ export declare function newIndividualImporters<SpecType extends Spec>(simUI: Ind
 export declare abstract class Importer extends Popup {
     private readonly textElem;
     protected readonly descriptionElem: HTMLElement;
-    constructor(parent: HTMLElement, title: string);
+    protected readonly importButton: HTMLButtonElement;
+    private readonly includeFile;
+    constructor(parent: HTMLElement, title: string, includeFile: boolean);
     abstract onImport(data: string): void;
     protected finishIndividualImport<SpecType extends Spec>(simUI: IndividualSimUI<SpecType>, charClass: Class, race: Race, equipmentSpec: EquipmentSpec, talentsStr: string): void;
 }
