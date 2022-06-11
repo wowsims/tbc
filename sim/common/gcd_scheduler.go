@@ -231,11 +231,11 @@ func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.Action
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
 			success := gs.managedMCDs[mcdIdx].TryActivate(sim, character)
-			if !success {
+			if success {
+				character.UpdateMajorCooldowns()
+			} else {
 				character.EnableMajorCooldown(gs.managedMCDIDs[mcdIdx])
 				gs.managedMCDs[mcdIdx].Spell.DefaultCast.GCD = 0
-			} else {
-				character.UpdateMajorCooldowns()
 			}
 			return success
 		},
