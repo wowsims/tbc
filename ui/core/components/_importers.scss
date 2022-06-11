@@ -27,6 +27,12 @@
 	cursor: pointer;
 }
 
+.importer-button:disabled {
+	cursor: wait;
+	background-color: gray;
+	color: white;
+}
+
 .importer-upload-input {
 	display: none !important;
 }

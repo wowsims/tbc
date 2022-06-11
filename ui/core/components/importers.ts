@@ -51,14 +51,16 @@ export function newIndividualImporters<SpecType extends Spec>(simUI: IndividualS
 export abstract class Importer extends Popup {
 	private readonly textElem: HTMLTextAreaElement;
 	protected readonly descriptionElem: HTMLElement;
+	protected readonly importButton: HTMLButtonElement;
+	private readonly includeFile: boolean;
 
-	constructor(parent: HTMLElement, title: string) {
+	constructor(parent: HTMLElement, title: string, includeFile: boolean) {
 		super(parent);
-
+		this.includeFile = includeFile;
 		const uploadInputId = 'upload-input-' + title.toLowerCase().replaceAll(' ', '-');
 
 		this.rootElem.classList.add('importer');
-		this.rootElem.innerHTML = `
+		let htmlVal = `
 			<span class="importer-title">${title}</span>
 			<div class="import-description">
 			</div>
@@ -66,25 +68,33 @@ export abstract class Importer extends Popup {
 				<textarea class="importer-textarea"></textarea>
 			</div>
 			<div class="actions-row">
-				<label for="${uploadInputId}" class="importer-button sim-button upload-button">UPLOAD FROM FILE</label>
+		`;
+		if (this.includeFile) {
+			htmlVal += `<label for="${uploadInputId}" class="importer-button sim-button upload-button">UPLOAD FROM FILE</label>
 				<input type="file" id="${uploadInputId}" class="importer-upload-input" hidden>
-				<button class="importer-button sim-button import-button">IMPORT</button>
+			`
+		}
+		htmlVal += `<button class="importer-button sim-button import-button">IMPORT</button>
 			</div>
 		`;
+
+		this.rootElem.innerHTML = htmlVal
 
 		this.addCloseButton();
 
 		this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLTextAreaElement;
 		this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
 
-		const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
-		uploadInput.addEventListener('change', async event => {
-			const data: string = await (event as any).target.files[0].text();
-			this.textElem.textContent = data;
-		});
+		if (this.includeFile) {
+			const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLButtonElement;
+			uploadInput.addEventListener('change', async event => {
+				const data: string = await (event as any).target.files[0].text();
+				this.textElem.textContent = data;
+			});	
+		}
 
-		const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
-		importButton.addEventListener('click', event => {
+		this.importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLButtonElement;
+		this.importButton.addEventListener('click', event => {
 			try {
 				this.onImport(this.textElem.value || '');
 			} catch (error) {
@@ -147,7 +157,7 @@ export abstract class Importer extends Popup {
 class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
 	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-		super(parent, 'JSON Import');
+		super(parent, 'JSON Import', true);
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -176,7 +186,7 @@ class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 class Individual70UImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
 	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-		super(parent, '70 Upgrades Import');
+		super(parent, '70 Upgrades Import', true);
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -234,7 +244,7 @@ class Individual70UImporter<SpecType extends Spec> extends Importer {
 class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
 	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-		super(parent, 'Addon Import');
+		super(parent, 'Addon Import', true);
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
