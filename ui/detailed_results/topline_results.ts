@@ -11,8 +11,7 @@ export class ToplineResults extends ResultComponent {
 	}
 
 	onSimResult(resultData: SimResultData) {
-		const players = resultData.result.getPlayers(resultData.filter);
-		let content = RaidSimResultsManager.makeToplineResultsContent(resultData.result, players.length == 1);
+		let content = RaidSimResultsManager.makeToplineResultsContent(resultData.result, resultData.filter);
 
 		const noManaSpecs = [
 			Spec.SpecFeralDruid,
@@ -22,6 +21,7 @@ export class ToplineResults extends ResultComponent {
 			Spec.SpecProtectionWarrior,
 		];
 
+		const players = resultData.result.getPlayers(resultData.filter);
 		if (players.length == 1 && !noManaSpecs.includes(players[0].spec)) {
 			const player = players[0];
 			const secondsOOM = player.secondsOomAvg;

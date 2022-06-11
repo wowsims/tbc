@@ -123,9 +123,9 @@ export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
 			this.rootElem.classList.add('hide-in-front-of-target');
 		}
 
-		const actions = player.getMeleeActions();
+		const actions = player.getMeleeActions().map(action => action.forTarget(resultData.filter));
 		const actionGroups = ActionMetrics.groupById(actions);
-		const petGroups = player.pets.map(pet => pet.getMeleeActions());
+		const petGroups = player.pets.map(pet => pet.getMeleeActions().map(action => action.forTarget(resultData.filter)));
 
 		return actionGroups.concat(petGroups);
 	}

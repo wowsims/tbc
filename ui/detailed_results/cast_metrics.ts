@@ -41,9 +41,9 @@ export class CastMetricsTable extends MetricsTable<ActionMetrics> {
 		}
 		const player = players[0];
 
-		const actions = player.actions.filter(action => action.casts != 0);
+		const actions = player.actions.filter(action => action.casts != 0).map(action => action.forTarget(resultData.filter));
 		const actionGroups = ActionMetrics.groupById(actions);
-		const petGroups = player.pets.map(pet => pet.actions.filter(action => action.casts != 0));
+		const petGroups = player.pets.map(pet => pet.actions.filter(action => action.casts != 0).map(action => action.forTarget(resultData.filter)));
 
 		return actionGroups.concat(petGroups);
 	}
