@@ -610,6 +610,7 @@ export const ActionMetrics = new ActionMetrics$Type();
 class TargetedActionMetrics$Type extends MessageType {
     constructor() {
         super("proto.TargetedActionMetrics", [
+            { no: 12, name: "unit_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 1, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -624,7 +625,7 @@ class TargetedActionMetrics$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { casts: 0, hits: 0, crits: 0, crushes: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
+        const message = { unitIndex: 0, casts: 0, hits: 0, crits: 0, crushes: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -635,6 +636,9 @@ class TargetedActionMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* int32 unit_index */ 12:
+                    message.unitIndex = reader.int32();
+                    break;
                 case /* int32 casts */ 1:
                     message.casts = reader.int32();
                     break;
@@ -680,6 +684,9 @@ class TargetedActionMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* int32 unit_index = 12; */
+        if (message.unitIndex !== 0)
+            writer.tag(12, WireType.Varint).int32(message.unitIndex);
         /* int32 casts = 1; */
         if (message.casts !== 0)
             writer.tag(1, WireType.Varint).int32(message.casts);

@@ -288,6 +288,12 @@ export interface ActionMetrics {
  */
 export interface TargetedActionMetrics {
     /**
+     * Raid/Target Index of the unit these metrics are targeted at.
+     *
+     * @generated from protobuf field: int32 unit_index = 12;
+     */
+    unitIndex: number;
+    /**
      * # of times this action was used by the agent.
      *
      * @generated from protobuf field: int32 casts = 1;

@@ -484,9 +484,15 @@ export class ActionMetrics {
             return this;
         }
         else {
-            const targetData = ActionMetricsProto.clone(this.data);
-            targetData.targets = [targetData.targets[index]];
-            return new ActionMetrics(this.unit, this.actionId, targetData, this.resultData);
+            const target = this.targets.find(target => target.data.unitIndex == index);
+            if (target) {
+                const targetData = ActionMetricsProto.clone(this.data);
+                targetData.targets = [target.data];
+                return new ActionMetrics(this.unit, this.actionId, targetData, this.resultData);
+            }
+            else {
+                throw new Error('Could not find target with index ' + index);
+            }
         }
     }
     static async makeNew(unit, resultData, actionMetrics, playerIndex) {
