@@ -760,7 +760,7 @@ class WCLSimPlayer implements wclSimPlayer {
 				
 				// Diff the distance to the preset.
 				
-				const newDistance = presetTalents.reduce((acc, v, i) => acc += Math.abs(this.talents[i].guid - presetTalents[i]), 0);
+				const newDistance = presetTalents.reduce((acc, v, i) => acc += Math.abs(this.talents[i]?.guid - presetTalents[i]), 0);
 				
 				// If this is the best distance, assign this preset.
 				if (newDistance < distance) {
