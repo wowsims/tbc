@@ -66,7 +66,7 @@ $TBC_CMD make host
 # Commands
 We use a makefile for our build system. These commands will usually be all you need while developing for this project:
 ```sh
-# Installs a pre-commit git hook so that your go code is automatically formatted (if you don't use an IDE that supports that).  If you want to manually format go code you can run make fmt
+# Installs a pre-commit git hook so that your go code is automatically formatted (if you don't use an IDE that supports that).  If you want to manually format go code you can run make fmt.
 make setup
 
 # Run all the tests. Currently only the backend sim has tests.
@@ -83,15 +83,15 @@ make host
 # Delete all generated files (.pb.go and .ts proto files, and dist/)
 make clean
 
-# Only recompiles the ts for the given spec (make host_elemental_shaman)
-make host_spec
+# Recompiles the ts only for the given spec (e.g. make host_elemental_shaman)
+make host_$spec
 
-# Make wowsimtbc will create the binary 'wowsimtbc' that can host the UI and run simulations natively (instead of with wasm)
+# Creates the 'wowsimtbc' binary that can host the UI and run simulations natively (instead of with wasm).
 # Builds the UI and the compiles it into the binary so that you can host the sim as a server instead of wasm on the client.
 # It does this by first doing make dist/tbc and then copying all those files to binary_dist/tbc and loading all the files in that directory into its binary on compile.
 make wowsimtbc
 
-# Recompiles the server binary `wowsimtbc` only. This is the fastest way to iterate on core go simulator code so you don't have to wait for client rebuilds.
+# Recompiles the `wowsimtbc` server binary only. This is the fastest way to iterate on core go simulator code so you don't have to wait for client rebuilds.
 # Includes whatever client code is in the binary_dist directory. If this is not there you can generate it using `make wowsimtbc`
 make devserver
 
