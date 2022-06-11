@@ -128,7 +128,6 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 				}
 				report(progMetric)
 				if progMetric.FinalRaidResult != nil || progMetric.FinalWeightResult != nil {
-					close(reporter)
 					return
 				}
 			}

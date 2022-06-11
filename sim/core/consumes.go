@@ -418,9 +418,6 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				for _, aura := range auras {
 					aura.Activate(sim)
 				}
-
-				// All MCDs that use the GCD and have a non-zero cast time must call this.
-				character.UpdateMajorCooldowns()
 			},
 		})
 	} else {
