@@ -2,7 +2,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult, ProgressMetrics } from '/tbc/core/proto/api.js';
 import { SimRunData } from '/tbc/core/proto/ui.js';
-import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
+import { ActionMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { formatDeltaTextElem } from '/tbc/core/utils.js';
@@ -76,7 +76,7 @@ export class RaidSimResultsManager {
 		const dpsMetrics = simResult.raidMetrics.dps;
 		this.simUI.resultsViewer.setContent(`
       <div class="results-sim">
-				${RaidSimResultsManager.makeToplineResultsContent(simResult, this.simUI.isIndividualSim())}
+				${RaidSimResultsManager.makeToplineResultsContent(simResult)}
 				<div class="results-sim-reference">
 					<span class="results-sim-set-reference fa fa-map-pin"></span>
 					<div class="results-sim-reference-bar">
@@ -214,34 +214,55 @@ export class RaidSimResultsManager {
 		};
 	}
 
-	static makeToplineResultsContent(simResult: SimResult, isIndividualSim: boolean): string {
-		const dpsMetrics = simResult.raidMetrics.dps;
-		const playerMetrics = isIndividualSim
-			? simResult.raidMetrics.parties[0].players[0]
-			: null;
+	static makeToplineResultsContent(simResult: SimResult, filter?: SimResultFilter): string {
+		const players = simResult.getPlayers(filter);
+		const playerMetrics = players.length == 1 ? players[0] : null;
+		let content = '';
 
-		let content = `
-			<div class="results-sim-dps">
-				<span class="topline-result-avg">${dpsMetrics.avg.toFixed(2)}</span>
-				<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
-			</div>
-    `;
 		if (playerMetrics) {
-			const tpsMetrics = playerMetrics.tps;
-			content += `
-				<div class="results-sim-tps threat-metrics">
-					<span class="topline-result-avg">${tpsMetrics.avg.toFixed(2)}</span>
-					<span class="topline-result-stdev">${tpsMetrics.stdev.toFixed(2)}</span>
-				</div>
-			`;
-			const dtpsMetrics = playerMetrics.dtps;
-			content += `
-				<div class="results-sim-dtps threat-metrics">
-					<span class="topline-result-avg">${dtpsMetrics.avg.toFixed(2)}</span>
-					<span class="topline-result-stdev">${dtpsMetrics.stdev.toFixed(2)}</span>
+			if (playerMetrics.getTargetIndex(filter) == null) {
+				const dpsMetrics = simResult.raidMetrics.dps;
+				const tpsMetrics = playerMetrics.tps;
+				const dtpsMetrics = playerMetrics.dtps;
+				content = `
+					<div class="results-sim-dps">
+						<span class="topline-result-avg">${dpsMetrics.avg.toFixed(2)}</span>
+						<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
+					</div>
+					<div class="results-sim-tps threat-metrics">
+						<span class="topline-result-avg">${tpsMetrics.avg.toFixed(2)}</span>
+						<span class="topline-result-stdev">${tpsMetrics.stdev.toFixed(2)}</span>
+					</div>
+					<div class="results-sim-dtps threat-metrics">
+						<span class="topline-result-avg">${dtpsMetrics.avg.toFixed(2)}</span>
+						<span class="topline-result-stdev">${dtpsMetrics.stdev.toFixed(2)}</span>
+					</div>
+				`;
+			} else {
+				const mergedActions = ActionMetrics.merge(simResult.getActionMetrics(filter));
+				const mergedTargetActions = ActionMetrics.merge(simResult.getTargets(filter)[0].actions.map(action => action.forTarget(filter)));
+				content = `
+					<div class="results-sim-dps">
+						<span class="topline-result-avg">${mergedActions.dps.toFixed(2)}</span>
+					</div>
+					<div class="results-sim-tps threat-metrics">
+						<span class="topline-result-avg">${mergedActions.tps.toFixed(2)}</span>
+					</div>
+					<div class="results-sim-dtps threat-metrics">
+						<span class="topline-result-avg">${mergedTargetActions.dps.toFixed(2)}</span>
+					</div>
+				`;
+			}
+		} else {
+			const dpsMetrics = simResult.raidMetrics.dps;
+			content = `
+				<div class="results-sim-dps">
+					<span class="topline-result-avg">${dpsMetrics.avg.toFixed(2)}</span>
+					<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
 				</div>
 			`;
 		}
+
 		return content;
 	}
 }
