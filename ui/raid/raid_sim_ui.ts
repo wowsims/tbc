@@ -1,42 +1,31 @@
-import { Encounter } from '/tbc/core/encounter.js';
-import { Player } from '/tbc/core/player.js';
-import { Raid } from '/tbc/core/raid.js';
-import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
-import { Stat } from '/tbc/core/proto/common.js';
-import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
-import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { Blessings } from '/tbc/core/proto/paladin.js';
-import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
-import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
-import { RaidSimSettings } from '/tbc/core/proto/ui.js';
-import { SavedEncounter } from '/tbc/core/proto/ui.js';
-import { SavedRaid } from '/tbc/core/proto/ui.js';
-import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
-import { Class } from '/tbc/core/proto/common.js';
-import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
-import { Spec } from '/tbc/core/proto/common.js';
-import { TristateEffect } from '/tbc/core/proto/common.js';
-import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
-import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
-import { DetailedResults } from '/tbc/core/components/detailed_results.js';
-import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
-import { LogRunner } from '/tbc/core/components/log_runner.js';
-import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
-import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
-import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
-import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
-import { downloadJson } from '/tbc/core/utils.js';
+import { BooleanPicker } from "/tbc/core/components/boolean_picker.js";
+import { DetailedResults } from "/tbc/core/components/detailed_results.js";
+import { EncounterPicker } from "/tbc/core/components/encounter_picker.js";
+import { LogRunner } from "/tbc/core/components/log_runner.js";
+import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from "/tbc/core/components/raid_sim_action.js";
+import { SavedDataManager } from "/tbc/core/components/saved_data_manager.js";
+import { SettingsMenu } from "/tbc/core/components/settings_menu.js";
 
-import { AssignmentsPicker } from './assignments_picker.js';
-import { BlessingsPicker } from './blessings_picker.js';
-import { BuffBot } from './buff_bot.js';
-import { RaidPicker } from './raid_picker.js';
-import { TanksPicker } from './tanks_picker.js';
-import { implementedSpecs } from './presets.js';
-import { newRaidExporters, newRaidImporters } from './import_export.js';
+import * as Tooltips from "/tbc/core/constants/tooltips.js";
+import { Encounter } from "/tbc/core/encounter.js";
+import { Player } from "/tbc/core/player.js";
+import { Raid as RaidProto } from "/tbc/core/proto/api.js";
+import { Class, Encounter as EncounterProto, Stat, TristateEffect } from "/tbc/core/proto/common.js";
+import { Blessings } from "/tbc/core/proto/paladin.js";
+import { BlessingsAssignments, BuffBot as BuffBotProto, RaidSimSettings, SavedEncounter, SavedRaid } from "/tbc/core/proto/ui.js";
+import { playerToSpec } from "/tbc/core/proto_utils/utils.js";
+import { Raid } from "/tbc/core/raid.js";
+import { Sim } from "/tbc/core/sim.js";
+import { SimUI } from "/tbc/core/sim_ui.js";
+import { EventID, TypedEvent } from "/tbc/core/typed_event.js";
 
-import * as Tooltips from '/tbc/core/constants/tooltips.js';
+import { AssignmentsPicker } from "./assignments_picker.js";
+import { BlessingsPicker } from "./blessings_picker.js";
+import { BuffBot } from "./buff_bot.js";
+import { newRaidExporters, newRaidImporters } from "./import_export.js";
+import { implementedSpecs } from "./presets.js";
+import { RaidPicker } from "./raid_picker.js";
+import { TanksPicker } from "./tanks_picker.js";
 
 declare var Muuri: any;
 declare var tippy: any;
@@ -361,6 +350,10 @@ export class RaidSimUI extends SimUI {
 	setBuffBots(eventID: EventID, buffBotProtos: BuffBotProto[]): void {
 		this.raidPicker!.setBuffBots(eventID, buffBotProtos);
 	}
+	
+	clearBuffBots(eventID: EventID): void {
+		this.raidPicker!.setBuffBots(eventID, []);
+	}
 
 	getPlayersAndBuffBots(): Array<Player<any> | BuffBot | null> {
 		const players = this.sim.raid.getPlayers();
@@ -406,6 +399,7 @@ export class RaidSimUI extends SimUI {
 
 	clearRaid(eventID: EventID) {
 		this.sim.raid.clear(eventID);
+		this.clearBuffBots(eventID);
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.
