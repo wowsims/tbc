@@ -195,9 +195,9 @@ func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
-			spell.Unit.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
+			spell.Unit.Log(sim, "%s %s tick %s. (Threat: %0.3f)", spellEffect.Target.LogLabel(), spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
 		} else {
-			spell.Unit.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
+			spell.Unit.Log(sim, "%s %s %s. (Threat: %0.3f)", spellEffect.Target.LogLabel(), spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
 		}
 	}
 
