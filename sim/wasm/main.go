@@ -5,6 +5,7 @@ package main
 
 import (
 	"log"
+	"runtime/debug"
 	"syscall/js"
 
 	"github.com/wowsims/tbc/sim"
@@ -30,7 +31,31 @@ func main() {
 	<-c
 }
 
-func computeStats(this js.Value, args []js.Value) interface{} {
+func computeStats(this js.Value, args []js.Value) (response interface{}) {
+	defer func() {
+		if err := recover(); err != nil {
+			errStr := ""
+			switch errt := err.(type) {
+			case string:
+				errStr = errt
+			case error:
+				errStr = errt.Error()
+			}
+
+			errStr += "\nStack Trace:\n" + string(debug.Stack())
+			result := &proto.ComputeStatsResult{
+				ErrorResult: errStr,
+			}
+			outbytes, err := googleProto.Marshal(result)
+			if err != nil {
+				log.Printf("[ERROR] Failed to marshal error (%s) result: %s", errStr, err.Error())
+				return
+			}
+			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+			js.CopyBytesToJS(outArray, outbytes)
+			response = outArray
+		}
+	}()
 	csr := &proto.ComputeStatsRequest{}
 	if err := googleProto.Unmarshal(getArgsBinary(args[0]), csr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
@@ -47,7 +72,8 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 	outArray := js.Global().Get("Uint8Array").New(len(outbytes))
 	js.CopyBytesToJS(outArray, outbytes)
 
-	return outArray
+	response = outArray
+	return response
 }
 
 func gearList(this js.Value, args []js.Value) interface{} {
