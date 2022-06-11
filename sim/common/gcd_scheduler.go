@@ -234,6 +234,8 @@ func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.Action
 			if !success {
 				character.EnableMajorCooldown(gs.managedMCDIDs[mcdIdx])
 				gs.managedMCDs[mcdIdx].Spell.DefaultCast.GCD = 0
+			} else {
+				character.UpdateMajorCooldowns()
 			}
 			return success
 		},
