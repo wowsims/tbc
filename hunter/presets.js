@@ -28,13 +28,13 @@ export const DefaultRotation = HunterRotation.create({
     useArcaneShot: true,
     viperStartManaPercent: 0.1,
     viperStopManaPercent: 0.3,
-    weave: WeaveType.WeaveFull,
+    weave: WeaveType.WeaveNone,
     timeToWeaveMs: 500,
     percentWeaved: 0.8,
 });
 export const DefaultOptions = HunterOptions.create({
     quiverBonus: QuiverBonus.Speed15,
-    ammo: Ammo.AdamantiteStinger,
+    ammo: Ammo.TimelessArrow,
     petType: PetType.Ravager,
     petUptime: 1,
     latencyMs: 30,
