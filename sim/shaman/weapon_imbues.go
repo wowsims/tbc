@@ -191,7 +191,8 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 
 	mhSpell := shaman.newFrostbrandImbueSpell(true)
 	ohSpell := shaman.newFrostbrandImbueSpell(false)
-	ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	ppmm := shaman.AutoAttacks.NewPPMManager(9.0, procMask)
 
 	shaman.RegisterAura(core.Aura{
 		Label:    "Frostbrand Imbue",
@@ -200,20 +201,15 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 				return
 			}
 
-			isMHHit := spellEffect.IsMH()
-			if (isMHHit && !mh) || (!isMHHit && !oh) {
-				return // cant proc if not enchanted
-			}
-
-			if !ppmm.Proc(sim, isMHHit, false, "Frostbrand Weapon") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Frostbrand Weapon") {
 				return
 			}
 
-			if isMHHit {
+			if spellEffect.IsMH() {
 				mhSpell.Cast(sim, spellEffect.Target)
 			} else {
 				ohSpell.Cast(sim, spellEffect.Target)

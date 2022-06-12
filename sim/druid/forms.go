@@ -49,9 +49,9 @@ func (druid *Druid) registerCatFormSpell() {
 	actionID := core.ActionID{SpellID: 768}
 	baseCost := druid.BaseMana() * 0.35
 
-	previousEnergy := 0.0
-	finalEnergy := 0.0
 	furorProcChance := 0.2 * float64(druid.Talents.Furor)
+
+	finalEnergy := 0.0
 	if druid.Equip[items.ItemSlotHead].ID == 8345 { // Wolfshead Helm
 		finalEnergy += 20.0
 	}
@@ -62,7 +62,6 @@ func (druid *Druid) registerCatFormSpell() {
 		Duration: core.NeverExpires,
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			druid.form = Humanoid
-			previousEnergy = druid.CurrentEnergy()
 			druid.AutoAttacks.CancelAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
 		},
@@ -91,10 +90,11 @@ func (druid *Druid) registerCatFormSpell() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
-			energyDelta := finalEnergy - previousEnergy
+			energyDelta := finalEnergy - druid.CurrentEnergy()
 			if furorProcChance == 1 || (furorProcChance > 0 && sim.RandomFloat("Furor") < furorProcChance) {
 				energyDelta += 40.0
 			}
+
 			if energyDelta > 0 {
 				druid.AddEnergy(sim, energyDelta, energyMetrics)
 			} else if energyDelta < 0 {

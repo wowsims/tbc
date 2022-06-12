@@ -542,7 +542,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	procAura := character.NewTemporaryStatsAura("Band of the Eternal Champion Proc", core.ActionID{ItemID: 29301}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*10)
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMeleeOrRanged)
 
 	icd := core.Cooldown{
 		Timer:    character.NewTimer(),
@@ -563,7 +563,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 			if !icd.IsReady(sim) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Band of the Eternal Champion") {
+			if !ppmm.ProcWithWeaponSpecials(sim, spellEffect.ProcMask, "Band of the Eternal Champion") {
 				return
 			}
 
@@ -604,7 +604,7 @@ func ApplyHeartrazor(agent core.Agent) {
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
 	procAura := character.NewTemporaryStatsAura("Heartrazor Proc", core.ActionID{ItemID: 29962}, stats.Stats{stats.AttackPower: 270, stats.RangedAttackPower: 270}, time.Second*10)
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	character.GetOrRegisterAura(core.Aura{
 		Label:    "Heartrazor",
@@ -617,7 +617,7 @@ func ApplyHeartrazor(agent core.Agent) {
 				return
 			}
 
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Heartrazor") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Heartrazor") {
 				return
 			}
 
@@ -838,14 +838,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 	character := agent.GetCharacter()
 	mh, oh := character.GetWeaponHands(31332)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
-
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
-	if !mh {
-		ppmm.SetProcChance(true, 0)
-	}
-	if !oh {
-		ppmm.SetProcChance(false, 0)
-	}
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	var blinkstrikeSpell *core.Spell
 	icd := core.Cooldown{
@@ -876,7 +869,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 				return
 			}
 
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Blinkstrike") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Blinkstrike") {
 				return
 			}
 			icd.Use(sim)
@@ -924,14 +917,9 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	character := agent.GetCharacter()
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh, oh := character.GetWeaponHands(32262)
-	if !mh {
-		ppmm.SetProcChance(true, 0)
-	}
-	if !oh {
-		ppmm.SetProcChance(false, 0)
-	}
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 40291},
@@ -969,7 +957,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				return
 			}
 
-			if ppmm.Proc(sim, spellEffect.IsMH(), false, "Syphon Of The Nathrezim") {
+			if ppmm.Proc(sim, spellEffect.ProcMask, "Syphon Of The Nathrezim") {
 				procAura.Activate(sim)
 			}
 		},

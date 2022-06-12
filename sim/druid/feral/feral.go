@@ -37,10 +37,11 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	}
 
 	cat := &FeralDruid{
-		Druid:    druid.New(character, druid.Cat, selfBuffs, *feralOptions.Talents),
-		Rotation: *feralOptions.Rotation,
-		latency:  time.Duration(feralOptions.Options.LatencyMs) * time.Millisecond,
+		Druid:   druid.New(character, druid.Cat, selfBuffs, *feralOptions.Talents),
+		latency: time.Duration(feralOptions.Options.LatencyMs) * time.Millisecond,
 	}
+
+	cat.setupRotation(feralOptions.Rotation)
 
 	// Passive Cat Form threat reduction
 	cat.PseudoStats.ThreatMultiplier *= 0.71
@@ -91,7 +92,7 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 type FeralDruid struct {
 	*druid.Druid
 
-	Rotation proto.FeralDruid_Rotation
+	Rotation FeralDruidRotation
 
 	// currently unused
 	readyToShift   bool
