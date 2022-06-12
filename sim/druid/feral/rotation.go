@@ -170,6 +170,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	} else if rip_now {
 		if (energy >= 30) || omen_proc {
 			cat.Rip.Cast(sim, cat.CurrentTarget)
+			cat.waitingForTick = false
 		} else if time_to_next_tick > max_wait_time {
 			cat.shift(sim)
 		}
