@@ -296,7 +296,7 @@ func (druid *Druid) applyOmenOfClarity() {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.ProcMask, "Omen of Clarity") {
+			if !ppmm.ProcWithWeaponSpecials(sim, spellEffect.ProcMask, "Omen of Clarity") {
 				return
 			}
 			clearcastingAura.Activate(sim)
