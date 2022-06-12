@@ -64,7 +64,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 
 	rip_now := cp >= rotation.rip_cp && !rip_debuff
 	ripweave_now := (rotation.use_rip_trick &&
-		cp >= rip_trick_cp &&
+		cp >= rotation.rip_trick_cp &&
 		!rip_debuff &&
 		energy >= rip_trick_min &&
 		!cat.PseudoStats.NoCost)
@@ -248,7 +248,6 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 const bite_trick_cp = int32(2)
 const bite_trick_max = 39.0
 const bite_time = time.Second * 0.0
-const rip_trick_cp = int32(4)
 const rip_trick_min = 52.0
 const rip_end_thresh = time.Second * 10
 const max_wait_time = time.Second * 1.0
@@ -256,6 +255,7 @@ const max_wait_time = time.Second * 1.0
 type FeralDruidRotation struct {
 	rip_cp           int32
 	bite_cp          int32
+	rip_trick_cp     int32
 	use_bite         bool
 	bite_over_rip    bool
 	use_mangle_trick bool
@@ -272,6 +272,7 @@ func (cat *FeralDruid) setupRotation(rotation *proto.FeralDruid_Rotation) {
 	cat.Rotation = FeralDruidRotation{
 		rip_cp:           rotation.RipMinComboPoints,
 		bite_cp:          rotation.BiteMinComboPoints,
+		rip_trick_cp:     rotation.RipMinComboPoints,
 		use_bite:         use_bite,
 		bite_over_rip:    use_bite && rotation.FinishingMove != proto.FeralDruid_Rotation_Rip,
 		use_mangle_trick: rotation.MangleTrick,
