@@ -247,7 +247,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		}
 		if (energy >= mangle_cost) &&
-			(time_to_next_tick > latency) {
+			(time_to_next_tick > time.Second+latency) {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		}
 		if time_to_next_tick > max_wait_time {
