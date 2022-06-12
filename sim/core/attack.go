@@ -601,28 +601,13 @@ type PPMManager struct {
 // Returns whether the effect procced.
 func (ppmm *PPMManager) Proc(sim *Simulation, procMask ProcMask, label string) bool {
 	if procMask.Matches(ProcMaskMeleeMH) {
-		return ppmm.ProcMH(sim, label)
+		return ppmm.mhProcChance > 0 && sim.RandomFloat(label) < ppmm.mhProcChance
 	} else if procMask.Matches(ProcMaskMeleeOH) {
-		return ppmm.ProcOH(sim, label)
+		return ppmm.ohProcChance > 0 && sim.RandomFloat(label) < ppmm.ohProcChance
 	} else if procMask.Matches(ProcMaskRanged) {
-		return ppmm.ProcRanged(sim, label)
+		return ppmm.rangedProcChance > 0 && sim.RandomFloat(label) < ppmm.rangedProcChance
 	}
 	return false
-}
-
-// Returns whether the effect procced, assuming MH.
-func (ppmm *PPMManager) ProcMH(sim *Simulation, label string) bool {
-	return ppmm.mhProcChance > 0 && sim.RandomFloat(label) < ppmm.mhProcChance
-}
-
-// Returns whether the effect procced, assuming OH.
-func (ppmm *PPMManager) ProcOH(sim *Simulation, label string) bool {
-	return ppmm.ohProcChance > 0 && sim.RandomFloat(label) < ppmm.ohProcChance
-}
-
-// Returns whether the effect procced, assuming Ranged.
-func (ppmm *PPMManager) ProcRanged(sim *Simulation, label string) bool {
-	return ppmm.rangedProcChance > 0 && sim.RandomFloat(label) < ppmm.rangedProcChance
 }
 
 func (aa *AutoAttacks) NewPPMManager(ppm float64, procMask ProcMask) PPMManager {

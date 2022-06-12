@@ -122,7 +122,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				return
 			}
 
-			if !ppmm.ProcMH(sim, "seal of command") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "seal of command") {
 				return
 			}
 
