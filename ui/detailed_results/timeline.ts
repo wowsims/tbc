@@ -945,6 +945,11 @@ const idToCategoryMap: Record<number, number> = {
 	[33745]: MELEE_ACTION_CATEGORY + 0.2, // Lacerate
 	[26997]: MELEE_ACTION_CATEGORY + 0.3, // Swipe
 
+	[33983]: MELEE_ACTION_CATEGORY + 0.1, // Mangle (Cat)
+	[27002]: MELEE_ACTION_CATEGORY + 0.2, // Shred
+	[27008]: MELEE_ACTION_CATEGORY + 0.3, // Rip
+	[24248]: MELEE_ACTION_CATEGORY + 0.4, // Ferocious Bite
+
 	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
