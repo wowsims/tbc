@@ -156,7 +156,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	})
 
 	actionID := core.ActionID{ItemID: 21670}
-	ppmm := character.AutoAttacks.NewPPMManager(10.0)
+	ppmm := character.AutoAttacks.NewPPMManager(10.0, core.ProcMaskMeleeOrRanged)
 	activeAura := character.RegisterAura(core.Aura{
 		Label:    "Badge of the Swarmguard",
 		ActionID: actionID,
@@ -172,7 +172,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 				return
 			}
 
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Badge of the Swarmguard") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Badge of the Swarmguard") {
 				return
 			}
 
@@ -262,7 +262,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		}),
 	})
 
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMeleeOrRanged)
 
 	character.RegisterAura(core.Aura{
 		Label:    "Romulos Poison Vial",
@@ -275,7 +275,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "RomulosPoisonVial") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "RomulosPoisonVial") {
 				return
 			}
 
@@ -292,7 +292,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		Timer:    character.NewTimer(),
 		Duration: time.Second * 20,
 	}
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMeleeOrRanged)
 
 	character.RegisterAura(core.Aura{
 		Label:    "Dragonspine Trophy",
@@ -308,7 +308,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 			if !icd.IsReady(sim) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "dragonspine") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "dragonspine") {
 				return
 			}
 			icd.Use(sim)
@@ -449,7 +449,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Madness of the Betrayer Proc", core.ActionID{ItemID: 32505}, stats.Stats{stats.ArmorPenetration: 300}, time.Second*10)
 
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMeleeOrRanged)
 
 	character.RegisterAura(core.Aura{
 		Label:    "Madness of the Betrayer",
@@ -462,7 +462,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Madness of the Betrayer") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Madness of the Betrayer") {
 				return
 			}
 

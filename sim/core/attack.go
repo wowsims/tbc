@@ -598,27 +598,16 @@ type PPMManager struct {
 	rangedProcChance float64
 }
 
-// For manually overriding proc chance.
-func (ppmm *PPMManager) SetProcChance(isMH bool, newChance float64) {
-	if isMH {
-		ppmm.mhProcChance = newChance
-	} else {
-		ppmm.ohProcChance = newChance
-	}
-}
-func (ppmm *PPMManager) SetRangedChance(newChance float64) {
-	ppmm.rangedProcChance = newChance
-}
-
 // Returns whether the effect procced.
-func (ppmm *PPMManager) Proc(sim *Simulation, isMH bool, isRanged bool, label string) bool {
-	if isMH {
+func (ppmm *PPMManager) Proc(sim *Simulation, procMask ProcMask, label string) bool {
+	if procMask.Matches(ProcMaskMeleeMH) {
 		return ppmm.ProcMH(sim, label)
-	} else if !isRanged {
+	} else if procMask.Matches(ProcMaskMeleeOH) {
 		return ppmm.ProcOH(sim, label)
-	} else {
+	} else if procMask.Matches(ProcMaskRanged) {
 		return ppmm.ProcRanged(sim, label)
 	}
+	return false
 }
 
 // Returns whether the effect procced, assuming MH.
@@ -636,22 +625,23 @@ func (ppmm *PPMManager) ProcRanged(sim *Simulation, label string) bool {
 	return ppmm.rangedProcChance > 0 && sim.RandomFloat(label) < ppmm.rangedProcChance
 }
 
-// PPMToChance converts a unit proc-per-minute into mh/oh proc chances
-func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
-	if aa.MH.SwingSpeed == 0 {
-		// Means this unit didn't enable autoattacks.
-		return PPMManager{
-			mhProcChance:     0,
-			ohProcChance:     0,
-			rangedProcChance: 0,
-		}
+func (aa *AutoAttacks) NewPPMManager(ppm float64, procMask ProcMask) PPMManager {
+	if !aa.IsEnabled() {
+		return PPMManager{}
 	}
 
-	return PPMManager{
-		mhProcChance:     (aa.MH.SwingSpeed * ppm) / 60.0,
-		ohProcChance:     (aa.OH.SwingSpeed * ppm) / 60.0,
-		rangedProcChance: (aa.Ranged.SwingSpeed * ppm) / 60.0,
+	ppmm := PPMManager{}
+	if procMask.Matches(ProcMaskMeleeMH) {
+		ppmm.mhProcChance = ppm * aa.MH.SwingSpeed / 60.0
 	}
+	if procMask.Matches(ProcMaskMeleeOH) {
+		ppmm.ohProcChance = ppm * aa.OH.SwingSpeed / 60.0
+	}
+	if procMask.Matches(ProcMaskRanged) {
+		ppmm.rangedProcChance = ppm * aa.Ranged.SwingSpeed / 60.0
+	}
+
+	return ppmm
 }
 
 func (unit *Unit) applyParryHaste() {

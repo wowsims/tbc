@@ -303,7 +303,7 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 		})
 	} else if imbue == proto.WeaponImbue_WeaponImbueRighteousWeaponCoating {
 		procAura := character.NewTemporaryStatsAura("RighteousWeaponCoatingProc", ActionID{ItemID: 34539}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
-		ppmm := character.AutoAttacks.NewPPMManager(10.0)
+		ppmm := character.AutoAttacks.NewPPMManager(10.0, ProcMaskMeleeOrRanged)
 
 		icd := Cooldown{
 			Timer:    character.NewTimer(),
@@ -324,7 +324,7 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 				if !icd.IsReady(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(ProcMaskRanged), "Righteous Weapon Coating") {
+				if !ppmm.Proc(sim, spellEffect.ProcMask, "Righteous Weapon Coating") {
 					return
 				}
 

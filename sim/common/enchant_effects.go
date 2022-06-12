@@ -48,18 +48,13 @@ func ApplyWeaponMajorStriking(agent core.Agent, slot proto.ItemSlot) {
 //   A single application of the aura will handle both mh and oh procs.
 func ApplyCrusader(agent core.Agent) {
 	character := agent.GetCharacter()
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 16252
 	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 16252
 	if !mh && !oh {
 		return
 	}
-	if !mh {
-		ppmm.SetProcChance(true, 0)
-	}
-	if !oh {
-		ppmm.SetProcChance(false, 0)
-	}
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	// -4 str per level over 60
 	const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
@@ -77,9 +72,8 @@ func ApplyCrusader(agent core.Agent) {
 				return
 			}
 
-			isMH := spellEffect.IsMH()
-			if ppmm.Proc(sim, isMH, false, "Crusader") {
-				if isMH {
+			if ppmm.Proc(sim, spellEffect.ProcMask, "Crusader") {
+				if spellEffect.IsMH() {
 					mhAura.Activate(sim)
 				} else {
 					ohAura.Activate(sim)
@@ -118,18 +112,13 @@ func newLightningSpeedAura(character *core.Character, auraLabel string, actionID
 //   A single application of the aura will handle both mh and oh procs.
 func ApplyMongoose(agent core.Agent) {
 	character := agent.GetCharacter()
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 22559
 	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 22559
 	if !mh && !oh {
 		return
 	}
-	if !mh {
-		ppmm.SetProcChance(true, 0)
-	}
-	if !oh {
-		ppmm.SetProcChance(false, 0)
-	}
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
 	ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
@@ -145,9 +134,8 @@ func ApplyMongoose(agent core.Agent) {
 				return
 			}
 
-			isMH := spellEffect.IsMH()
-			if ppmm.Proc(sim, isMH, false, "mongoose") {
-				if isMH {
+			if ppmm.Proc(sim, spellEffect.ProcMask, "mongoose") {
+				if spellEffect.IsMH() {
 					mhAura.Activate(sim)
 				} else {
 					ohAura.Activate(sim)
@@ -179,18 +167,13 @@ func ApplyGlovesThreat(agent core.Agent) {
 
 func ApplyExecutioner(agent core.Agent) {
 	character := agent.GetCharacter()
-	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 33307
 	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 33307
 	if !mh && !oh {
 		return
 	}
-	if !mh {
-		ppmm.SetProcChance(true, 0)
-	}
-	if !oh {
-		ppmm.SetProcChance(false, 0)
-	}
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0, procMask)
 
 	procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
 
@@ -205,7 +188,7 @@ func ApplyExecutioner(agent core.Agent) {
 				return
 			}
 
-			if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
+			if ppmm.Proc(sim, spellEffect.ProcMask, "Executioner") {
 				procAura.Activate(sim)
 			}
 		},
@@ -249,7 +232,6 @@ func ApplyDeathfrost(agent core.Agent) {
 	}
 }
 func applyDeathfrostForWeapon(character *core.Character, procSpell *core.Spell, isMH bool) {
-	ppmm := character.AutoAttacks.NewPPMManager(2.15)
 	icd := core.Cooldown{
 		Timer:    character.NewTimer(),
 		Duration: time.Second * 25,
@@ -261,6 +243,7 @@ func applyDeathfrostForWeapon(character *core.Character, procSpell *core.Spell, 
 	} else {
 		label += "OH"
 	}
+	ppmm := character.AutoAttacks.NewPPMManager(2.15, core.ProcMaskMelee)
 
 	character.GetOrRegisterAura(core.Aura{
 		Label:    label,
@@ -274,7 +257,7 @@ func applyDeathfrostForWeapon(character *core.Character, procSpell *core.Spell, 
 			}
 
 			if spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-				if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Deathfrost") {
+				if !ppmm.Proc(sim, spellEffect.ProcMask, "Deathfrost") {
 					return
 				}
 				procSpell.Cast(sim, spellEffect.Target)

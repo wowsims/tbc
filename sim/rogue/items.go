@@ -60,7 +60,7 @@ var ItemSetDeathmantle = core.ItemSet{
 				Duration: time.Second * 15,
 			})
 
-			ppmm := rogue.AutoAttacks.NewPPMManager(1.0)
+			ppmm := rogue.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMelee)
 
 			rogue.RegisterAura(core.Aura{
 				Label:    "Deathmantle 4pc",
@@ -78,7 +78,7 @@ var ItemSetDeathmantle = core.ItemSet{
 						return
 					}
 
-					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Deathmantle 4pc") {
+					if !ppmm.Proc(sim, spellEffect.ProcMask, "Deathmantle 4pc") {
 						return
 					}
 
