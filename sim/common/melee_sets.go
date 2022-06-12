@@ -156,7 +156,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 				}),
 			})
 
-			ppmm := character.AutoAttacks.NewPPMManager(2)
+			ppmm := character.AutoAttacks.NewPPMManager(2, core.ProcMaskMelee)
 
 			character.RegisterAura(core.Aura{
 				Label:    "Fists of Fury",
@@ -168,7 +168,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 						return
 					}
-					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "The Fists of Fury") {
+					if !ppmm.Proc(sim, spellEffect.ProcMask, "The Fists of Fury") {
 						return
 					}
 
@@ -218,7 +218,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 			}
 			procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)
 
-			ppmm := character.AutoAttacks.NewPPMManager(1.0)
+			ppmm := character.AutoAttacks.NewPPMManager(1.0, core.ProcMaskMelee)
 			icd := core.Cooldown{
 				Timer:    character.NewTimer(),
 				Duration: time.Second * 45,
@@ -244,7 +244,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 						return
 					}
 
-					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Twin Blades of Azzinoth") {
+					if !ppmm.Proc(sim, spellEffect.ProcMask, "Twin Blades of Azzinoth") {
 						return
 					}
 					icd.Use(sim)

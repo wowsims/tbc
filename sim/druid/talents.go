@@ -265,7 +265,7 @@ func (druid *Druid) applyOmenOfClarity() {
 		return
 	}
 
-	ppmm := druid.AutoAttacks.NewPPMManager(2.0)
+	ppmm := druid.AutoAttacks.NewPPMManager(2.0, core.ProcMaskMelee)
 
 	clearcastingAura := druid.RegisterAura(core.Aura{
 		Label:    "Clearcasting",
@@ -296,7 +296,7 @@ func (druid *Druid) applyOmenOfClarity() {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Omen of Clarity") {
+			if !ppmm.ProcWithWeaponSpecials(sim, spellEffect.ProcMask, "Omen of Clarity") {
 				return
 			}
 			clearcastingAura.Activate(sim)

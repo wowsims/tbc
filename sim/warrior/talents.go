@@ -159,7 +159,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 	}
 
 	if warrior.Talents.MaceSpecialization > 0 && maceSpecMask != core.ProcMaskUnknown {
-		ppmm := warrior.AutoAttacks.NewPPMManager(1.5)
+		ppmm := warrior.AutoAttacks.NewPPMManager(1.5, maceSpecMask)
 		rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 12704})
 
 		warrior.RegisterAura(core.Aura{
@@ -182,7 +182,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 					return
 				}
 
-				if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Mace Specialization") {
+				if !ppmm.Proc(sim, spellEffect.ProcMask, "Mace Specialization") {
 					return
 				}
 
@@ -248,7 +248,7 @@ func (warrior *Warrior) applyUnbridledWrath() {
 		return
 	}
 
-	ppmm := warrior.AutoAttacks.NewPPMManager(3 * float64(warrior.Talents.UnbridledWrath))
+	ppmm := warrior.AutoAttacks.NewPPMManager(3*float64(warrior.Talents.UnbridledWrath), core.ProcMaskMelee)
 	rageMetrics := warrior.NewRageMetrics(core.ActionID{SpellID: 13002})
 
 	warrior.RegisterAura(core.Aura{
@@ -266,7 +266,7 @@ func (warrior *Warrior) applyUnbridledWrath() {
 				return
 			}
 
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Unbrided Wrath") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Unbrided Wrath") {
 				return
 			}
 

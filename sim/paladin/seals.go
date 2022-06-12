@@ -102,7 +102,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		}),
 	})
 
-	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
+	ppmm := paladin.AutoAttacks.NewPPMManager(7.0, core.ProcMaskMelee)
 	icd := core.Cooldown{
 		Timer:    paladin.NewTimer(),
 		Duration: time.Second * 1,
@@ -122,7 +122,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				return
 			}
 
-			if !ppmm.Proc(sim, true, false, "seal of command") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "seal of command") {
 				return
 			}
 
