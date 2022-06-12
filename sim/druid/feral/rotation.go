@@ -30,6 +30,9 @@ func (cat *FeralDruid) shift(sim *core.Simulation) bool {
 }
 
 func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
+	if sim.Log != nil {
+		cat.Log(sim, "doRotation")
+	}
 
 	// On gcd do nothing
 	if !cat.GCD.IsReady(sim) {
@@ -45,6 +48,10 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	// the input delay is over.
 	if cat.readyToShift {
 		return cat.shift(sim)
+	}
+
+	if sim.Log != nil {
+		cat.Log(sim, "mainRotation")
 	}
 
 	//strategy = {
@@ -146,6 +153,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		// No-shift rotation
 		if rip_now && ((energy >= 30) || omen_proc) {
 			cat.Rip.Cast(sim, cat.CurrentTarget)
+			cat.waitingForTick = false
 		} else if mangle_now &&
 			((energy >= mangle_cost) || omen_proc) {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
@@ -156,6 +164,9 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		}
 	} else if energy < 10 {
 		cat.shift(sim)
+		if sim.Log != nil {
+			cat.Log(sim, "energy < 10")
+		}
 	} else if rip_now {
 		if (energy >= 30) || omen_proc {
 			cat.Rip.Cast(sim, cat.CurrentTarget)
@@ -263,11 +274,16 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	// powershift without clipping the GCD, the shift will in practice be
 	// slightly delayed after the GCD ends.
 
-	if cat.waitingForTick {
-		cat.SetGCDTimer(sim, sim.CurrentTime+time_to_next_tick+latency)
-	}
 	if cat.readyToShift {
 		cat.SetGCDTimer(sim, sim.CurrentTime+latency)
+		if sim.Log != nil {
+			cat.Log(sim, "readyToShiftTimer")
+		}
+	} else if cat.waitingForTick {
+		cat.SetGCDTimer(sim, sim.CurrentTime+time_to_next_tick+latency)
+		if sim.Log != nil {
+			cat.Log(sim, "waitingForTickTimer")
+		}
 	}
 
 	return false
