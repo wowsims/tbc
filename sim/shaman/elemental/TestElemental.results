@@ -949,8 +949,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Average-Default"
  value: {
-  dps: 1554.9878858009295
-  tps: 1297.1878825257324
+  dps: 1558.3328520667474
+  tps: 1299.978185655598
  }
 }
 dps_results: {

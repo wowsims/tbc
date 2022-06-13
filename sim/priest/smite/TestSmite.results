@@ -734,8 +734,8 @@ dps_results: {
 dps_results: {
  key: "TestSmite-Average-Default"
  value: {
-  dps: 1098.600885329858
-  tps: 1068.575107804702
+  dps: 1101.2355073371766
+  tps: 1071.1376986783869
  }
 }
 dps_results: {

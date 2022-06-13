@@ -96,12 +96,12 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	gcdAt := hunter.NextGCDAt()
 	gcdReady := gcdAt <= sim.CurrentTime
 
-	percent := sim.GetRemainingDurationPercent()
+	percentRemaining := sim.GetRemainingDurationPercent()
 
 	waitingForMana := hunter.IsWaitingForMana()
 	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
 		(hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly || hunter.RaptorStrike.IsReady(sim)) &&
-		percent <= hunter.Rotation.PercentWeaved &&
+		percentRemaining <= 1.0-hunter.Rotation.PercentWeaved &&
 		hunter.AutoAttacks.MainhandSwingAt <= sim.CurrentTime
 	if canWeave && !shootReady && (!gcdReady || (waitingForMana && hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly)) {
 		hunter.nextAction = OptionWeave

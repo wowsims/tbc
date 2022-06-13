@@ -120,8 +120,8 @@ func (hp *HunterPet) Reset(sim *core.Simulation) {
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
-	percent := sim.GetRemainingDurationPercent()
-	if percent > hp.uptimePercent { // once fight is % completed, disable pet.
+	percentRemaining := sim.GetRemainingDurationPercent()
+	if percentRemaining < 1.0-hp.uptimePercent { // once fight is % completed, disable pet.
 		hp.Disable(sim)
 		hp.focusBar.Cancel(sim)
 		return
