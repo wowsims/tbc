@@ -21,8 +21,14 @@ func NewEncounter(options proto.Encounter) Encounter {
 		Duration:           DurationFromSeconds(options.Duration),
 		DurationVariation:  DurationFromSeconds(options.DurationVariation),
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
-		Health:             options.Health,
 		Targets:            []*Target{},
+	}
+	// If UseHealth is set, we use the primary target's health.
+	if options.UseHealth {
+		encounter.Health = options.Targets[0].Stats[stats.Health]
+		if encounter.Health == 0 {
+			encounter.Health = 100000 // what is best choice here?
+		}
 	}
 
 	for targetIndex, targetOptions := range options.Targets {

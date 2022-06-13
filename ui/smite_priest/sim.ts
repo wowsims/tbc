@@ -223,6 +223,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
+				showHealthPicker: false,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

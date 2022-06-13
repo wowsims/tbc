@@ -18,6 +18,7 @@ export class Encounter {
 	private durationVariation: number = 5;
 	private executeProportion: number = 0.2;
 	private health: number = 0;
+	private useHealth: boolean = false;
 	private targets: Array<Target>;
 
 	readonly targetsChangeEmitter = new TypedEvent<void>();
@@ -75,15 +76,28 @@ export class Encounter {
 		this.executeProportionChangeEmitter.emit(eventID);
 	}
 
+	getUseHealth(): boolean {
+		return this.useHealth;
+	}
+	setUseHealth(eventID: EventID, newUseHealth: boolean) {
+		if (newUseHealth == this.useHealth)
+			return;
+
+		this.useHealth = newUseHealth;
+		this.durationChangeEmitter.emit(eventID);
+		this.executeProportionChangeEmitter.emit(eventID);
+	}
+
 	getHealth(): number {
-		return this.health;
+		return this.primaryTarget.getStats().getStat(Stat.StatHealth);
 	}
 	setHealth(eventID: EventID, newHealth: number) {
 		if (newHealth == this.health)
 			return;
 
-		this.health = newHealth;
-		this.durationChangeEmitter.emit(eventID);
+		let stats = this.primaryTarget.getStats();
+		this.primaryTarget.setStats(eventID, stats.withStat(Stat.StatHealth, newHealth));
+		this.targetsChangeEmitter.emit(eventID);
 	}
 
 	getNumTargets(): number {
@@ -120,6 +134,9 @@ export class Encounter {
 
 			newTargets.forEach((nt, i) => nt.applyPreset(eventID, preset.targets[i]));
 			this.setTargets(eventID, newTargets);
+
+			// Set encounter health to the primary target's health.
+			this.setHealth(eventID, preset.targets[0].target!.stats[Stat.StatHealth]);
 		});
 	}
 
@@ -128,7 +145,7 @@ export class Encounter {
 			duration: this.duration,
 			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
-			health: this.health,
+			useHealth: this.useHealth,
 			targets: this.targets.map(target => target.toProto()),
 		});
 	}
@@ -138,7 +155,7 @@ export class Encounter {
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
-			this.setHealth(eventID, proto.health);
+			this.setUseHealth(eventID, proto.useHealth);
 
 			if (proto.targets.length > 0) {
 				this.setTargets(eventID, proto.targets.map(targetProto => {
@@ -157,7 +174,6 @@ export class Encounter {
 			duration: 180,
 			durationVariation: 5,
 			executeProportion: 0.2,
-			health: 0,
 			targets: [ Target.defaultProto() ],
 		}));
 	}

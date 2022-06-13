@@ -20,13 +20,14 @@ import * as Mechanics from '/tbc/core/constants/mechanics.js';
 export interface EncounterPickerConfig {
 	simpleTargetStats?: Array<Stat>;
 	showExecuteProportion: boolean;
+	showHealthPicker: boolean;
 }
 
 export class EncounterPicker extends Component {
 	constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig) {
 		super(parent, 'encounter-picker-root');
 
-		addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion);
+		addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion, config.showHealthPicker);
 
 		new EnumPicker<Encounter>(this.rootElem, modEncounter, {
 			label: 'Target Level',
@@ -117,7 +118,7 @@ class AdvancedEncounterPicker extends Popup {
 		const header = this.rootElem.getElementsByClassName('encounter-header')[0] as HTMLElement;
 		const targetsElem = this.rootElem.getElementsByClassName('encounter-targets')[0] as HTMLElement;
 
-		addEncounterFieldPickers(header, this.encounter, true);
+		addEncounterFieldPickers(header, this.encounter, true, true);
 
 		new ListPicker<Encounter, Target>(targetsElem, this.encounter, {
 			extraCssClasses: [
@@ -314,9 +315,7 @@ class TargetPicker extends Component {
 	}
 }
 
-function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean) {
-	let useHealth = encounter.getHealth() > 0;
-
+function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean, showHealthPicker: boolean) {
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration',
 		labelTooltip: 'The fight length for each sim iteration, in seconds.',
@@ -325,7 +324,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDuration(eventID, newValue);
 		},
-		enableWhen: (obj) => { return !useHealth },
+		enableWhen: (obj) => { return !encounter.getUseHealth() },
 	});
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration +/-',
@@ -335,7 +334,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDurationVariation(eventID, newValue);
 		},
-		enableWhen: (obj) => { return !useHealth },
+		enableWhen: (obj) => { return !encounter.getUseHealth() },
 	});
 
 	if (showExecuteProportion) {
@@ -347,33 +346,30 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 				encounter.setExecuteProportion(eventID, newValue / 100);
 			},
-			enableWhen: (obj) => { return !useHealth },
+			enableWhen: (obj) => { return !encounter.getUseHealth() },
 		});
 	}
 
-	// TODO: Add 'showHealthPicker' to signature.
-	if (true) {
+	// Enable for raids and if manually enabled in the advanced options.
+	if (showHealthPicker || encounter.getUseHealth()) {
 		new BooleanPicker<Encounter>(rootElem, encounter, {
 			label: 'Use Health',
 			labelTooltip: 'use a damage limit in place of a duration limit.',
-			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
-			getValue: (encounter: Encounter) => useHealth,
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+			getValue: (encounter: Encounter) => encounter.getUseHealth(),
 			setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
-				useHealth = newValue;
-				// Notify the various UI elements to toggle.
-				encounter.durationChangeEmitter.emit(eventID);
-				encounter.executeProportionChangeEmitter.emit(eventID);
+				encounter.setUseHealth(eventID, newValue);
 			},
 		});
 		let np = new NumberPicker(rootElem, encounter, {
 			label: 'Health',
 			labelTooltip: 'If picked, ignores duration setting and instead fights until the raid kills the primary target. Effectively a damage limit instead of time limit.',
-			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
 			getValue: (encounter: Encounter) => encounter.getHealth(),
 			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 				encounter.setHealth(eventID, newValue);
 			},
-			enableWhen: (obj) => { return useHealth },
+			enableWhen: (obj) => { return encounter.getUseHealth() },
 		});
 		let ele = np.rootElem.getElementsByClassName("number-picker-input").item(0)! as HTMLElement;
 		ele.style.width = "150px";
@@ -382,7 +378,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 }
 
 const ALL_TARGET_STATS: Array<{ stat: Stat, tooltip: string, extraCssClasses: Array<string>}> = [
-	{ stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.', extraCssClasses: []},
+	{ stat: Stat.StatHealth, tooltip: '', extraCssClasses: []},
 	{ stat: Stat.StatArmor, tooltip: '', extraCssClasses: []},
 	{ stat: Stat.StatArcaneResistance, tooltip: '', extraCssClasses: []},
 	{ stat: Stat.StatFireResistance, tooltip: '', extraCssClasses: []},

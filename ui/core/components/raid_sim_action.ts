@@ -271,6 +271,10 @@ export class RaidSimResultsManager {
 			`;
 		}
 
+		if (simResult.request.encounter?.useHealth) {
+			content += `<div class="results-sim-dur"><span class="topline-result-avg">${simResult.result.avgIterationDuration.toFixed(2)}s</span></div>`;
+		}
+
 		return content;
 	}
 }

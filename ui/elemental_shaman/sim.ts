@@ -234,6 +234,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
+				showHealthPicker: false,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

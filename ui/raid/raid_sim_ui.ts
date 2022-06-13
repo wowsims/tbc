@@ -205,6 +205,7 @@ export class RaidSimUI extends SimUI {
 				Stat.StatArmor,
 			],
 			showExecuteProportion: true,
+			showHealthPicker: true,
 		});
 		const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
 			label: 'Encounter',
