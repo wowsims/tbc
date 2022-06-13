@@ -735,10 +735,10 @@ class WCLSimPlayer implements wclSimPlayer {
 		player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
 
 		// Set tanks 'in front of target'
-		if (player.spec.oneofKind == "feralTankDruid" || player.spec.oneofKind == "protectionPaladin" || player.spec.oneofKind == "protectionWarrior") {
+		if (isTankSpec(this.spec)) {
 			player.inFrontOfTarget = true;
 		}
-		
+
 		player.talentsString = matchingPreset.talents;
 		player.consumes = matchingPreset.consumes;
 		
