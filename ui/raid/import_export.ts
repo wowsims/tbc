@@ -4,7 +4,7 @@ import { MAX_PARTY_SIZE } from "/tbc/core/party.js";
 import { BuffBot, RaidSimSettings } from "/tbc/core/proto/ui.js";
 import { TypedEvent } from "/tbc/core/typed_event.js";
 import { Party, Player, Raid } from "../core/proto/api.js";
-import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target } from "../core/proto/common.js";
+import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget } from "../core/proto/common.js";
 import { nameToClass } from "../core/proto_utils/names.js";
 import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto } from "../core/proto_utils/utils.js";
 import { MAX_NUM_PARTIES } from "../core/raid.js";
@@ -590,9 +590,11 @@ class RaidWCLImporter extends Importer {
 					const playerRaidIndex: number | undefined = wclIDtoRaidIndex.get(playerID);
 					const buffBot = buffBots.find((buffBot) => buffBot.raidIndex === playerRaidIndex);
 					if (buffBot) {
-						if (player.innervateTarget && buffBot.innervateAssignment) {
+						if (player.innervateTarget) {
+							buffBot.innervateAssignment = RaidTarget.create();
 							buffBot.innervateAssignment.targetIndex = targetRaidIndex
-						} else if (player.powerInfusionTarget && buffBot.powerInfusionAssignment) {
+						} else if (player.powerInfusionTarget) {
+							buffBot.powerInfusionAssignment = RaidTarget.create();
 							buffBot.powerInfusionAssignment.targetIndex = targetRaidIndex
 						}
 					}
@@ -614,24 +616,20 @@ class RaidWCLImporter extends Importer {
 					console.warn("Could not find raid player " + player.name + " in raid party " + raidParty);
 					return;
 				}
-				
-				const playerSpecName = raidPlayer.spec.oneofKind;
-				
-				// @ts-ignore // TODO: Fix this so we don't have to ignore it.
-				const raiderSpecOptions = raidPlayer.spec[playerSpecName];
-				
-				if (!targetRaidIndex) {
-					console.warn("Could not find raid index for target player " + target.name);
-					return;
-				} else if (!raiderSpecOptions) {
-					console.warn("Could not find raid player spec options for player " + player.name);
-					return;
-				}
-				
+
 				if (player.innervateTarget) {
-					raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex
+					if (raidPlayer.spec.oneofKind == "balanceDruid") {
+						raidPlayer.spec.balanceDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.balanceDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					} else if (raidPlayer.spec.oneofKind == "feralDruid") {
+						raidPlayer.spec.feralDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.feralDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					} else if (raidPlayer.spec.oneofKind == "feralTankDruid") {
+						raidPlayer.spec.feralTankDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.feralTankDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					}
 				} else if (player.powerInfusionTarget) {
-					raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex
+					// Pretty sure there is no shadow priest that has PI
 				}
 			});
 		
