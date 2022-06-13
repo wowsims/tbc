@@ -6,7 +6,7 @@ import { TypedEvent } from "/tbc/core/typed_event.js";
 import { Party, Player, Raid } from "../core/proto/api.js";
 import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget } from "../core/proto/common.js";
 import { nameToClass } from "../core/proto_utils/names.js";
-import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto } from "../core/proto_utils/utils.js";
+import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec } from "../core/proto_utils/utils.js";
 import { MAX_NUM_PARTIES } from "../core/raid.js";
 import { playerPresets, PresetSpecSettings } from "./presets.js";
 
@@ -332,7 +332,7 @@ class RaidWCLImporter extends Importer {
 		const raid = Raid.create();
 		raid.parties = new Array<Party>();
 		settings.raid = raid;
-		
+
 		const buffBots = new Array<BuffBot>();
 		
 		// Raid index of players that received innervates
@@ -435,6 +435,11 @@ class RaidWCLImporter extends Importer {
 				raidParty.players.push(Player.create());
 			} else if (simPlayer) {
 				raidParty.players.push(simPlayer);
+				if (simPlayer.spec.oneofKind == "feralTankDruid" || simPlayer.spec.oneofKind == "protectionWarrior" || simPlayer.spec.oneofKind == "protectionPaladin") {
+					let rt = RaidTarget.create();
+					rt.targetIndex = wclIDtoRaidIndex.get(player.id)!;
+					settings.raid!.tanks.push(rt);
+				}
 			}
 			
 			// Just in case this did not get set previously.
@@ -728,6 +733,11 @@ class WCLSimPlayer implements wclSimPlayer {
 		}
 		
 		player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
+
+		// Set tanks 'in front of target'
+		if (player.spec.oneofKind == "feralTankDruid" || player.spec.oneofKind == "protectionPaladin" || player.spec.oneofKind == "protectionWarrior") {
+			player.inFrontOfTarget = true;
+		}
 		
 		player.talentsString = matchingPreset.talents;
 		player.consumes = matchingPreset.consumes;
