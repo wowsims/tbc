@@ -66,6 +66,8 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimRe
 	duration := DurationFromSeconds(presimRequest.Encounter.Duration)
 
 	var lastResult *proto.RaidSimResult
+
+	// TODO: Do presim if we are doing a health based fight. Need a way to differentiate presim from normal sim
 	for remainingAgents > 0 {
 		// ** Run a presim round. **
 

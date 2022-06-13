@@ -319,7 +319,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration',
 		labelTooltip: 'The fight length for each sim iteration, in seconds.',
-		changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+		changedEvent: (encounter: Encounter) => encounter.changeEmitter,
 		getValue: (encounter: Encounter) => encounter.getDuration(),
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDuration(eventID, newValue);
@@ -329,7 +329,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration +/-',
 		labelTooltip: 'Adds a random amount of time, in seconds, between [value, -1 * value] to each sim iteration. For example, setting Duration to 180 and Duration +/- to 10 will result in random durations between 170s and 190s.',
-		changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+		changedEvent: (encounter: Encounter) => encounter.changeEmitter,
 		getValue: (encounter: Encounter) => encounter.getDurationVariation(),
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDurationVariation(eventID, newValue);

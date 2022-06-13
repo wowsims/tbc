@@ -303,7 +303,7 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 
 	if !sim.executePhase {
 		if (sim.Encounter.EndFightAtHealth == 0 && sim.CurrentTime >= sim.Encounter.executePhaseBegins) ||
-			(sim.Encounter.EndFightAtHealth > 0 && sim.Encounter.EndFightAtHealth < sim.Encounter.Targets[0].DamageTaken) {
+			(sim.Encounter.EndFightAtHealth > 0 && sim.GetRemainingDurationPercent() <= 0.2) {
 			sim.executePhase = true
 			for _, callback := range sim.executePhaseCallbacks {
 				callback(sim)
@@ -345,7 +345,7 @@ func (sim *Simulation) GetRemainingDuration() time.Duration {
 // Returns the percentage of time remaining in the current iteration, as a value from 0-1.
 func (sim *Simulation) GetRemainingDurationPercent() float64 {
 	if sim.Encounter.EndFightAtHealth > 0 {
-		return sim.Encounter.Targets[0].DamageTaken / sim.Encounter.EndFightAtHealth
+		return 1.0 - sim.Encounter.Targets[0].DamageTaken/sim.Encounter.EndFightAtHealth
 	}
 	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
 }
