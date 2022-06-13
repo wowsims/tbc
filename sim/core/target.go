@@ -12,7 +12,7 @@ type Encounter struct {
 	Duration           time.Duration
 	DurationVariation  time.Duration
 	executePhaseBegins time.Duration
-	Health             float64
+	EndFightAtHealth   float64
 	Targets            []*Target
 }
 
@@ -25,9 +25,9 @@ func NewEncounter(options proto.Encounter) Encounter {
 	}
 	// If UseHealth is set, we use the primary target's health.
 	if options.UseHealth {
-		encounter.Health = options.Targets[0].Stats[stats.Health]
-		if encounter.Health == 0 {
-			encounter.Health = 100000 // what is best choice here?
+		encounter.EndFightAtHealth = options.Targets[0].Stats[stats.Health]
+		if encounter.EndFightAtHealth == 0 {
+			encounter.EndFightAtHealth = 1 // default to something so we don't instantly end without anything.
 		}
 	}
 
@@ -41,9 +41,9 @@ func NewEncounter(options proto.Encounter) Encounter {
 		encounter.Targets = append(encounter.Targets, NewTarget(proto.Target{}, 0))
 	}
 
-	if encounter.Health > 0 {
+	if encounter.EndFightAtHealth > 0 {
+		// Until we pre-sim set duration to 10m
 		encounter.Duration = time.Minute * 10
-		encounter.DurationVariation = time.Second * 30
 	}
 
 	return encounter
