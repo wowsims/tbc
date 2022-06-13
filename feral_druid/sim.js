@@ -9,6 +9,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
@@ -21,6 +22,7 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { FeralDruid_Options as FeralDruidOptions } from '/tbc/core/proto/druid.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
 import * as DruidInputs from './inputs.js';
 import * as Presets from './presets.js';
 export class FeralDruidSimUI extends IndividualSimUI {
@@ -29,6 +31,15 @@ export class FeralDruidSimUI extends IndividualSimUI {
             cssClass: 'feral-druid-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
+            warnings: [
+                (simUI) => {
+                    return {
+                        updateOn: new TypedEvent(),
+                        shouldDisplay: () => true,
+                        getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
+                    };
+                },
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatStrength,

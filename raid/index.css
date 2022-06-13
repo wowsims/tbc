@@ -3040,6 +3040,34 @@ input, select {
   font-size: 14px;
 }
 
+.feral-druid-sim-ui {
+  --theme-color-primary: #e0a335;
+  --theme-color-background: #1d1510;
+  --theme-color-background-raw: 29, 21, 16;
+  --theme-background-image: url("/tbc/assets/feral_druid_background.jpg");
+  --main-text-color: White;
+}
+
+.feral-druid-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.feral-druid-sim-ui .consumes-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feral-druid-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feral-druid-sim-ui .debuffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.feral-druid-sim-ui .character-stats-table-row {
+  font-size: 14px;
+}
+
 .feral-tank-druid-sim-ui {
   --theme-color-primary: #e0a335;
   --theme-color-background: #1d1510;
