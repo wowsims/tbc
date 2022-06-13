@@ -17,6 +17,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Alchohol} from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -46,12 +47,21 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecFeralDruid>) => {
+					return {
+						updateOn: new TypedEvent(),
+						shouldDisplay: () => true,
+						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
+					};
+				},
+			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
 				Stat.StatStrength,
 				Stat.StatAgility,
-	  			Stat.StatAttackPower,
+				Stat.StatAttackPower,
 				Stat.StatFeralAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
@@ -72,9 +82,9 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
 				Stat.StatMeleeHaste,
-	  			Stat.StatArmorPenetration,
+				Stat.StatArmorPenetration,
 				Stat.StatExpertise,
-	  			Stat.StatMana,
+				Stat.StatMana,
 				Stat.StatMP5,
 			],
 
@@ -103,7 +113,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				specOptions: FeralDruidOptions.create({
 					innervateTarget: RaidTarget.create({
 						targetIndex: NO_TARGET, // In an individual sim the 0-indexed player is ourself.
-	  				}),
+					}),
 					latencyMs: 100,
 				}),
 				// Default raid/party buffs settings.
@@ -116,29 +126,29 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					bloodlust: 1,
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
 					braidedEterniumChain: true,
-	  				graceOfAirTotem: TristateEffect.TristateEffectImproved,
-	  				strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
+					graceOfAirTotem: TristateEffect.TristateEffectImproved,
+					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
 					battleShout: TristateEffect.TristateEffectImproved,
-	  				snapshotBsSolarianSapphire: true,
+					snapshotBsSolarianSapphire: true,
 					sanctityAura: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
-	  				blessingOfMight: TristateEffect.TristateEffectImproved,
+					blessingOfMight: TristateEffect.TristateEffectImproved,
 					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
 					improvedSealOfTheCrusader: true,
-	  				bloodFrenzy: true,
+					bloodFrenzy: true,
 					giftOfArthas: true,
 					exposeArmor: TristateEffect.TristateEffectImproved,
-	  				faerieFire: TristateEffect.TristateEffectImproved,
-	  				sunderArmor: true,
-	  				curseOfRecklessness: true,
-	  				huntersMark: TristateEffect.TristateEffectImproved,
-	  				exposeWeaknessUptime: 0.95,
-	  				exposeWeaknessHunterAgility: 1200,
+					faerieFire: TristateEffect.TristateEffectImproved,
+					sunderArmor: true,
+					curseOfRecklessness: true,
+					huntersMark: TristateEffect.TristateEffectImproved,
+					exposeWeaknessUptime: 0.95,
+					exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 

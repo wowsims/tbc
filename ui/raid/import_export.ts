@@ -4,9 +4,9 @@ import { MAX_PARTY_SIZE } from "/tbc/core/party.js";
 import { BuffBot, RaidSimSettings } from "/tbc/core/proto/ui.js";
 import { TypedEvent } from "/tbc/core/typed_event.js";
 import { Party, Player, Raid } from "../core/proto/api.js";
-import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target } from "../core/proto/common.js";
+import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget } from "../core/proto/common.js";
 import { nameToClass } from "../core/proto_utils/names.js";
-import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto } from "../core/proto_utils/utils.js";
+import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec } from "../core/proto_utils/utils.js";
 import { MAX_NUM_PARTIES } from "../core/raid.js";
 import { playerPresets, PresetSpecSettings } from "./presets.js";
 
@@ -263,19 +263,16 @@ class RaidWCLImporter extends Importer {
 							guild {
 								name faction {id}
 							}
-							table(fightIDs: [${fightID}], endTime: 99999999, dataType: Casts, killType: All, viewBy: Default)
+							playerDetails: table(fightIDs: [${fightID}], endTime: 99999999, dataType: Casts, killType: All, viewBy: Default)
 							fights(fightIDs: [${fightID}]) {
 								startTime, endTime, id, name
 							}
+							innervates: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Druid", abilityID: 29166),
+							powerInfusion: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Priest", abilityID: 10060)
 						}
 					}
 				}
 				`;
-		
-		/*
-			INNERVATE BUFFS ARE UNUSED RIGHT NOW.
-			buffs: events(fightIDs: [${fightID}], dataType:Buffs, endTime: 99999999, abilityID: 29166) { data }
-		 */
 		
 		const reportData = await this.queryWCL(reportDataQuery, token);
 		
@@ -283,7 +280,9 @@ class RaidWCLImporter extends Importer {
 		const wclData = reportData.data.reportData.report; // TODO: Typings?
 		
 		const guildData = wclData.guild;
-		const playerData: wclPlayer[] = wclData.table.data.entries;
+		const playerData: wclPlayer[] = wclData.playerDetails.data.entries;
+		const innervateData: wclBuffCastsData[] = wclData.innervates.data.entries;
+		const powerInfusionData: wclBuffCastsData[] = wclData.powerInfusion.data.entries;
 		
 		// Set up the general variables we need for import to be successful.
 		const fight: { startTime: number, endTime: number, id: number, name: string } = wclData.fights[0];
@@ -333,7 +332,7 @@ class RaidWCLImporter extends Importer {
 		const raid = Raid.create();
 		raid.parties = new Array<Party>();
 		settings.raid = raid;
-		
+
 		const buffBots = new Array<BuffBot>();
 		
 		// Raid index of players that received innervates
@@ -371,6 +370,25 @@ class RaidWCLImporter extends Importer {
 		
 		const mappedPlayers = playerData
 			.map((wclPlayer) => new WCLSimPlayer(wclPlayer, this.simUI, faction));
+		
+		const processBuffCastData = (buffCastData: wclBuffCastsData[]): { player: WCLSimPlayer, target: string }[] => {
+			const playerCasts: { player: WCLSimPlayer, target: string }[] = [];
+			if (buffCastData.length) {
+				buffCastData.forEach((cast) => {
+					const sourcePlayer = mappedPlayers.find((player) => player.name === cast.name);
+					const targetPlayer = mappedPlayers.find((player) => player.name === cast.targets[0].name);
+					
+					// Buff bots do not get PI/Innervates.
+					if (sourcePlayer && targetPlayer && !targetPlayer.isBuffBot) {
+						playerCasts.push({ player: sourcePlayer, target: targetPlayer.name });
+					}
+				});
+			}
+			return playerCasts;
+		}
+		
+		processBuffCastData(innervateData).forEach((cast) => cast.player.innervateTarget = cast.target);
+		processBuffCastData(powerInfusionData).forEach((cast) => cast.player.powerInfusionTarget = cast.target);
 		
 		const wclPlayers: WCLSimPlayer[] = sortByProperty(sortByProperty(mappedPlayers, "type"), "sortPriority");
 		
@@ -417,6 +435,11 @@ class RaidWCLImporter extends Importer {
 				raidParty.players.push(Player.create());
 			} else if (simPlayer) {
 				raidParty.players.push(simPlayer);
+				if (simPlayer.spec.oneofKind == "feralTankDruid" || simPlayer.spec.oneofKind == "protectionWarrior" || simPlayer.spec.oneofKind == "protectionPaladin") {
+					let rt = RaidTarget.create();
+					rt.targetIndex = wclIDtoRaidIndex.get(player.id)!;
+					settings.raid!.tanks.push(rt);
+				}
 			}
 			
 			// Just in case this did not get set previously.
@@ -545,7 +568,75 @@ class RaidWCLImporter extends Importer {
       .map((player) => {
         let raidParty = raid.parties.filter((party) => party.players.length < MAX_PARTY_SIZE)[0];
 				assignPlayerToParty(player, raidParty, true);
-      });
+			});
+		
+		// Insert the innervate / PI buffs into the options for the raid.
+		wclPlayers
+			.filter((player) => player.innervateTarget || player.powerInfusionTarget)
+			.forEach((player) => {
+				
+				const target: wclSimPlayer | undefined = wclPlayers.find((wclPlayer) => wclPlayer.name === player.innervateTarget || player.name === player.powerInfusionTarget);
+				
+				if (!target) {
+					console.warn("Could not find target assignment player");
+					return;
+				}
+				
+				const targetID: number = target.id;
+				const targetRaidIndex: number | undefined = wclIDtoRaidIndex.get(targetID);
+				
+				if (!targetRaidIndex) {
+					console.warn(`Could not find ${target.name} raid index!`);
+					return;
+				}
+				
+				if (player.isBuffBot) {
+					const playerID: number = player.id;
+					const playerRaidIndex: number | undefined = wclIDtoRaidIndex.get(playerID);
+					const buffBot = buffBots.find((buffBot) => buffBot.raidIndex === playerRaidIndex);
+					if (buffBot) {
+						if (player.innervateTarget) {
+							buffBot.innervateAssignment = RaidTarget.create();
+							buffBot.innervateAssignment.targetIndex = targetRaidIndex
+						} else if (player.powerInfusionTarget) {
+							buffBot.powerInfusionAssignment = RaidTarget.create();
+							buffBot.powerInfusionAssignment.targetIndex = targetRaidIndex
+						}
+					}
+					return;
+				}
+				
+				// Regular players.
+				
+				const raidParty = raid.parties.filter((party) => party.players.some((raidPlayer) => raidPlayer.name === player.name))[0];
+				
+				if (!raidParty) {
+					console.warn("Could not find raiding party for player " + player.name);
+					return;
+				}
+				
+				const raidPlayer = raidParty.players.find((raidPlayer) => raidPlayer.name === player.name);
+				
+				if (!raidPlayer) {
+					console.warn("Could not find raid player " + player.name + " in raid party " + raidParty);
+					return;
+				}
+
+				if (player.innervateTarget) {
+					if (raidPlayer.spec.oneofKind == "balanceDruid") {
+						raidPlayer.spec.balanceDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.balanceDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					} else if (raidPlayer.spec.oneofKind == "feralDruid") {
+						raidPlayer.spec.feralDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.feralDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					} else if (raidPlayer.spec.oneofKind == "feralTankDruid") {
+						raidPlayer.spec.feralTankDruid.options!.innervateTarget = RaidTarget.create();
+						raidPlayer.spec.feralTankDruid.options!.innervateTarget.targetIndex = targetRaidIndex;
+					}
+				} else if (player.powerInfusionTarget) {
+					// Pretty sure there is no shadow priest that has PI
+				}
+			});
 		
 		wclPlayers
 			.filter((player) => !player.partyAssigned)
@@ -555,7 +646,6 @@ class RaidWCLImporter extends Importer {
 		
 		settings.blessings = makeDefaultBlessings(numPaladins);
 		
-		this.simUI.clearRaid(TypedEvent.nextEventID());
 		this.simUI.fromProto(TypedEvent.nextEventID(), settings);
 		this.simUI.setBuffBots(TypedEvent.nextEventID(), buffBots);
 		
@@ -584,6 +674,9 @@ class WCLSimPlayer implements wclSimPlayer {
 	public isPartyBuffer: boolean = false;
 	public isBuffBot: boolean = false;
 	public sortPriority: number = 99;
+	
+	public innervateTarget: string | undefined;
+	public powerInfusionTarget: string | undefined;
 	
 	private simUI: RaidSimUI;
 	private spec: Spec;
@@ -640,7 +733,12 @@ class WCLSimPlayer implements wclSimPlayer {
 		}
 		
 		player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
-		
+
+		// Set tanks 'in front of target'
+		if (isTankSpec(this.spec)) {
+			player.inFrontOfTarget = true;
+		}
+
 		player.talentsString = matchingPreset.talents;
 		player.consumes = matchingPreset.consumes;
 		
@@ -821,7 +919,7 @@ const specNames: Record<string, Spec> = {
 	"Balance": Spec.SpecBalanceDruid,
 	"Elemental": Spec.SpecElementalShaman,
 	"Enhancement": Spec.SpecEnhancementShaman,
-	// 'Feral': Spec.SpecFeralDruid,
+	'Feral': Spec.SpecFeralDruid,
 	"Warden": Spec.SpecFeralTankDruid,
 	"Guardian": Spec.SpecFeralTankDruid,
 	"Survival": Spec.SpecHunter,
@@ -848,9 +946,6 @@ const specNames: Record<string, Spec> = {
 
 // Maps WCL spec+type to internal buff bot IDs.
 const buffBotNames: Record<string, string> = {
-	// DPS
-	"FeralDruid": "Bear",
-	
 	// Healers
 	"HolyPaladin": "Paladin",
 	"HolyPriest": "Holy Priest",
@@ -859,6 +954,14 @@ const buffBotNames: Record<string, string> = {
 	"DreamstateDruid": "Resto Druid",
 	"RestorationShaman": "Resto Shaman",
 };
+
+interface wclBuffCastsData {
+	name: string;
+	targets: {
+		name: string;
+		type: string;
+	}[];
+}
 
 interface wclRateLimitData {
 	limitPerHour: number,

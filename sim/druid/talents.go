@@ -265,7 +265,11 @@ func (druid *Druid) applyOmenOfClarity() {
 		return
 	}
 
-	ppmm := druid.AutoAttacks.NewPPMManager(2.0)
+	ppmm := druid.AutoAttacks.NewPPMManager(2.0, core.ProcMaskMelee)
+	icd := core.Cooldown{
+		Timer:    druid.NewTimer(),
+		Duration: time.Second * 10,
+	}
 
 	clearcastingAura := druid.RegisterAura(core.Aura{
 		Label:    "Clearcasting",
@@ -296,9 +300,13 @@ func (druid *Druid) applyOmenOfClarity() {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Omen of Clarity") {
+			if !icd.IsReady(sim) {
 				return
 			}
+			if !ppmm.ProcWithWeaponSpecials(sim, spellEffect.ProcMask, "Omen of Clarity") {
+				return
+			}
+			icd.Use(sim)
 			clearcastingAura.Activate(sim)
 		},
 	})

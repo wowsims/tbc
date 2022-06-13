@@ -91,7 +91,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 		Timer:    character.NewTimer(),
 		Duration: time.Second * 40,
 	}
-	ppmm := character.AutoAttacks.NewPPMManager(1.5)
+	ppmm := character.AutoAttacks.NewPPMManager(1.5, core.ProcMaskMeleeOrRanged)
 
 	character.RegisterAura(core.Aura{
 		Label:    "Thundering Skyfire Diamond",
@@ -107,7 +107,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 			if !icd.IsReady(sim) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Thundering Skyfire Diamond") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "Thundering Skyfire Diamond") {
 				return
 			}
 			icd.Use(sim)

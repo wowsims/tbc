@@ -13,7 +13,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 	}
 
 	actionID := core.ActionID{SpellID: 30823}
-	ppmm := shaman.AutoAttacks.NewPPMManager(15)
+	ppmm := shaman.AutoAttacks.NewPPMManager(15, core.ProcMaskMelee)
 	manaMetrics := shaman.NewManaMetrics(actionID)
 	srAura := shaman.RegisterAura(core.Aura{
 		Label:    "Shamanistic Rage",
@@ -24,7 +24,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
-			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "shamanistic rage") {
+			if !ppmm.Proc(sim, spellEffect.ProcMask, "shamanistic rage") {
 				return
 			}
 			mana := shaman.GetStat(stats.AttackPower) * 0.3

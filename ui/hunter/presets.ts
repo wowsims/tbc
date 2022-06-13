@@ -1,16 +1,12 @@
 import { Consumes } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
-import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import {
-	Hunter,
 	Hunter_Rotation as HunterRotation,
 	Hunter_Rotation_WeaveType as WeaveType,
 	Hunter_Options as HunterOptions,
@@ -19,8 +15,6 @@ import {
 	Hunter_Options_PetType as PetType,
 } from '/tbc/core/proto/hunter.js';
 
-import * as Enchants from '/tbc/core/constants/enchants.js';
-import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Preset options for this spec.
@@ -50,14 +44,14 @@ export const DefaultRotation = HunterRotation.create({
 	viperStartManaPercent: 0.1,
 	viperStopManaPercent: 0.3,
 
-	weave: WeaveType.WeaveFull,
+	weave: WeaveType.WeaveNone,
 	timeToWeaveMs: 500,
 	percentWeaved: 0.8,
 });
 
 export const DefaultOptions = HunterOptions.create({
 	quiverBonus: QuiverBonus.Speed15,
-	ammo: Ammo.AdamantiteStinger,
+	ammo: Ammo.TimelessArrow,
 	petType: PetType.Ravager,
 	petUptime: 1,
 	latencyMs: 30,
