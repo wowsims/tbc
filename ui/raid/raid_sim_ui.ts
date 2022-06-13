@@ -34,7 +34,7 @@ export interface RaidSimConfig {
 	knownIssues?: Array<string>,
 }
 
-const extraKnownIssues = [
+const extraKnownIssues: Array<string> = [
 	//'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
 ];
 
