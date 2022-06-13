@@ -268,9 +268,14 @@ func (cat *FeralDruid) setupRotation(rotation *proto.FeralDruid_Rotation) {
 
 	use_bite := (rotation.Biteweave && rotation.FinishingMove == proto.FeralDruid_Rotation_Rip) ||
 		rotation.FinishingMove == proto.FeralDruid_Rotation_Bite
+	rip_cp := rotation.RipMinComboPoints
+
+	if rotation.FinishingMove != proto.FeralDruid_Rotation_Rip {
+		rip_cp = 6
+	}
 
 	cat.Rotation = FeralDruidRotation{
-		rip_cp:           rotation.RipMinComboPoints,
+		rip_cp:           rip_cp,
 		bite_cp:          rotation.BiteMinComboPoints,
 		rip_trick_cp:     rotation.RipMinComboPoints,
 		use_bite:         use_bite,
