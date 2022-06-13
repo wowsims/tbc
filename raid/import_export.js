@@ -6,7 +6,7 @@ import { TypedEvent } from "/tbc/core/typed_event.js";
 import { Party, Player, Raid } from "../core/proto/api.js";
 import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget } from "../core/proto/common.js";
 import { nameToClass } from "../core/proto_utils/names.js";
-import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto } from "../core/proto_utils/utils.js";
+import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec } from "../core/proto_utils/utils.js";
 import { MAX_NUM_PARTIES } from "../core/raid.js";
 import { playerPresets } from "./presets.js";
 export function newRaidImporters(simUI) {
@@ -568,7 +568,7 @@ class WCLSimPlayer {
         }
         player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
         // Set tanks 'in front of target'
-        if (player.spec.oneofKind == "feralTankDruid" || player.spec.oneofKind == "protectionPaladin" || player.spec.oneofKind == "protectionWarrior") {
+        if (isTankSpec(this.spec)) {
             player.inFrontOfTarget = true;
         }
         player.talentsString = matchingPreset.talents;
