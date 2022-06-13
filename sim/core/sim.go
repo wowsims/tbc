@@ -62,12 +62,28 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) (res
 	}()
 
 	sim := NewSim(rsr)
-	sim.runPresims(rsr)
 	if progress != nil {
+		progress <- &proto.ProgressMetrics{
+			TotalIterations: sim.Options.Iterations,
+			PresimRunning:   true,
+		}
+	}
+	presimResult := sim.runPresims(rsr)
+	if progress != nil {
+		progress <- &proto.ProgressMetrics{
+			TotalIterations: sim.Options.Iterations,
+			PresimRunning:   false,
+		}
 		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
 			progress <- progMetric
 		}
 	}
+
+	if sim.Encounter.Health > 0 && presimResult != nil {
+		sim.BaseDuration = time.Duration(presimResult.AvgIterationDuration)
+		sim.Duration = time.Duration(presimResult.AvgIterationDuration)
+	}
+
 	// using a variable here allows us to mutate it in the deferred recover, sending out error info
 	result = sim.run()
 
@@ -126,13 +142,14 @@ func (sim *Simulation) reset() {
 		sim.Log("SIM RESET")
 		sim.Log("----------------------")
 	}
-	variation := sim.DurationVariation * 2
 
 	sim.Encounter.Targets[0].DamageTaken = 0
-	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
-	if sim.Encounter.Health > 0 {
-		sim.Duration = time.Minute * 10
+	sim.Duration = sim.BaseDuration
+	if sim.DurationVariation != 0 {
+		variation := sim.DurationVariation * 2
+		sim.Duration += time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
 	}
+
 	sim.CurrentTime = 0.0
 
 	sim.pendingActions = make([]*PendingAction, 0, 64)
@@ -232,6 +249,7 @@ func (sim *Simulation) runOnce() {
 		}
 
 		if sim.Encounter.Health == 0 {
+			// Only use duration as an end check if not using health.
 			if pa.NextActionAt > sim.Duration {
 				break
 			}
@@ -313,7 +331,7 @@ func (sim *Simulation) GetRemainingDuration() time.Duration {
 	if sim.Encounter.Health > 0 {
 		dmgTaken := sim.Encounter.Targets[0].DamageTaken
 		if dmgTaken == 0 {
-			return time.Minute * 10
+			return sim.Duration - sim.CurrentTime
 		}
 		dps := dmgTaken / sim.CurrentTime.Seconds()
 		// Estimate time remaining via avg dps

@@ -31,7 +31,7 @@ type PresimOptions struct {
 	OnPresimResult func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool
 }
 
-func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
+func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimResult {
 	const numPresimIterations = 100
 
 	// Run presims if requested.
@@ -65,6 +65,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 	presimRequest.SimOptions.Iterations = numPresimIterations
 	duration := DurationFromSeconds(presimRequest.Encounter.Duration)
 
+	var lastResult *proto.RaidSimResult
 	for remainingAgents > 0 {
 		// ** Run a presim round. **
 
@@ -85,9 +86,10 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 
 		// Run the presim.
 		presimResult := RunSim(*presimRequest, nil)
+		lastResult = presimResult
 
 		if presimResult.ErrorResult != "" {
-			return
+			break
 		}
 
 		// Provide each Agent with their own results.
@@ -106,4 +108,5 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 			}
 		}
 	}
+	return lastResult
 }

@@ -1,6 +1,7 @@
 package warlock
 
 import (
+	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -93,7 +94,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	}
 
 	bigCDs := warlock.GetMajorCooldowns()
-	nextBigCD := sim.Duration
+	nextBigCD := time.Duration(math.MaxInt64)
 	for _, cd := range bigCDs {
 		if cd == nil {
 			continue // not on cooldown right now.

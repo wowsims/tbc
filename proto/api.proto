@@ -310,6 +310,7 @@ message ProgressMetrics {
     int32 total_iterations = 2;
     int32 completed_sims = 3;
     int32 total_sims = 4;
+	bool presim_running = 8;
 
     // Partial Results 
     double dps = 5;

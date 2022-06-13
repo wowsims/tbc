@@ -16,13 +16,12 @@ type HunterPet struct {
 
 	hunterOwner *Hunter
 
-	// Time when pet should die, as per petUptime.
-	deathTime time.Duration
-
 	KillCommand *core.Spell
 
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility
+
+	uptimePercent float64
 }
 
 func (hunter *Hunter) NewHunterPet() *HunterPet {
@@ -117,13 +116,12 @@ func (hp *HunterPet) Reset(sim *core.Simulation) {
 		hp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
 	}
 
-	uptime := core.MinFloat(1, core.MaxFloat(0, hp.hunterOwner.Options.PetUptime))
-	// TODO: rework this to check sim.GetRemainingDurationPercent() instead of deathTime
-	hp.deathTime = time.Duration(float64(sim.Duration) * uptime)
+	hp.uptimePercent = core.MinFloat(1, core.MaxFloat(0, hp.hunterOwner.Options.PetUptime))
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
-	if sim.CurrentTime > hp.deathTime {
+	percent := sim.GetRemainingDurationPercent()
+	if percent > hp.uptimePercent { // once fight is % completed, disable pet.
 		hp.Disable(sim)
 		hp.focusBar.Cancel(sim)
 		return

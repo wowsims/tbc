@@ -1,6 +1,7 @@
 package retribution
 
 import (
+	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -166,7 +167,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 
-	manaRegenAt := sim.Duration + 1
+	manaRegenAt := time.Duration(math.MaxInt64)
 	// Roll seal of blood
 	if sim.CurrentTime+time.Second >= sobExpiration {
 		sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
@@ -176,7 +177,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 		if ret.GCD.IsReady(sim) {
 			if success := ret.SealOfBlood.Cast(sim, target); !success {
 				// This should only happen in VERY BAD mana situations.
-				manaRegenAt = ret.TimeUntilManaRegen(ret.SealOfBlood.CurCast.Cost)
+				manaRegenAt = sim.CurrentTime + ret.TimeUntilManaRegen(ret.SealOfBlood.CurCast.Cost)
 			}
 		}
 	} else if ret.GCD.IsReady(sim) && ret.CrusaderStrike.CD.IsReady(sim) {
@@ -194,7 +195,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	events := []time.Duration{
 		ret.GCD.ReadyAt(),
 		ret.CrusaderStrike.CD.ReadyAt(),
-		manaRegenAt, // TODO: manaRegenAt is actually a timeuntilregen ... fix this.
+		manaRegenAt,
 		sobExpiration - time.Second,
 	}
 
@@ -204,7 +205,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 // Helper function for finding the next event
 func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events []time.Duration) {
 	// Find the minimum possible next event that is greater than the current time
-	nextEventAt := sim.Duration + 1 // setting this to sim.Duration will result in an infinite loop where we keep putting actions and it never advances.
+	nextEventAt := time.Duration(math.MaxInt64) // any event will happen before forever.
 	for _, elem := range events {
 		if elem > sim.CurrentTime && elem < nextEventAt {
 			nextEventAt = elem
