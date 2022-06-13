@@ -67,6 +67,7 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) (res
 			TotalIterations: sim.Options.Iterations,
 			PresimRunning:   true,
 		}
+		runtime.Gosched() // allow time for message to make it back out.
 	}
 	presimResult := sim.runPresims(rsr)
 	if progress != nil {
@@ -77,6 +78,7 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) (res
 		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
 			progress <- progMetric
 		}
+		runtime.Gosched() // allow time for message to make it back out.
 	}
 
 	// Use pre-sim as estimate for length of fight (when using health fight)
@@ -209,7 +211,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		sim.Log = nil
 	}
 
-	st := time.Now()
+	var st time.Time
 	for i := int32(1); i < sim.Options.Iterations; i++ {
 		// fmt.Printf("Iteration: %d\n", i)
 		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*100 {
