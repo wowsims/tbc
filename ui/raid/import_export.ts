@@ -821,7 +821,7 @@ const specNames: Record<string, Spec> = {
 	"Balance": Spec.SpecBalanceDruid,
 	"Elemental": Spec.SpecElementalShaman,
 	"Enhancement": Spec.SpecEnhancementShaman,
-	// 'Feral': Spec.SpecFeralDruid,
+	'Feral': Spec.SpecFeralDruid,
 	"Warden": Spec.SpecFeralTankDruid,
 	"Guardian": Spec.SpecFeralTankDruid,
 	"Survival": Spec.SpecHunter,
@@ -848,9 +848,6 @@ const specNames: Record<string, Spec> = {
 
 // Maps WCL spec+type to internal buff bot IDs.
 const buffBotNames: Record<string, string> = {
-	// DPS
-	"FeralDruid": "Bear",
-	
 	// Healers
 	"HolyPaladin": "Paladin",
 	"HolyPriest": "Holy Priest",
