@@ -403,7 +403,7 @@ export class PlayerPicker extends Component {
                         setBalanceDruidSelfInnervate(eventID, newPlayer);
                     }
                     else if (newPlayer.spec == Spec.SpecSmitePriest) {
-                        setBalanceDruidSelfInnervate(eventID, newPlayer);
+                        setSmitePriestSelfPI(eventID, newPlayer);
                     }
                 }
             }
