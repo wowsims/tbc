@@ -21,7 +21,7 @@ import { implementedSpecs } from "./presets.js";
 import { RaidPicker } from "./raid_picker.js";
 import { TanksPicker } from "./tanks_picker.js";
 const extraKnownIssues = [
-    'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
+//'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
 ];
 export class RaidSimUI extends SimUI {
     constructor(parentElem, config) {
