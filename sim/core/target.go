@@ -12,6 +12,7 @@ type Encounter struct {
 	Duration           time.Duration
 	DurationVariation  time.Duration
 	executePhaseBegins time.Duration
+	Health             float64
 	Targets            []*Target
 }
 
@@ -20,6 +21,7 @@ func NewEncounter(options proto.Encounter) Encounter {
 		Duration:           DurationFromSeconds(options.Duration),
 		DurationVariation:  DurationFromSeconds(options.DurationVariation),
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
+		Health:             options.Health,
 		Targets:            []*Target{},
 	}
 
@@ -31,6 +33,11 @@ func NewEncounter(options proto.Encounter) Encounter {
 		// Add a dummy target. The only case where targets aren't specified is when
 		// computing character stats, and targets won't matter there.
 		encounter.Targets = append(encounter.Targets, NewTarget(proto.Target{}, 0))
+	}
+
+	if encounter.Health > 0 {
+		encounter.Duration = time.Minute * 10
+		encounter.DurationVariation = time.Second * 30
 	}
 
 	return encounter

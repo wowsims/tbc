@@ -147,6 +147,8 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.rangedSwingSpeed = 0
 	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
 	hunter.permaHawk = false
+	// TODO: This has to be fixed or percent weaved will not work.
+	//  We could change this to weave until sim.GetRemainingDurationPercent() is percentweaved
 	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
 	huntersMarkAura := core.HuntersMarkAura(hunter.CurrentTarget, hunter.Talents.ImprovedHuntersMark, false)

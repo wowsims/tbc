@@ -32,6 +32,7 @@ type Environment struct {
 }
 
 func NewEnvironment(raidProto proto.Raid, encounterProto proto.Encounter) *Environment {
+	encounterProto.Health = 4500000 // 4.5m health
 	env := &Environment{
 		State: Created,
 	}

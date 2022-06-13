@@ -191,6 +191,7 @@ func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spe
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalDamage += spellEffect.Damage
+	spellEffect.Target.DamageTaken += spellEffect.Damage
 	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalThreat += spellEffect.calcThreat(spell)
 
 	if sim.Log != nil {

@@ -543,6 +543,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 		}
 		mageManaGemMCD = character.GetMajorCooldown(MageManaGemMCDActionID)
 
+		// TODO: POSSIBLY USE PRE-SIM TO GUESS THIS??
 		remainingUsages = int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
 		if isStartingPotion {
 			remainingManaPotionUsages = MinInt(numStartingPotions, remainingUsages)
@@ -950,6 +951,7 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				expectedManaPerUsage := float64((900 + 600) / 2)
 
+				// TODO: POSSIBLY USE PRE-SIM TO GUESS THIS
 				remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
 
 				if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {

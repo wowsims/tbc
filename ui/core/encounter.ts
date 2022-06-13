@@ -17,6 +17,7 @@ export class Encounter {
 	private duration: number = 180;
 	private durationVariation: number = 5;
 	private executeProportion: number = 0.2;
+	private health: number = 0;
 	private targets: Array<Target>;
 
 	readonly targetsChangeEmitter = new TypedEvent<void>();
@@ -74,6 +75,17 @@ export class Encounter {
 		this.executeProportionChangeEmitter.emit(eventID);
 	}
 
+	getHealth(): number {
+		return this.health;
+	}
+	setHealth(eventID: EventID, newHealth: number) {
+		if (newHealth == this.health)
+			return;
+
+		this.health = newHealth;
+		this.durationChangeEmitter.emit(eventID);
+	}
+
 	getNumTargets(): number {
 		return this.targets.length;
 	}
@@ -116,6 +128,7 @@ export class Encounter {
 			duration: this.duration,
 			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
+			health: this.health,
 			targets: this.targets.map(target => target.toProto()),
 		});
 	}
@@ -125,6 +138,7 @@ export class Encounter {
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
+			this.setHealth(eventID, proto.health);
 
 			if (proto.targets.length > 0) {
 				this.setTargets(eventID, proto.targets.map(targetProto => {
@@ -143,6 +157,7 @@ export class Encounter {
 			duration: 180,
 			durationVariation: 5,
 			executeProportion: 0.2,
+			health: 0,
 			targets: [ Target.defaultProto() ],
 		}));
 	}

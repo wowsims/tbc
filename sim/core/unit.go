@@ -110,6 +110,8 @@ type Unit struct {
 	CastSpeed float64
 
 	CurrentTarget *Unit
+
+	DamageTaken float64
 }
 
 func (unit *Unit) LogLabel() string {
@@ -374,7 +376,7 @@ func (unit *Unit) advance(sim *Simulation, elapsedTime time.Duration) {
 
 func (unit *Unit) doneIteration(sim *Simulation) {
 	unit.Hardcast = Hardcast{}
-	unit.doneIterationGCD(sim.Duration)
+	unit.doneIterationGCD(sim.CurrentTime)
 
 	unit.doneIterationMana()
 	unit.rageBar.doneIteration()

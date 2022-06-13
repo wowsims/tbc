@@ -315,6 +315,8 @@ class TargetPicker extends Component {
 }
 
 function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean) {
+	let useHealth = encounter.getHealth() > 0;
+
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration',
 		labelTooltip: 'The fight length for each sim iteration, in seconds.',
@@ -323,6 +325,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDuration(eventID, newValue);
 		},
+		enableWhen: (obj) => { return !useHealth },
 	});
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration +/-',
@@ -332,18 +335,49 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 			encounter.setDurationVariation(eventID, newValue);
 		},
+		enableWhen: (obj) => { return !useHealth },
 	});
 
 	if (showExecuteProportion) {
 		new NumberPicker(rootElem, encounter, {
 			label: 'Execute Duration (%)',
 			labelTooltip: 'Percentage of the total encounter duration, for which the targets will be considered to be in execute range (< 20% HP) for the purpose of effects like Warrior Execute or Mage Molten Fury.',
-			changedEvent: (encounter: Encounter) => encounter.executeProportionChangeEmitter,
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
 			getValue: (encounter: Encounter) => encounter.getExecuteProportion() * 100,
 			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 				encounter.setExecuteProportion(eventID, newValue / 100);
 			},
+			enableWhen: (obj) => { return !useHealth },
 		});
+	}
+
+	// TODO: Add 'showHealthPicker' to signature.
+	if (true) {
+		new BooleanPicker<Encounter>(rootElem, encounter, {
+			label: 'Use Health',
+			labelTooltip: 'use a damage limit in place of a duration limit.',
+			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+			getValue: (encounter: Encounter) => useHealth,
+			setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
+				useHealth = newValue;
+				// Notify the various UI elements to toggle.
+				encounter.durationChangeEmitter.emit(eventID);
+				encounter.executeProportionChangeEmitter.emit(eventID);
+			},
+		});
+		let np = new NumberPicker(rootElem, encounter, {
+			label: 'Health',
+			labelTooltip: 'If picked, ignores duration setting and instead fights until the raid kills the primary target. Effectively a damage limit instead of time limit.',
+			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+			getValue: (encounter: Encounter) => encounter.getHealth(),
+			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+				encounter.setHealth(eventID, newValue);
+			},
+			enableWhen: (obj) => { return useHealth },
+		});
+		let ele = np.rootElem.getElementsByClassName("number-picker-input").item(0)! as HTMLElement;
+		ele.style.width = "150px";
+	
 	}
 }
 

@@ -81,7 +81,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	mangle_end := cat.MangleAura.ExpiresAt()
 	rake_debuff := cat.RakeDot.IsActive()
 	next_tick := cat.NextEnergyTickAt()
-	fight_length := sim.Duration
+	fight_length := sim.CurrentTime + sim.GetRemainingDuration() // use this calculation to handle the health length fight.
 	wolfshead := cat.Equip[items.ItemSlotHead].ID == 8345
 	shift_cost := cat.CatForm.DefaultCast.Cost
 	omen_proc := cat.PseudoStats.NoCost

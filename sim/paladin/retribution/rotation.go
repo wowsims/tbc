@@ -194,7 +194,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	events := []time.Duration{
 		ret.GCD.ReadyAt(),
 		ret.CrusaderStrike.CD.ReadyAt(),
-		manaRegenAt,
+		manaRegenAt, // TODO: manaRegenAt is actually a timeuntilregen ... fix this.
 		sobExpiration - time.Second,
 	}
 

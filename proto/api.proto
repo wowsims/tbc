@@ -227,6 +227,7 @@ message RaidSimResult {
 	// Needed for displaying the timeline properly when the duration +/- option
 	// is used.
 	double first_iteration_duration = 4;
+	double avg_iteration_duration = 6;
 
 	string error_result = 5;
 }

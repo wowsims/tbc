@@ -535,6 +535,9 @@ message Encounter {
     // Fury, etc.
     double execute_proportion = 3;
 
+    // If health is non-zero then use this instead of duration for timing.
+    double health = 5;
+
 		// If type != Simple or Custom, then this may be empty.
     repeated Target targets = 2;
 }

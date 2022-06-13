@@ -118,6 +118,7 @@ func (hp *HunterPet) Reset(sim *core.Simulation) {
 	}
 
 	uptime := core.MinFloat(1, core.MaxFloat(0, hp.hunterOwner.Options.PetUptime))
+	// TODO: rework this to check sim.GetRemainingDurationPercent() instead of deathTime
 	hp.deathTime = time.Duration(float64(sim.Duration) * uptime)
 }
 
