@@ -21,6 +21,7 @@ import { Player } from '/tbc/core/player.js';
 import { BuffBot } from './buff_bot.js';
 
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
+import * as FeralDruidPresets from '/tbc/feral_druid/presets.js';
 import * as FeralTankDruidPresets from '/tbc/feral_tank_druid/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
@@ -37,6 +38,7 @@ import * as WarlockPresets from '/tbc/warlock/presets.js';
 
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
+import { FeralDruidSimUI } from '/tbc/feral_druid/sim.js';
 import { FeralTankDruidSimUI } from '/tbc/feral_tank_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
@@ -53,6 +55,7 @@ import { WarlockSimUI } from '/tbc/warlock/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
+	[Spec.SpecFeralDruid]: (parentElem: HTMLElement, player: Player<any>) => new FeralDruidSimUI(parentElem, player),
 	[Spec.SpecFeralTankDruid]: (parentElem: HTMLElement, player: Player<any>) => new FeralTankDruidSimUI(parentElem, player),
 	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
 	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
@@ -135,6 +138,38 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		},
 		tooltip: specNames[Spec.SpecBalanceDruid],
 		iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
+	},
+	{
+		spec: Spec.SpecFeralDruid,
+		rotation: FeralDruidPresets.DefaultRotation,
+		talents: FeralDruidPresets.StandardTalents.data,
+		specOptions: FeralDruidPresets.DefaultOptions,
+		consumes: FeralDruidPresets.DefaultConsumes,
+		defaultName: 'Cat Druid',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceNightElf,
+			[Faction.Horde]: Race.RaceTauren,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: FeralDruidPresets.P1_PRESET.gear,
+				2: FeralDruidPresets.P2_PRESET.gear,
+				3: FeralDruidPresets.P3_PRESET.gear,
+				4: FeralDruidPresets.P4_PRESET.gear,
+				5: FeralDruidPresets.P5_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: FeralDruidPresets.P1_PRESET.gear,
+				2: FeralDruidPresets.P2_PRESET.gear,
+				3: FeralDruidPresets.P3_PRESET.gear,
+				4: FeralDruidPresets.P4_PRESET.gear,
+				5: FeralDruidPresets.P5_PRESET.gear,
+			},
+		},
+		tooltip: specNames[Spec.SpecFeralDruid],
+		iconUrl: specIconsLarge[Spec.SpecFeralDruid],
 	},
 	{
 		spec: Spec.SpecFeralTankDruid,
