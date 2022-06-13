@@ -209,23 +209,23 @@ class RaidWCLImporter extends Importer {
 							guild {
 								name faction {id}
 							}
-							table(fightIDs: [${fightID}], endTime: 99999999, dataType: Casts, killType: All, viewBy: Default)
+							playerDetails: table(fightIDs: [${fightID}], endTime: 99999999, dataType: Casts, killType: All, viewBy: Default)
 							fights(fightIDs: [${fightID}]) {
 								startTime, endTime, id, name
 							}
+							innervates: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Druid", abilityID: 29166),
+							powerInfusion: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Priest", abilityID: 10060)
 						}
 					}
 				}
 				`;
-        /*
-            INNERVATE BUFFS ARE UNUSED RIGHT NOW.
-            buffs: events(fightIDs: [${fightID}], dataType:Buffs, endTime: 99999999, abilityID: 29166) { data }
-         */
         const reportData = await this.queryWCL(reportDataQuery, token);
         // Process the report data.
         const wclData = reportData.data.reportData.report; // TODO: Typings?
         const guildData = wclData.guild;
-        const playerData = wclData.table.data.entries;
+        const playerData = wclData.playerDetails.data.entries;
+        const innervateData = wclData.innervates.data.entries;
+        const powerInfusionData = wclData.powerInfusion.data.entries;
         // Set up the general variables we need for import to be successful.
         const fight = wclData.fights[0];
         const startTime = fight.startTime;
@@ -296,6 +296,22 @@ class RaidWCLImporter extends Importer {
         };
         const mappedPlayers = playerData
             .map((wclPlayer) => new WCLSimPlayer(wclPlayer, this.simUI, faction));
+        const processBuffCastData = (buffCastData) => {
+            const playerCasts = [];
+            if (buffCastData.length) {
+                buffCastData.forEach((cast) => {
+                    const sourcePlayer = mappedPlayers.find((player) => player.name === cast.name);
+                    const targetPlayer = mappedPlayers.find((player) => player.name === cast.targets[0].name);
+                    // Buff bots do not get PI/Innervates.
+                    if (sourcePlayer && targetPlayer && !targetPlayer.isBuffBot) {
+                        playerCasts.push({ player: sourcePlayer, target: targetPlayer.name });
+                    }
+                });
+            }
+            return playerCasts;
+        };
+        processBuffCastData(innervateData).forEach((cast) => cast.player.innervateTarget = cast.target);
+        processBuffCastData(powerInfusionData).forEach((cast) => cast.player.powerInfusionTarget = cast.target);
         const wclPlayers = sortByProperty(sortByProperty(mappedPlayers, "type"), "sortPriority");
         let raidIndex = 0;
         // Sorts buff bots to the end of the array to prevent overwriting them later on.
@@ -427,13 +443,70 @@ class RaidWCLImporter extends Importer {
             let raidParty = raid.parties.filter((party) => party.players.length < MAX_PARTY_SIZE)[0];
             assignPlayerToParty(player, raidParty, true);
         });
+        // Insert the innervate / PI buffs into the options for the raid.
+        wclPlayers
+            .filter((player) => player.innervateTarget || player.powerInfusionTarget)
+            .forEach((player) => {
+            const target = wclPlayers.find((wclPlayer) => wclPlayer.name === player.innervateTarget || player.name === player.powerInfusionTarget);
+            if (!target) {
+                console.warn("Could not find target assignment player");
+                return;
+            }
+            const targetID = target.id;
+            const targetRaidIndex = wclIDtoRaidIndex.get(targetID);
+            if (!targetRaidIndex) {
+                console.warn(`Could not find ${target.name} raid index!`);
+                return;
+            }
+            if (player.isBuffBot) {
+                const playerID = player.id;
+                const playerRaidIndex = wclIDtoRaidIndex.get(playerID);
+                const buffBot = buffBots.find((buffBot) => buffBot.raidIndex === playerRaidIndex);
+                if (buffBot) {
+                    if (player.innervateTarget && buffBot.innervateAssignment) {
+                        buffBot.innervateAssignment.targetIndex = targetRaidIndex;
+                    }
+                    else if (player.powerInfusionTarget && buffBot.powerInfusionAssignment) {
+                        buffBot.powerInfusionAssignment.targetIndex = targetRaidIndex;
+                    }
+                }
+                return;
+            }
+            // Regular players.
+            const raidParty = raid.parties.filter((party) => party.players.some((raidPlayer) => raidPlayer.name === player.name))[0];
+            if (!raidParty) {
+                console.warn("Could not find raiding party for player " + player.name);
+                return;
+            }
+            const raidPlayer = raidParty.players.find((raidPlayer) => raidPlayer.name === player.name);
+            if (!raidPlayer) {
+                console.warn("Could not find raid player " + player.name + " in raid party " + raidParty);
+                return;
+            }
+            const playerSpecName = raidPlayer.spec.oneofKind;
+            // @ts-ignore // TODO: Fix this so we don't have to ignore it.
+            const raiderSpecOptions = raidPlayer.spec[playerSpecName];
+            if (!targetRaidIndex) {
+                console.warn("Could not find raid index for target player " + target.name);
+                return;
+            }
+            else if (!raiderSpecOptions) {
+                console.warn("Could not find raid player spec options for player " + player.name);
+                return;
+            }
+            if (player.innervateTarget) {
+                raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex;
+            }
+            else if (player.powerInfusionTarget) {
+                raiderSpecOptions.options.innervateTarget.targetIndex = targetRaidIndex;
+            }
+        });
         wclPlayers
             .filter((player) => !player.partyAssigned)
             .forEach((player) => {
             console.error(`${player.name} is not in a party!`, player);
         });
         settings.blessings = makeDefaultBlessings(numPaladins);
-        this.simUI.clearRaid(TypedEvent.nextEventID());
         this.simUI.fromProto(TypedEvent.nextEventID(), settings);
         this.simUI.setBuffBots(TypedEvent.nextEventID(), buffBots);
         if (!experimentalGenerateParties) {
