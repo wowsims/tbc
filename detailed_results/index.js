@@ -35,8 +35,14 @@ const isIndividualSim = urlParams.has('isIndividualSim');
 if (isIndividualSim) {
     document.body.classList.add('individual-sim');
 }
-if (!window.frameElement) {
-    // Means we're not inside an iframe, i.e. this is a new tab.
+const isInIframe = Boolean(window.frameElement);
+if (isInIframe) {
+    // Causes links opened from the iframe to be opened as tabs in the parent window instead.
+    const base = document.createElement('base');
+    base.target = '_parent';
+    document.head.appendChild(base);
+}
+else {
     document.body.classList.add('new-tab');
 }
 const colorSettings = {
