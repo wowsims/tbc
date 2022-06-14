@@ -17,6 +17,9 @@ const (
 	Moonkin
 )
 
+// Converts from 0.009327 to 0.0085
+const AnimalSpiritRegenSuppression = 0.911337
+
 func (form DruidForm) Matches(other DruidForm) bool {
 	return (form & other) != 0
 }
@@ -60,15 +63,17 @@ func (druid *Druid) registerCatFormSpell() {
 		Label:    "Cat Form",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			druid.form = Humanoid
-			druid.AutoAttacks.CancelAutoSwing(sim)
-			druid.manageCooldownsEnabled(sim)
-		},
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			druid.form = Cat
 			druid.AutoAttacks.EnableAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
+			druid.PseudoStats.SpiritRegenMultiplier *= AnimalSpiritRegenSuppression
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			druid.form = Humanoid
+			druid.AutoAttacks.CancelAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+			druid.PseudoStats.SpiritRegenMultiplier /= AnimalSpiritRegenSuppression
 		},
 	})
 
@@ -134,16 +139,18 @@ func (druid *Druid) registerBearFormSpell() {
 		Label:    "Bear Form",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			druid.form = Bear
+			druid.AutoAttacks.EnableAutoSwing(sim)
+			druid.manageCooldownsEnabled(sim)
+			druid.PseudoStats.SpiritRegenMultiplier *= AnimalSpiritRegenSuppression
+		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			previousRage = druid.CurrentRage()
 			druid.form = Humanoid
 			druid.AutoAttacks.CancelAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
-		},
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			druid.form = Bear
-			druid.AutoAttacks.EnableAutoSwing(sim)
-			druid.manageCooldownsEnabled(sim)
+			druid.PseudoStats.SpiritRegenMultiplier /= AnimalSpiritRegenSuppression
 		},
 	})
 

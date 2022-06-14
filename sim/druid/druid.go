@@ -43,6 +43,7 @@ type Druid struct {
 	RakeDot        *core.Dot
 	RipDot         *core.Dot
 
+	ClearcastingAura     *core.Aura
 	DemoralizingRoarAura *core.Aura
 	FaerieFireAura       *core.Aura
 	MangleAura           *core.Aura

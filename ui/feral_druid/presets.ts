@@ -27,6 +27,12 @@ export const StandardTalents = {
 	data: '-503032132322105301251-05503301',
 };
 
+export const MonocatTalents = {
+	name: 'Monocat',
+	data: '-553002132322105301051-05503301',
+};
+
+
 export const DefaultRotation = FeralDruidRotation.create({
 	finishingMove: FinishingMove.Rip,
 	mangleTrick: true,

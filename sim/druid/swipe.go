@@ -50,6 +50,7 @@ func (druid *Druid) registerSwipeSpell() {
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 

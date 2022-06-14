@@ -29,6 +29,7 @@ func (druid *Druid) registerRakeSpell() {
 				Cost: cost,
 				GCD:  time.Second,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 

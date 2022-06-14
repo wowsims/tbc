@@ -38,6 +38,7 @@ func (druid *Druid) registerLacerateSpell() {
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 
