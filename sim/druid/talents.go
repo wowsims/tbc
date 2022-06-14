@@ -271,23 +271,10 @@ func (druid *Druid) applyOmenOfClarity() {
 		Duration: time.Second * 10,
 	}
 
-	clearcastingAura := druid.RegisterAura(core.Aura{
+	druid.ClearcastingAura = druid.RegisterAura(core.Aura{
 		Label:    "Clearcasting",
 		ActionID: core.ActionID{SpellID: 16870},
 		Duration: time.Second * 15,
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			druid.PseudoStats.NoCost = true
-		},
-		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			druid.PseudoStats.NoCost = false
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			// This check is used as a proxy, not sure if it will exactly match the list here:
-			// https://tbc.wowhead.com/spell=16870
-			if spell.DefaultCast.Cost > 0 {
-				aura.Deactivate(sim)
-			}
-		},
 	})
 
 	druid.RegisterAura(core.Aura{
@@ -307,7 +294,18 @@ func (druid *Druid) applyOmenOfClarity() {
 				return
 			}
 			icd.Use(sim)
-			clearcastingAura.Activate(sim)
+			druid.ClearcastingAura.Activate(sim)
 		},
 	})
+}
+
+func (druid *Druid) ClearcastingActive() bool {
+	return druid.ClearcastingAura != nil && druid.ClearcastingAura.IsActive()
+}
+
+func (druid *Druid) ApplyClearcasting(sim *core.Simulation, spell *core.Spell, cast *core.Cast) {
+	if druid.ClearcastingActive() {
+		cast.Cost = 0
+		druid.ClearcastingAura.Deactivate(sim)
+	}
 }
