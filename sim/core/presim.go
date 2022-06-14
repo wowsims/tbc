@@ -67,8 +67,8 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimRe
 
 	var lastResult *proto.RaidSimResult
 
-	// TODO: Do presim if we are doing a health based fight. Need a way to differentiate presim from normal sim
-	for remainingAgents > 0 {
+	doOne := sim.Encounter.EndFightAtHealth > 0
+	for doOne || remainingAgents > 0 {
 		// ** Run a presim round. **
 
 		// Let each Agent modify their own settings.
@@ -87,7 +87,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimRe
 		}
 
 		// Run the presim.
-		presimResult := RunSim(*presimRequest, nil)
+		presimResult := runSim(*presimRequest, nil, true)
 		lastResult = presimResult
 
 		if presimResult.ErrorResult != "" {
@@ -109,6 +109,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimRe
 				}
 			}
 		}
+		doOne = false
 	}
 	return lastResult
 }

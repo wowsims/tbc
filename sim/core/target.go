@@ -18,6 +18,8 @@ type Encounter struct {
 	// DamgeTaken is used to track health fights instead of duration fights.
 	//  Once primary target has taken its health worth of damage, fight ends.
 	DamageTaken float64
+	// In health fight: set to true until we get something to base on
+	DurationIsEstimate bool
 }
 
 func NewEncounter(options proto.Encounter) Encounter {
@@ -50,6 +52,7 @@ func NewEncounter(options proto.Encounter) Encounter {
 	if encounter.EndFightAtHealth > 0 {
 		// Until we pre-sim set duration to 10m
 		encounter.Duration = time.Minute * 10
+		encounter.DurationIsEstimate = true
 	}
 
 	return encounter
