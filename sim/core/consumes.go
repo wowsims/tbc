@@ -640,7 +640,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	}
 }
 
-var AlchStoneItemIDs = []int32{13503, 35749, 35750, 35748, 47050}
+var AlchStoneItemIDs = []int32{13503, 35748, 35749, 35750, 35751}
 
 func makePotionActivation(potionType proto.Potions, character *Character, potionCD *Timer) (MajorCooldown, *Spell) {
 	if potionType == proto.Potions_DestructionPotion {
