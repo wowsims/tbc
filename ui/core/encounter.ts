@@ -17,7 +17,6 @@ export class Encounter {
 	private duration: number = 180;
 	private durationVariation: number = 5;
 	private executeProportion: number = 0.2;
-	private health: number = 0;
 	private useHealth: boolean = false;
 	private targets: Array<Target>;
 
@@ -88,18 +87,6 @@ export class Encounter {
 		this.executeProportionChangeEmitter.emit(eventID);
 	}
 
-	getHealth(): number {
-		return this.primaryTarget.getStats().getStat(Stat.StatHealth);
-	}
-	setHealth(eventID: EventID, newHealth: number) {
-		if (newHealth == this.health)
-			return;
-
-		let stats = this.primaryTarget.getStats();
-		this.primaryTarget.setStats(eventID, stats.withStat(Stat.StatHealth, newHealth));
-		this.targetsChangeEmitter.emit(eventID);
-	}
-
 	getNumTargets(): number {
 		return this.targets.length;
 	}
@@ -134,9 +121,6 @@ export class Encounter {
 
 			newTargets.forEach((nt, i) => nt.applyPreset(eventID, preset.targets[i]));
 			this.setTargets(eventID, newTargets);
-
-			// Set encounter health to the primary target's health.
-			this.setHealth(eventID, preset.targets[0].target!.stats[Stat.StatHealth]);
 		});
 	}
 
