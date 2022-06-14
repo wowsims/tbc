@@ -147,7 +147,7 @@ func (sim *Simulation) reset() {
 	}
 
 	// Reset primary targets damage taken for tracking health fights.
-	sim.Encounter.Targets[0].DamageTaken = 0
+	sim.Encounter.DamageTaken = 0
 	sim.Duration = sim.BaseDuration
 	if sim.DurationVariation != 0 {
 		variation := sim.DurationVariation * 2
@@ -257,7 +257,7 @@ func (sim *Simulation) runOnce() {
 			if pa.NextActionAt > sim.Duration {
 				break
 			}
-		} else if sim.Encounter.EndFightAtHealth < sim.Encounter.Targets[0].DamageTaken {
+		} else if sim.Encounter.EndFightAtHealth < sim.Encounter.DamageTaken {
 			break
 		}
 
@@ -331,13 +331,12 @@ func (sim *Simulation) IsExecutePhase() bool {
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {
 	if sim.Encounter.EndFightAtHealth > 0 {
-		dmgTaken := sim.Encounter.Targets[0].DamageTaken
-		if dmgTaken == 0 {
+		if sim.Encounter.DamageTaken == 0 {
 			return sim.Duration - sim.CurrentTime
 		}
-		dps := dmgTaken / sim.CurrentTime.Seconds()
+		dps := sim.Encounter.DamageTaken / sim.CurrentTime.Seconds()
 		// Estimate time remaining via avg dps
-		return time.Duration(sim.Encounter.EndFightAtHealth-dmgTaken/dps) * time.Second
+		return time.Duration((sim.Encounter.EndFightAtHealth-sim.Encounter.DamageTaken)/dps) * time.Second
 	}
 	return sim.Duration - sim.CurrentTime
 }
@@ -345,7 +344,7 @@ func (sim *Simulation) GetRemainingDuration() time.Duration {
 // Returns the percentage of time remaining in the current iteration, as a value from 0-1.
 func (sim *Simulation) GetRemainingDurationPercent() float64 {
 	if sim.Encounter.EndFightAtHealth > 0 {
-		return 1.0 - sim.Encounter.Targets[0].DamageTaken/sim.Encounter.EndFightAtHealth
+		return 1.0 - sim.Encounter.DamageTaken/sim.Encounter.EndFightAtHealth
 	}
 	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
 }

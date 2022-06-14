@@ -110,10 +110,6 @@ type Unit struct {
 	CastSpeed float64
 
 	CurrentTarget *Unit
-
-	// DamgeTaken is used to track health fights instead of duration fights.
-	//  Once primary target has taken its health worth of damage, fight ends.
-	DamageTaken float64
 }
 
 func (unit *Unit) LogLabel() string {

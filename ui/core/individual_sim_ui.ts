@@ -700,7 +700,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		});
 
 		const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
-		new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker);
+		new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker, false);
 		const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
 			label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),

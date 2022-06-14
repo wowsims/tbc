@@ -12,8 +12,12 @@ type Encounter struct {
 	Duration           time.Duration
 	DurationVariation  time.Duration
 	executePhaseBegins time.Duration
-	EndFightAtHealth   float64
 	Targets            []*Target
+
+	EndFightAtHealth float64
+	// DamgeTaken is used to track health fights instead of duration fights.
+	//  Once primary target has taken its health worth of damage, fight ends.
+	DamageTaken float64
 }
 
 func NewEncounter(options proto.Encounter) Encounter {
@@ -23,9 +27,11 @@ func NewEncounter(options proto.Encounter) Encounter {
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
 		Targets:            []*Target{},
 	}
-	// If UseHealth is set, we use the primary target's health.
+	// If UseHealth is set, we use the sum of targets health.
 	if options.UseHealth {
-		encounter.EndFightAtHealth = options.Targets[0].Stats[stats.Health]
+		for _, t := range options.Targets {
+			encounter.EndFightAtHealth += t.Stats[stats.Health]
+		}
 		if encounter.EndFightAtHealth == 0 {
 			encounter.EndFightAtHealth = 1 // default to something so we don't instantly end without anything.
 		}

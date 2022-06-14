@@ -16,18 +16,18 @@ import { Component } from './component.js';
 import { Popup } from './popup.js';
 
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
+import { SimUI } from '../sim_ui.js';
 
 export interface EncounterPickerConfig {
 	simpleTargetStats?: Array<Stat>;
 	showExecuteProportion: boolean;
-	showHealthPicker: boolean;
 }
 
 export class EncounterPicker extends Component {
-	constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig) {
+	constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig, showHealthPicker: boolean) {
 		super(parent, 'encounter-picker-root');
 
-		addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion, config.showHealthPicker);
+		addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion);
 
 		new EnumPicker<Encounter>(this.rootElem, modEncounter, {
 			label: 'Target Level',
@@ -70,7 +70,7 @@ export class EncounterPicker extends Component {
 		const advancedButton = document.createElement('button');
 		advancedButton.classList.add('sim-button', 'advanced-button');
 		advancedButton.textContent = 'ADVANCED';
-		advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter));
+		advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter, showHealthPicker));
 		this.rootElem.appendChild(advancedButton);
 	}
 }
@@ -78,7 +78,7 @@ export class EncounterPicker extends Component {
 class AdvancedEncounterPicker extends Popup {
 	private readonly encounter: Encounter;
 
-	constructor(parent: HTMLElement, encounter: Encounter) {
+	constructor(parent: HTMLElement, encounter: Encounter, showHealthPicker: boolean) {
 		super(parent);
 		this.encounter = encounter;
 
@@ -118,8 +118,18 @@ class AdvancedEncounterPicker extends Popup {
 		const header = this.rootElem.getElementsByClassName('encounter-header')[0] as HTMLElement;
 		const targetsElem = this.rootElem.getElementsByClassName('encounter-targets')[0] as HTMLElement;
 
-		addEncounterFieldPickers(header, this.encounter, true, true);
-
+		addEncounterFieldPickers(header, this.encounter, true);
+		if (showHealthPicker) {
+			new BooleanPicker<Encounter>(header, encounter, {
+				label: 'Use Health',
+				labelTooltip: 'Uses a damage limit in place of a duration limit. Damage limit is equal to sum of all targets health.',
+				changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+				getValue: (encounter: Encounter) => encounter.getUseHealth(),
+				setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
+					encounter.setUseHealth(eventID, newValue);
+				},
+			});		
+		}
 		new ListPicker<Encounter, Target>(targetsElem, this.encounter, {
 			extraCssClasses: [
 				'targets-picker',
@@ -315,7 +325,7 @@ class TargetPicker extends Component {
 	}
 }
 
-function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean, showHealthPicker: boolean) {
+function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean) {
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration',
 		labelTooltip: 'The fight length for each sim iteration, in seconds.',
@@ -348,32 +358,6 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 			},
 			enableWhen: (obj) => { return !encounter.getUseHealth() },
 		});
-	}
-
-	// Enable for raids and if manually enabled in the advanced options.
-	if (showHealthPicker || encounter.getUseHealth()) {
-		new BooleanPicker<Encounter>(rootElem, encounter, {
-			label: 'Use Health',
-			labelTooltip: 'use a damage limit in place of a duration limit.',
-			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
-			getValue: (encounter: Encounter) => encounter.getUseHealth(),
-			setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
-				encounter.setUseHealth(eventID, newValue);
-			},
-		});
-		let np = new NumberPicker(rootElem, encounter, {
-			label: 'Health',
-			labelTooltip: 'If picked, ignores duration setting and instead fights until the raid kills the primary target. Effectively a damage limit instead of time limit.',
-			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
-			getValue: (encounter: Encounter) => encounter.getHealth(),
-			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-				encounter.setHealth(eventID, newValue);
-			},
-			enableWhen: (obj) => { return encounter.getUseHealth() },
-		});
-		let ele = np.rootElem.getElementsByClassName("number-picker-input").item(0)! as HTMLElement;
-		ele.style.width = "150px";
-	
 	}
 }
 

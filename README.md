@@ -86,14 +86,15 @@ make clean
 # Recompiles the ts only for the given spec (e.g. make host_elemental_shaman)
 make host_$spec
 
+# Recompiles the `wowsimtbc` server binary and runs it, hosting /dist directory at http://localhost:3333/tbc. 
+# This is the fastest way to iterate on core go simulator code so you don't have to wait for client rebuilds.
+# To rebuild client for a spec just do 'make $spec' and refresh browser.
+make rundevserver
+
 # Creates the 'wowsimtbc' binary that can host the UI and run simulations natively (instead of with wasm).
 # Builds the UI and the compiles it into the binary so that you can host the sim as a server instead of wasm on the client.
 # It does this by first doing make dist/tbc and then copying all those files to binary_dist/tbc and loading all the files in that directory into its binary on compile.
 make wowsimtbc
-
-# Recompiles the `wowsimtbc` server binary only. This is the fastest way to iterate on core go simulator code so you don't have to wait for client rebuilds.
-# Includes whatever client code is in the binary_dist directory. If this is not there you can generate it using `make wowsimtbc`
-make devserver
 
 # Using the --usefs flag will instead of hosting the client built into the binary, it will host whatever code is found in the /dist directory. 
 # Use --wasm to host the client with the wasm simulator.
