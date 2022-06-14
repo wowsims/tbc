@@ -13,6 +13,11 @@ type Encounter struct {
 	DurationVariation  time.Duration
 	executePhaseBegins time.Duration
 	Targets            []*Target
+
+	EndFightAtHealth float64
+	// DamgeTaken is used to track health fights instead of duration fights.
+	//  Once primary target has taken its health worth of damage, fight ends.
+	DamageTaken float64
 }
 
 func NewEncounter(options proto.Encounter) Encounter {
@@ -21,6 +26,15 @@ func NewEncounter(options proto.Encounter) Encounter {
 		DurationVariation:  DurationFromSeconds(options.DurationVariation),
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
 		Targets:            []*Target{},
+	}
+	// If UseHealth is set, we use the sum of targets health.
+	if options.UseHealth {
+		for _, t := range options.Targets {
+			encounter.EndFightAtHealth += t.Stats[stats.Health]
+		}
+		if encounter.EndFightAtHealth == 0 {
+			encounter.EndFightAtHealth = 1 // default to something so we don't instantly end without anything.
+		}
 	}
 
 	for targetIndex, targetOptions := range options.Targets {
@@ -31,6 +45,11 @@ func NewEncounter(options proto.Encounter) Encounter {
 		// Add a dummy target. The only case where targets aren't specified is when
 		// computing character stats, and targets won't matter there.
 		encounter.Targets = append(encounter.Targets, NewTarget(proto.Target{}, 0))
+	}
+
+	if encounter.EndFightAtHealth > 0 {
+		// Until we pre-sim set duration to 10m
+		encounter.Duration = time.Minute * 10
 	}
 
 	return encounter

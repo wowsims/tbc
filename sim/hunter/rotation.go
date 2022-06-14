@@ -96,10 +96,12 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	gcdAt := hunter.NextGCDAt()
 	gcdReady := gcdAt <= sim.CurrentTime
 
+	percentRemaining := sim.GetRemainingDurationPercent()
+
 	waitingForMana := hunter.IsWaitingForMana()
 	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
 		(hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly || hunter.RaptorStrike.IsReady(sim)) &&
-		sim.CurrentTime >= hunter.weaveStartTime &&
+		percentRemaining <= 1.0-hunter.Rotation.PercentWeaved &&
 		hunter.AutoAttacks.MainhandSwingAt <= sim.CurrentTime
 	if canWeave && !shootReady && (!gcdReady || (waitingForMana && hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly)) {
 		hunter.nextAction = OptionWeave
@@ -221,10 +223,11 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		}
 	}
 
+	percent := sim.GetRemainingDurationPercent()
 	// Only allow weaving if autos and GCD will both be on CD. Otherwise it will
 	// get used even when it would cause delays to them.
 	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
-		sim.CurrentTime >= hunter.weaveStartTime &&
+		percent <= hunter.Rotation.PercentWeaved &&
 		weaveAt < shootAt &&
 		(weaveAt < gcdAt || (waitingForMana && hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly))
 	if canWeave {

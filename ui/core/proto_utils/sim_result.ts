@@ -58,7 +58,7 @@ class SimResultData {
 	}
 
 	get duration() {
-		return this.request.encounter?.duration || 1;
+		return this.result.avgIterationDuration || 1;
 	}
 
 	get firstIterationDuration() {

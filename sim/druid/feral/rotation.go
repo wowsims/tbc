@@ -69,10 +69,12 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		energy >= rip_trick_min &&
 		!cat.PseudoStats.NoCost)
 
-	rip_now = (rip_now || ripweave_now) && (sim.Duration-sim.CurrentTime >= rip_end_thresh)
+	remainingDuration := sim.GetRemainingDuration()
+	rip_now = (rip_now || ripweave_now) && (remainingDuration >= rip_end_thresh)
 
+	// TODO: Can we use fight % completion as an estimate for this instead of exact time calculation?
 	bite_at_end := (cp >= rotation.bite_cp &&
-		((sim.Duration-sim.CurrentTime < rip_end_thresh) ||
+		((remainingDuration < rip_end_thresh) ||
 			(rip_debuff && (sim.Duration-rip_end < rip_end_thresh))))
 
 	mangle_now := !rip_now && !mangle_debuff
@@ -84,6 +86,7 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	bite_now := ((bite_before_rip || rotation.bite_over_rip) &&
 		cp >= rotation.bite_cp)
 
+	// TODO: Can we use fight % completion as an estimate for this instead of exact time calculation?
 	rip_next := ((rip_now || ((cp >= rotation.rip_cp) && (rip_end <= next_tick))) &&
 		(sim.Duration-next_tick >= rip_end_thresh))
 

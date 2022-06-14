@@ -48,8 +48,6 @@ type Hunter struct {
 	latency     time.Duration
 	timeToWeave time.Duration
 
-	weaveStartTime time.Duration
-
 	nextAction   int
 	nextActionAt time.Duration
 
@@ -147,7 +145,6 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.rangedSwingSpeed = 0
 	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
 	hunter.permaHawk = false
-	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
 	huntersMarkAura := core.HuntersMarkAura(hunter.CurrentTarget, hunter.Talents.ImprovedHuntersMark, false)
 	huntersMarkAura.Activate(sim)

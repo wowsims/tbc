@@ -41,9 +41,6 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	// calculate how much time a VT cast would take so we can possibly start casting right before the dot is up.
 	vtCastTime := spriest.ApplyCastSpeed(time.Millisecond * 1500)
 
-	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
-	// TODO: stop casting dots near the end?
-
 	if spriest.Talents.VampiricTouch && spriest.VampiricTouchDot.RemainingDuration(sim) <= vtCastTime {
 		spell = spriest.VampiricTouch
 	} else if !spriest.ShadowWordPainDot.IsActive() {

@@ -193,6 +193,12 @@ func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalDamage += spellEffect.Damage
 	spell.SpellMetrics[spellEffect.Target.TableIndex].TotalThreat += spellEffect.calcThreat(spell)
 
+	// Mark total damage done in raid so far for health based fights.
+	// Don't include damage done by EnemyUnits to Players
+	if spellEffect.Target.Type == EnemyUnit {
+		sim.Encounter.DamageTaken += spellEffect.Damage
+	}
+
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
 			spell.Unit.Log(sim, "%s %s tick %s. (Threat: %0.3f)", spellEffect.Target.LogLabel(), spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
