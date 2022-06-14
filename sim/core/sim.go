@@ -62,12 +62,31 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) (res
 	}()
 
 	sim := NewSim(rsr)
-	sim.runPresims(rsr)
 	if progress != nil {
+		progress <- &proto.ProgressMetrics{
+			TotalIterations: sim.Options.Iterations,
+			PresimRunning:   true,
+		}
+		runtime.Gosched() // allow time for message to make it back out.
+	}
+	presimResult := sim.runPresims(rsr)
+	if progress != nil {
+		progress <- &proto.ProgressMetrics{
+			TotalIterations: sim.Options.Iterations,
+			PresimRunning:   false,
+		}
 		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
 			progress <- progMetric
 		}
+		runtime.Gosched() // allow time for message to make it back out.
 	}
+
+	// Use pre-sim as estimate for length of fight (when using health fight)
+	if sim.Encounter.EndFightAtHealth > 0 && presimResult != nil {
+		sim.BaseDuration = time.Duration(presimResult.AvgIterationDuration)
+		sim.Duration = time.Duration(presimResult.AvgIterationDuration)
+	}
+
 	// using a variable here allows us to mutate it in the deferred recover, sending out error info
 	result = sim.run()
 
@@ -126,9 +145,15 @@ func (sim *Simulation) reset() {
 		sim.Log("SIM RESET")
 		sim.Log("----------------------")
 	}
-	variation := sim.DurationVariation * 2
 
-	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
+	// Reset primary targets damage taken for tracking health fights.
+	sim.Encounter.DamageTaken = 0
+	sim.Duration = sim.BaseDuration
+	if sim.DurationVariation != 0 {
+		variation := sim.DurationVariation * 2
+		sim.Duration += time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
+	}
+
 	sim.CurrentTime = 0.0
 
 	sim.pendingActions = make([]*PendingAction, 0, 64)
@@ -179,13 +204,14 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	sim.runOnce()
-	firstIterationDuration := sim.Duration
+	firstIterationDuration := sim.CurrentTime
+	totalDuration := firstIterationDuration
 
 	if !sim.Options.Debug {
 		sim.Log = nil
 	}
 
-	st := time.Now()
+	var st time.Time
 	for i := int32(1); i < sim.Options.Iterations; i++ {
 		// fmt.Printf("Iteration: %d\n", i)
 		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*100 {
@@ -195,6 +221,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 			st = time.Now()
 		}
 		sim.runOnce()
+		totalDuration += sim.CurrentTime
 	}
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
@@ -202,6 +229,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 
 		Logs:                   logsBuffer.String(),
 		FirstIterationDuration: firstIterationDuration.Seconds(),
+		AvgIterationDuration:   totalDuration.Seconds() / float64(sim.Options.Iterations),
 	}
 
 	// Final progress report
@@ -224,7 +252,12 @@ func (sim *Simulation) runOnce() {
 			continue
 		}
 
-		if pa.NextActionAt > sim.Duration {
+		// Use duration as an end check if not using health.
+		if sim.Encounter.EndFightAtHealth == 0 {
+			if pa.NextActionAt > sim.Duration {
+				break
+			}
+		} else if sim.Encounter.EndFightAtHealth < sim.Encounter.DamageTaken {
 			break
 		}
 
@@ -245,10 +278,10 @@ func (sim *Simulation) runOnce() {
 	sim.Encounter.doneIteration(sim)
 
 	for _, unit := range sim.Raid.AllUnits {
-		unit.Metrics.doneIteration(sim.Duration.Seconds())
+		unit.Metrics.doneIteration(sim.CurrentTime.Seconds())
 	}
 	for _, target := range sim.Encounter.Targets {
-		target.Metrics.doneIteration(sim.Duration.Seconds())
+		target.Metrics.doneIteration(sim.CurrentTime.Seconds())
 	}
 }
 
@@ -268,10 +301,13 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
-	if !sim.executePhase && sim.CurrentTime >= sim.Encounter.executePhaseBegins {
-		sim.executePhase = true
-		for _, callback := range sim.executePhaseCallbacks {
-			callback(sim)
+	if !sim.executePhase {
+		if (sim.Encounter.EndFightAtHealth == 0 && sim.CurrentTime >= sim.Encounter.executePhaseBegins) ||
+			(sim.Encounter.EndFightAtHealth > 0 && sim.GetRemainingDurationPercent() <= 0.2) {
+			sim.executePhase = true
+			for _, callback := range sim.executePhaseCallbacks {
+				callback(sim)
+			}
 		}
 	}
 
@@ -294,10 +330,21 @@ func (sim *Simulation) IsExecutePhase() bool {
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {
+	if sim.Encounter.EndFightAtHealth > 0 {
+		if sim.Encounter.DamageTaken == 0 {
+			return sim.Duration - sim.CurrentTime
+		}
+		dps := sim.Encounter.DamageTaken / sim.CurrentTime.Seconds()
+		// Estimate time remaining via avg dps
+		return time.Duration((sim.Encounter.EndFightAtHealth-sim.Encounter.DamageTaken)/dps) * time.Second
+	}
 	return sim.Duration - sim.CurrentTime
 }
 
 // Returns the percentage of time remaining in the current iteration, as a value from 0-1.
 func (sim *Simulation) GetRemainingDurationPercent() float64 {
+	if sim.Encounter.EndFightAtHealth > 0 {
+		return 1.0 - sim.Encounter.DamageTaken/sim.Encounter.EndFightAtHealth
+	}
 	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
 }

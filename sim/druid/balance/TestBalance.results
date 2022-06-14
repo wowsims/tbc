@@ -811,8 +811,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Average-Default"
  value: {
-  dps: 1304.351302504682
-  tps: 1304.1992392506024
+  dps: 1306.9328891846278
+  tps: 1306.7805941675565
  }
 }
 dps_results: {

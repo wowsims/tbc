@@ -144,22 +144,10 @@ func (wp *WarlockPet) Initialize() {
 }
 
 func (wp *WarlockPet) Reset(sim *core.Simulation) {
-	// if sim.Log != nil {
-	// 	wp.Log(sim, "Total Pet stats: %s", wp.GetStats())
-	// 	inheritedStats := hunterPetStatInheritance(wp.hunterOwner.GetStats())
-	// 	wp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
-	// }
 
-	// uptime := core.MinFloat(1, core.MaxFloat(0, wp.owner.Options.PetUptime))
-	// wp.deathTime = time.Duration(float64(sim.Duration) * uptime)
 }
 
 func (wp *WarlockPet) OnGCDReady(sim *core.Simulation) {
-	// if sim.CurrentTime > wp.deathTime {
-	// 	wp.Disable(sim)
-	// 	return
-	// }
-
 	target := wp.CurrentTarget
 	if wp.config.RandomSelection {
 		if sim.RandomFloat("Warlock Pet Ability") < 0.5 {
