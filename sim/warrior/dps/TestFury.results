@@ -60,6 +60,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFury-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 900.9751461013294
+  tps: 686.4401094342934
+ }
+}
+dps_results: {
  key: "TestFury-AllItems-AncientAqirArtifact-33830"
  value: {
   dps: 891.5841307715184
@@ -445,6 +452,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFury-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 891.5841307715184
+  tps: 679.012206182051
+ }
+}
+dps_results: {
  key: "TestFury-AllItems-HandofJustice-11815"
  value: {
   dps: 912.7951053942804
@@ -631,6 +645,13 @@ dps_results: {
  value: {
   dps: 888.0655956190553
   tps: 676.605507709193
+ }
+}
+dps_results: {
+ key: "TestFury-AllItems-Redeemer'sAlchemistStone-35750"
+ value: {
+  dps: 891.5841307715184
+  tps: 679.012206182051
  }
 }
 dps_results: {

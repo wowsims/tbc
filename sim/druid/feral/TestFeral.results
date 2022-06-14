@@ -60,6 +60,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFeral-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 2246.008316943009
+  tps: 1630.0795700441988
+ }
+}
+dps_results: {
  key: "TestFeral-AllItems-AncientAqirArtifact-33830"
  value: {
   dps: 2193.202234282249
@@ -305,6 +312,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFeral-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 2193.202234282249
+  tps: 1592.854754527817
+ }
+}
+dps_results: {
  key: "TestFeral-AllItems-HandofJustice-11815"
  value: {
   dps: 2234.4778797400595
@@ -460,6 +474,13 @@ dps_results: {
 }
 dps_results: {
  key: "TestFeral-AllItems-Quagmirran'sEye-27683"
+ value: {
+  dps: 2193.202234282249
+  tps: 1592.854754527817
+ }
+}
+dps_results: {
+ key: "TestFeral-AllItems-Redeemer'sAlchemistStone-35750"
  value: {
   dps: 2193.202234282249
   tps: 1592.854754527817

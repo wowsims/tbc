@@ -60,6 +60,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 1179.743073889281
+  tps: 825.5671999860849
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-AncientAqirArtifact-33830"
  value: {
   dps: 1167.7913807439427
@@ -333,6 +340,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 1167.7913807439427
+  tps: 817.0972392746764
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-HandofJustice-11815"
  value: {
   dps: 1194.948216091495
@@ -467,6 +481,13 @@ dps_results: {
 }
 dps_results: {
  key: "TestMutilate-AllItems-Quagmirran'sEye-27683"
+ value: {
+  dps: 1167.7913807439427
+  tps: 817.0972392746764
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Redeemer'sAlchemistStone-35750"
  value: {
   dps: 1167.7913807439427
   tps: 817.0972392746764

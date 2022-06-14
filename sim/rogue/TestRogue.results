@@ -60,6 +60,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 1361.6715537280354
+  tps: 954.7679256075727
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-AncientAqirArtifact-33830"
  value: {
   dps: 1347.4280010279472
@@ -403,6 +410,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 1347.4280010279472
+  tps: 944.65500319051
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-HandofJustice-11815"
  value: {
   dps: 1383.3446104361092
@@ -568,6 +582,13 @@ dps_results: {
  value: {
   dps: 1347.4280010278587
   tps: 944.655003190448
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Redeemer'sAlchemistStone-35750"
+ value: {
+  dps: 1347.4280010279472
+  tps: 944.65500319051
  }
 }
 dps_results: {

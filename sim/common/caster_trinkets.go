@@ -33,7 +33,10 @@ func init() {
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
-	core.AddItemEffect(core.AlchStoneItemID, func(core.Agent) {})
+	for _, itemID := range core.AlchStoneItemIDs {
+		core.AddItemEffect(itemID, func(core.Agent) {})
+	}
+
 }
 
 func ApplyMarkOfTheChampionCaster(agent core.Agent) {
