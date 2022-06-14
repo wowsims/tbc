@@ -1,5 +1,4 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
-import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 import { TypedEvent } from './typed_event.js';
@@ -9,7 +8,6 @@ export class Encounter {
         this.duration = 180;
         this.durationVariation = 5;
         this.executeProportion = 0.2;
-        this.health = 0;
         this.useHealth = false;
         this.targetsChangeEmitter = new TypedEvent();
         this.durationChangeEmitter = new TypedEvent();
@@ -64,16 +62,6 @@ export class Encounter {
         this.durationChangeEmitter.emit(eventID);
         this.executeProportionChangeEmitter.emit(eventID);
     }
-    getHealth() {
-        return this.primaryTarget.getStats().getStat(Stat.StatHealth);
-    }
-    setHealth(eventID, newHealth) {
-        if (newHealth == this.health)
-            return;
-        let stats = this.primaryTarget.getStats();
-        this.primaryTarget.setStats(eventID, stats.withStat(Stat.StatHealth, newHealth));
-        this.targetsChangeEmitter.emit(eventID);
-    }
     getNumTargets() {
         return this.targets.length;
     }
@@ -103,8 +91,6 @@ export class Encounter {
             }
             newTargets.forEach((nt, i) => nt.applyPreset(eventID, preset.targets[i]));
             this.setTargets(eventID, newTargets);
-            // Set encounter health to the primary target's health.
-            this.setHealth(eventID, preset.targets[0].target.stats[Stat.StatHealth]);
         });
     }
     toProto() {

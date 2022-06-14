@@ -8,7 +8,6 @@ export declare class Encounter {
     private duration;
     private durationVariation;
     private executeProportion;
-    private health;
     private useHealth;
     private targets;
     readonly targetsChangeEmitter: TypedEvent<void>;
@@ -25,8 +24,6 @@ export declare class Encounter {
     setExecuteProportion(eventID: EventID, newExecuteProportion: number): void;
     getUseHealth(): boolean;
     setUseHealth(eventID: EventID, newUseHealth: boolean): void;
-    getHealth(): number;
-    setHealth(eventID: EventID, newHealth: number): void;
     getNumTargets(): number;
     getTargets(): Array<Target>;
     setTargets(eventID: EventID, newTargets: Array<Target>): void;
