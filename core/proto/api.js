@@ -1277,11 +1277,12 @@ class RaidSimResult$Type extends MessageType {
             { no: 2, name: "encounter_metrics", kind: "message", T: () => EncounterMetrics },
             { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "first_iteration_duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "avg_iteration_duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "error_result", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { logs: "", firstIterationDuration: 0, errorResult: "" };
+        const message = { logs: "", firstIterationDuration: 0, avgIterationDuration: 0, errorResult: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1303,6 +1304,9 @@ class RaidSimResult$Type extends MessageType {
                     break;
                 case /* double first_iteration_duration */ 4:
                     message.firstIterationDuration = reader.double();
+                    break;
+                case /* double avg_iteration_duration */ 6:
+                    message.avgIterationDuration = reader.double();
                     break;
                 case /* string error_result */ 5:
                     message.errorResult = reader.string();
@@ -1331,6 +1335,9 @@ class RaidSimResult$Type extends MessageType {
         /* double first_iteration_duration = 4; */
         if (message.firstIterationDuration !== 0)
             writer.tag(4, WireType.Bit64).double(message.firstIterationDuration);
+        /* double avg_iteration_duration = 6; */
+        if (message.avgIterationDuration !== 0)
+            writer.tag(6, WireType.Bit64).double(message.avgIterationDuration);
         /* string error_result = 5; */
         if (message.errorResult !== "")
             writer.tag(5, WireType.LengthDelimited).string(message.errorResult);
@@ -2174,13 +2181,14 @@ class ProgressMetrics$Type extends MessageType {
             { no: 2, name: "total_iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "completed_sims", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "total_sims", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 8, name: "presim_running", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "dps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 6, name: "final_raid_result", kind: "message", T: () => RaidSimResult },
             { no: 7, name: "final_weight_result", kind: "message", T: () => StatWeightsResult }
         ]);
     }
     create(value) {
-        const message = { completedIterations: 0, totalIterations: 0, completedSims: 0, totalSims: 0, dps: 0 };
+        const message = { completedIterations: 0, totalIterations: 0, completedSims: 0, totalSims: 0, presimRunning: false, dps: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2202,6 +2210,9 @@ class ProgressMetrics$Type extends MessageType {
                     break;
                 case /* int32 total_sims */ 4:
                     message.totalSims = reader.int32();
+                    break;
+                case /* bool presim_running */ 8:
+                    message.presimRunning = reader.bool();
                     break;
                 case /* double dps */ 5:
                     message.dps = reader.double();
@@ -2236,6 +2247,9 @@ class ProgressMetrics$Type extends MessageType {
         /* int32 total_sims = 4; */
         if (message.totalSims !== 0)
             writer.tag(4, WireType.Varint).int32(message.totalSims);
+        /* bool presim_running = 8; */
+        if (message.presimRunning !== false)
+            writer.tag(8, WireType.Varint).bool(message.presimRunning);
         /* double dps = 5; */
         if (message.dps !== 0)
             writer.tag(5, WireType.Bit64).double(message.dps);

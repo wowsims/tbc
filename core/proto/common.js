@@ -2350,11 +2350,12 @@ class Encounter$Type extends MessageType {
             { no: 1, name: "duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "duration_variation", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "execute_proportion", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "use_health", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Target }
         ]);
     }
     create(value) {
-        const message = { duration: 0, durationVariation: 0, executeProportion: 0, targets: [] };
+        const message = { duration: 0, durationVariation: 0, executeProportion: 0, useHealth: false, targets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2373,6 +2374,9 @@ class Encounter$Type extends MessageType {
                     break;
                 case /* double execute_proportion */ 3:
                     message.executeProportion = reader.double();
+                    break;
+                case /* bool use_health */ 5:
+                    message.useHealth = reader.bool();
                     break;
                 case /* repeated proto.Target targets */ 2:
                     message.targets.push(Target.internalBinaryRead(reader, reader.uint32(), options));
@@ -2398,6 +2402,9 @@ class Encounter$Type extends MessageType {
         /* double execute_proportion = 3; */
         if (message.executeProportion !== 0)
             writer.tag(3, WireType.Bit64).double(message.executeProportion);
+        /* bool use_health = 5; */
+        if (message.useHealth !== false)
+            writer.tag(5, WireType.Varint).bool(message.useHealth);
         /* repeated proto.Target targets = 2; */
         for (let i = 0; i < message.targets.length; i++)
             Target.internalBinaryWrite(message.targets[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();

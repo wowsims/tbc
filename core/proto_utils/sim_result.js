@@ -23,7 +23,7 @@ class SimResultData {
         return this.request.simOptions?.iterations || 1;
     }
     get duration() {
-        return this.request.encounter?.duration || 1;
+        return this.result.avgIterationDuration || 1;
     }
     get firstIterationDuration() {
         return this.result.firstIterationDuration || 1;

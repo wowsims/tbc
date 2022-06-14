@@ -28,16 +28,30 @@ export class RaidSimResultsManager {
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     setSimProgress(progress) {
-        this.simUI.resultsViewer.setContent(`
-			<div class="results-sim">
-					<div class="results-sim-dps">
-						<span class="topline-result-avg">${progress.dps.toFixed(2)}</span>
-					</div>
-					<div class="">
-						${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
-					</div>
-			</div>
-		`);
+        if (progress.presimRunning) {
+            this.simUI.resultsViewer.setContent(`
+				<div class="results-sim">
+						<div class="results-sim-dps">
+							<span class="topline-result-avg">${progress.dps.toFixed(2)}</span>
+						</div>
+						<div class="">
+							presimulations running
+						</div>
+				</div>
+			`);
+        }
+        else {
+            this.simUI.resultsViewer.setContent(`
+				<div class="results-sim">
+						<div class="results-sim-dps">
+							<span class="topline-result-avg">${progress.dps.toFixed(2)}</span>
+						</div>
+						<div class="">
+							${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
+						</div>
+				</div>
+			`);
+        }
     }
     setSimResult(eventID, simResult) {
         this.currentData = {
@@ -227,6 +241,9 @@ export class RaidSimResultsManager {
 					<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
 				</div>
 			`;
+        }
+        if (simResult.request.encounter?.useHealth) {
+            content += `<div class="results-sim-dur"><span class="topline-result-avg">${simResult.result.avgIterationDuration.toFixed(2)}s</span></div>`;
         }
         return content;
     }

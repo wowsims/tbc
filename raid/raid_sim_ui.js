@@ -167,7 +167,7 @@ export class RaidSimUI extends SimUI {
                 Stat.StatArmor,
             ],
             showExecuteProportion: true,
-        });
+        }, true);
         const savedEncounterManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-encounter-manager')[0], this.sim.encounter, {
             label: 'Encounter',
             storageKey: this.getSavedEncounterStorageKey(),

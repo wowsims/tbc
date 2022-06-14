@@ -548,6 +548,12 @@ export interface Encounter {
      */
     executeProportion: number;
     /**
+     * If set, will use the targets health value instead of a duration for fight length.
+     *
+     * @generated from protobuf field: bool use_health = 5;
+     */
+    useHealth: boolean;
+    /**
      * If type != Simple or Custom, then this may be empty.
      *
      * @generated from protobuf field: repeated proto.Target targets = 2;

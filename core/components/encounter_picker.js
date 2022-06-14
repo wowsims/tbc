@@ -12,7 +12,7 @@ import { Component } from './component.js';
 import { Popup } from './popup.js';
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
 export class EncounterPicker extends Component {
-    constructor(parent, modEncounter, config) {
+    constructor(parent, modEncounter, config, showHealthPicker) {
         super(parent, 'encounter-picker-root');
         addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion);
         new EnumPicker(this.rootElem, modEncounter, {
@@ -53,12 +53,12 @@ export class EncounterPicker extends Component {
         const advancedButton = document.createElement('button');
         advancedButton.classList.add('sim-button', 'advanced-button');
         advancedButton.textContent = 'ADVANCED';
-        advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter));
+        advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter, showHealthPicker));
         this.rootElem.appendChild(advancedButton);
     }
 }
 class AdvancedEncounterPicker extends Popup {
-    constructor(parent, encounter) {
+    constructor(parent, encounter, showHealthPicker) {
         super(parent);
         this.encounter = encounter;
         this.rootElem.classList.add('advanced-encounter-picker');
@@ -93,6 +93,17 @@ class AdvancedEncounterPicker extends Popup {
         const header = this.rootElem.getElementsByClassName('encounter-header')[0];
         const targetsElem = this.rootElem.getElementsByClassName('encounter-targets')[0];
         addEncounterFieldPickers(header, this.encounter, true);
+        if (showHealthPicker) {
+            new BooleanPicker(header, encounter, {
+                label: 'Use Health',
+                labelTooltip: 'Uses a damage limit in place of a duration limit. Damage limit is equal to sum of all targets health.',
+                changedEvent: (encounter) => encounter.changeEmitter,
+                getValue: (encounter) => encounter.getUseHealth(),
+                setValue: (eventID, encounter, newValue) => {
+                    encounter.setUseHealth(eventID, newValue);
+                },
+            });
+        }
         new ListPicker(targetsElem, this.encounter, {
             extraCssClasses: [
                 'targets-picker',
@@ -285,35 +296,38 @@ function addEncounterFieldPickers(rootElem, encounter, showExecuteProportion) {
     new NumberPicker(rootElem, encounter, {
         label: 'Duration',
         labelTooltip: 'The fight length for each sim iteration, in seconds.',
-        changedEvent: (encounter) => encounter.durationChangeEmitter,
+        changedEvent: (encounter) => encounter.changeEmitter,
         getValue: (encounter) => encounter.getDuration(),
         setValue: (eventID, encounter, newValue) => {
             encounter.setDuration(eventID, newValue);
         },
+        enableWhen: (obj) => { return !encounter.getUseHealth(); },
     });
     new NumberPicker(rootElem, encounter, {
         label: 'Duration +/-',
         labelTooltip: 'Adds a random amount of time, in seconds, between [value, -1 * value] to each sim iteration. For example, setting Duration to 180 and Duration +/- to 10 will result in random durations between 170s and 190s.',
-        changedEvent: (encounter) => encounter.durationChangeEmitter,
+        changedEvent: (encounter) => encounter.changeEmitter,
         getValue: (encounter) => encounter.getDurationVariation(),
         setValue: (eventID, encounter, newValue) => {
             encounter.setDurationVariation(eventID, newValue);
         },
+        enableWhen: (obj) => { return !encounter.getUseHealth(); },
     });
     if (showExecuteProportion) {
         new NumberPicker(rootElem, encounter, {
             label: 'Execute Duration (%)',
             labelTooltip: 'Percentage of the total encounter duration, for which the targets will be considered to be in execute range (< 20% HP) for the purpose of effects like Warrior Execute or Mage Molten Fury.',
-            changedEvent: (encounter) => encounter.executeProportionChangeEmitter,
+            changedEvent: (encounter) => encounter.changeEmitter,
             getValue: (encounter) => encounter.getExecuteProportion() * 100,
             setValue: (eventID, encounter, newValue) => {
                 encounter.setExecuteProportion(eventID, newValue / 100);
             },
+            enableWhen: (obj) => { return !encounter.getUseHealth(); },
         });
     }
 }
 const ALL_TARGET_STATS = [
-    { stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.', extraCssClasses: [] },
+    { stat: Stat.StatHealth, tooltip: '', extraCssClasses: [] },
     { stat: Stat.StatArmor, tooltip: '', extraCssClasses: [] },
     { stat: Stat.StatArcaneResistance, tooltip: '', extraCssClasses: [] },
     { stat: Stat.StatFireResistance, tooltip: '', extraCssClasses: [] },

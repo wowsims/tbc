@@ -560,6 +560,10 @@ export interface RaidSimResult {
      */
     firstIterationDuration: number;
     /**
+     * @generated from protobuf field: double avg_iteration_duration = 6;
+     */
+    avgIterationDuration: number;
+    /**
      * @generated from protobuf field: string error_result = 5;
      */
     errorResult: string;
@@ -803,6 +807,10 @@ export interface ProgressMetrics {
      * @generated from protobuf field: int32 total_sims = 4;
      */
     totalSims: number;
+    /**
+     * @generated from protobuf field: bool presim_running = 8;
+     */
+    presimRunning: boolean;
     /**
      * Partial Results
      *

@@ -6,5 +6,5 @@ export interface EncounterPickerConfig {
     showExecuteProportion: boolean;
 }
 export declare class EncounterPicker extends Component {
-    constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig);
+    constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig, showHealthPicker: boolean);
 }
