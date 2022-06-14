@@ -68,12 +68,14 @@ func (druid *Druid) registerCatFormSpell() {
 			druid.AutoAttacks.EnableAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
 			druid.PseudoStats.SpiritRegenMultiplier *= AnimalSpiritRegenSuppression
+			druid.UpdateManaRegenRates()
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			druid.form = Humanoid
 			druid.AutoAttacks.CancelAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
 			druid.PseudoStats.SpiritRegenMultiplier /= AnimalSpiritRegenSuppression
+			druid.UpdateManaRegenRates()
 		},
 	})
 
@@ -144,6 +146,7 @@ func (druid *Druid) registerBearFormSpell() {
 			druid.AutoAttacks.EnableAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
 			druid.PseudoStats.SpiritRegenMultiplier *= AnimalSpiritRegenSuppression
+			druid.UpdateManaRegenRates()
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			previousRage = druid.CurrentRage()
@@ -151,6 +154,7 @@ func (druid *Druid) registerBearFormSpell() {
 			druid.AutoAttacks.CancelAutoSwing(sim)
 			druid.manageCooldownsEnabled(sim)
 			druid.PseudoStats.SpiritRegenMultiplier /= AnimalSpiritRegenSuppression
+			druid.UpdateManaRegenRates()
 		},
 	})
 
