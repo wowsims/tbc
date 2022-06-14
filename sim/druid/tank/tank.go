@@ -111,3 +111,8 @@ func (bear *FeralTankDruid) Initialize() {
 	bear.Druid.Initialize()
 	bear.RegisterBearSpells(float64(bear.Rotation.MaulRageThreshold))
 }
+
+func (bear *FeralTankDruid) Reset(sim *core.Simulation) {
+	bear.Druid.Reset(sim)
+	//bear.BearFormAura.Activate(sim)
+}

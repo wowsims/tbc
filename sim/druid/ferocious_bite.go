@@ -34,11 +34,9 @@ func (druid *Druid) registerFerociousBiteSpell() {
 			},
 			IgnoreHaste: true,
 			ModifyCast: func(sim *core.Simulation, spell *core.Spell, cast *core.Cast) {
-				clearcasting := druid.ClearcastingActive()
 				druid.ApplyClearcasting(sim, spell, cast)
-
+				excessEnergy = spell.Unit.CurrentEnergy() - cast.Cost
 				cast.Cost = spell.Unit.CurrentEnergy()
-				excessEnergy = core.TernaryFloat64(clearcasting, cast.Cost, cast.Cost-spell.BaseCost)
 			},
 		},
 
