@@ -244,6 +244,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                 // Preset talents that the user can quickly select.
                 talents: [
                     Presets.StandardTalents,
+                    Presets.MonocatTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [

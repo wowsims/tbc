@@ -5,6 +5,10 @@ export declare const StandardTalents: {
     name: string;
     data: string;
 };
+export declare const MonocatTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: FeralDruidRotation;
 export declare const DefaultOptions: FeralDruidOptions;
 export declare const DefaultConsumes: Consumes;
