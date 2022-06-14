@@ -81,6 +81,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArms-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 694.156539387769
+  tps: 589.0472832957247
+ }
+}
+dps_results: {
  key: "TestArms-AllItems-BadgeofTenacity-32658"
  value: {
   dps: 680.6373860920793

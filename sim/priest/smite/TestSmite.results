@@ -88,6 +88,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestSmite-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 1127.9489329503785
+  tps: 1101.081724871747
+ }
+}
+dps_results: {
  key: "TestSmite-AllItems-AvatarRegalia"
  value: {
   dps: 998.5565336023292

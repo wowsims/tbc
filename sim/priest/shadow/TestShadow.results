@@ -88,6 +88,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 1508.1420487951266
+  tps: 1181.4601332272166
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-AvatarRegalia"
  value: {
   dps: 1362.007713051156

@@ -81,6 +81,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFeral-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 2228.7407555759673
+  tps: 1618.0871046463574
+ }
+}
+dps_results: {
  key: "TestFeral-AllItems-BadgeofTenacity-32658"
  value: {
   dps: 2241.191317001036

@@ -81,6 +81,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 1194.1891394270492
+  tps: 835.8396479396822
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-AssassinationArmor"
  value: {
   dps: 1035.72161241677
