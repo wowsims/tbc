@@ -30,6 +30,7 @@ func (druid *Druid) registerMangleBearSpell() {
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 			CD: core.Cooldown{
 				Timer:    druid.NewTimer(),
@@ -81,6 +82,7 @@ func (druid *Druid) registerMangleCatSpell() {
 				Cost: cost,
 				GCD:  time.Second,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 

@@ -29,6 +29,7 @@ func (druid *Druid) registerShredSpell() {
 				Cost: baseCost,
 				GCD:  time.Second,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 

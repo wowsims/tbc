@@ -27,6 +27,7 @@ func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 			DefaultCast: core.Cast{
 				Cost: cost,
 			},
+			ModifyCast: druid.ApplyClearcasting,
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

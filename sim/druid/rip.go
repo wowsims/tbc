@@ -26,6 +26,7 @@ func (druid *Druid) registerRipSpell() {
 				Cost: baseCost,
 				GCD:  time.Second,
 			},
+			ModifyCast:  druid.ApplyClearcasting,
 			IgnoreHaste: true,
 		},
 
