@@ -640,7 +640,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	}
 }
 
-const AlchStoneItemID = 35749
+var AlchStoneItemIDs = []int32{13503, 35748, 35749, 35750, 35751}
 
 func makePotionActivation(potionType proto.Potions, character *Character, potionCD *Timer) (MajorCooldown, *Spell) {
 	if potionType == proto.Potions_DestructionPotion {
@@ -669,7 +669,10 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			})
 	} else if potionType == proto.Potions_SuperManaPotion {
-		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
+		alchStoneEquipped := false
+		for _, itemID := range AlchStoneItemIDs {
+			alchStoneEquipped = alchStoneEquipped || character.HasTrinketEquipped(itemID)
+		}
 		actionID := ActionID{ItemID: 22832}
 		manaMetrics := character.NewManaMetrics(actionID)
 		return MajorCooldown{
@@ -768,7 +771,10 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 
 		// Restores 3200 mana over 24 seconds.
 		manaGain := 3200.0
-		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
+		alchStoneEquipped := false
+		for _, itemID := range AlchStoneItemIDs {
+			alchStoneEquipped = alchStoneEquipped || character.HasTrinketEquipped(itemID)
+		}
 		if alchStoneEquipped {
 			manaGain *= 1.4
 		}

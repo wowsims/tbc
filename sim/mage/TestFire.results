@@ -60,6 +60,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 1657.4447566566007
+  tps: 1395.623541754131
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-AldorRegalia"
  value: {
   dps: 1442.6118440136415
@@ -78,6 +85,13 @@ dps_results: {
  value: {
   dps: 1543.8635541828633
   tps: 1294.0646976102817
+ }
+}
+dps_results: {
+ key: "TestFire-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 1625.5887320604418
+  tps: 1368.0897674782473
  }
 }
 dps_results: {
@@ -354,6 +368,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 1625.5887320604418
+  tps: 1368.0897674782473
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-HandofJustice-11815"
  value: {
   dps: 1539.7942944435317
@@ -491,6 +512,13 @@ dps_results: {
  value: {
   dps: 1523.734745152226
   tps: 1283.046557310449
+ }
+}
+dps_results: {
+ key: "TestFire-AllItems-Redeemer'sAlchemistStone-35750"
+ value: {
+  dps: 1655.8192999511666
+  tps: 1392.7069670927451
  }
 }
 dps_results: {

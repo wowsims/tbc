@@ -107,6 +107,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-Alchemist'sStone-13503"
+ value: {
+  dps: 483.969395237734
+  tps: 849.7508308402364
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-AncientAqirArtifact-33830"
  value: {
   dps: 474.3632269680199
@@ -118,6 +125,13 @@ dps_results: {
  value: {
   dps: 480.78327253079107
   tps: 843.675068194092
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-Assassin'sAlchemistStone-35751"
+ value: {
+  dps: 490.1951647643265
+  tps: 859.8886666796893
  }
 }
 dps_results: {
@@ -506,6 +520,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-Guardian'sAlchemistStone-35748"
+ value: {
+  dps: 474.3632269680199
+  tps: 833.0776679608915
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-HandofJustice-11815"
  value: {
   dps: 491.296586785735
@@ -682,6 +703,13 @@ dps_results: {
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Quagmirran'sEye-27683"
+ value: {
+  dps: 474.3632269680199
+  tps: 833.0776679608915
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-Redeemer'sAlchemistStone-35750"
  value: {
   dps: 474.3632269680199
   tps: 833.0776679608915
