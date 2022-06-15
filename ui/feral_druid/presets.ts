@@ -41,6 +41,7 @@ export const DefaultRotation = FeralDruidRotation.create({
 	biteMinComboPoints: 5,
 	rakeTrick: false,
 	ripweave: false,
+	maintainFaerieFire: true,
 });
 
 export const DefaultOptions = FeralDruidOptions.create({

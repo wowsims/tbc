@@ -48,6 +48,10 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 
 	rotation := &cat.Rotation
 
+	if cat.Rotation.maintain_faerie_fire && cat.ShouldFaerieFire(sim) {
+		return cat.FaerieFire.Cast(sim, cat.CurrentTarget)
+	}
+
 	energy := cat.CurrentEnergy()
 	cp := cat.ComboPoints()
 	rip_debuff := cat.RipDot.IsActive()
@@ -265,6 +269,8 @@ type FeralDruidRotation struct {
 	use_rip_trick    bool
 	use_rake_trick   bool
 	wolfshead        bool
+
+	maintain_faerie_fire bool
 }
 
 func (cat *FeralDruid) setupRotation(rotation *proto.FeralDruid_Rotation) {
@@ -287,6 +293,8 @@ func (cat *FeralDruid) setupRotation(rotation *proto.FeralDruid_Rotation) {
 		use_rip_trick:    rotation.Ripweave,
 		use_rake_trick:   rotation.RakeTrick && !druid.ItemSetThunderheartHarness.CharacterHasSetBonus(&cat.Character, 2),
 		wolfshead:        cat.Equip[items.ItemSlotHead].ID == 8345,
+
+		maintain_faerie_fire: rotation.MaintainFaerieFire,
 	}
 
 }

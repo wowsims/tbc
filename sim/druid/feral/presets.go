@@ -41,6 +41,7 @@ var PlayerOptionsBiteweave = &proto.Player_FeralDruid{
 			BiteMinComboPoints: 5,
 			RakeTrick:          false,
 			Ripweave:           false,
+			MaintainFaerieFire: true,
 		},
 	},
 }
