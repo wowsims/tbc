@@ -277,6 +277,7 @@ func applyInspiration(character *Character, uptime float64) {
 	if uptime <= 0 {
 		return
 	}
+	uptime = MinFloat(1, uptime)
 
 	var curBonus stats.Stats
 	inspirationAura := character.RegisterAura(Aura{
@@ -292,11 +293,15 @@ func applyInspiration(character *Character, uptime float64) {
 		},
 	})
 
+	tickLength := time.Millisecond * 2500
+	ticksPer15Seconds := float64(time.Second*15) / float64(tickLength)
+	chancePerTick := TernaryFloat64(uptime == 1, 1, 1.0-math.Pow(1-uptime, 1/ticksPer15Seconds))
+
 	character.RegisterResetEffect(func(sim *Simulation) {
 		StartPeriodicAction(sim, PeriodicActionOptions{
-			Period: time.Second * 15,
+			Period: tickLength,
 			OnAction: func(sim *Simulation) {
-				if sim.RandomFloat("Inspiration") < uptime {
+				if sim.RandomFloat("Inspiration") < chancePerTick {
 					inspirationAura.Activate(sim)
 				}
 			},
@@ -308,7 +313,11 @@ func applyInspiration(character *Character, uptime float64) {
 			NumTicks: 1,
 			OnAction: func(sim *Simulation) {
 				if sim.RandomFloat("Inspiration") < uptime {
+					// Use random duration to compensate for increased chance collapsed into single tick.
+					randomDur := time.Duration(float64(time.Second*15) * sim.RandomFloat("InspirationDur"))
+					inspirationAura.Duration = randomDur
 					inspirationAura.Activate(sim)
+					inspirationAura.Duration = time.Second * 15
 				}
 			},
 		})
