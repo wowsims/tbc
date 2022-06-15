@@ -748,22 +748,22 @@ dps_results: {
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-NoBuffs-LongMultiTarget"
  value: {
-  dps: 780.8070824225917
-  tps: 554.37302852004
+  dps: 796.9607107012963
+  tps: 568.3225605979204
  }
 }
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-NoBuffs-LongSingleTarget"
  value: {
-  dps: 780.8070824225917
-  tps: 554.37302852004
+  dps: 796.9607107012963
+  tps: 568.3225605979204
  }
 }
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 945.6822399734377
-  tps: 671.4343903811408
+  dps: 969.853253816102
+  tps: 691.7198102094321
  }
 }
 dps_results: {
