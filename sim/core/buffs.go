@@ -222,6 +222,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
+	applyInspiration(character, individualBuffs.InspirationUptime)
+
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
 	registerPowerInfusionCD(agent, individualBuffs.PowerInfusions)
 	registerManaTideTotemCD(agent, partyBuffs.ManaTideTotems)
@@ -269,6 +271,48 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 	partyBuffs.BraidedEterniumChain = false
 
 	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+}
+
+func applyInspiration(character *Character, uptime float64) {
+	if uptime <= 0 {
+		return
+	}
+
+	var curBonus stats.Stats
+	inspirationAura := character.RegisterAura(Aura{
+		Label:    "Inspiration",
+		ActionID: ActionID{SpellID: 15363},
+		Duration: time.Second * 15,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			curBonus = character.ApplyStatDependencies(stats.Stats{stats.Armor: character.GetStat(stats.Armor) * 0.25})
+			character.AddStatsDynamic(sim, curBonus)
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			character.AddStatsDynamic(sim, curBonus.Multiply(-1))
+		},
+	})
+
+	character.RegisterResetEffect(func(sim *Simulation) {
+		StartPeriodicAction(sim, PeriodicActionOptions{
+			Period: time.Second * 15,
+			OnAction: func(sim *Simulation) {
+				if sim.RandomFloat("Inspiration") < uptime {
+					inspirationAura.Activate(sim)
+				}
+			},
+		})
+
+		// Also try once at the start.
+		StartPeriodicAction(sim, PeriodicActionOptions{
+			Period:   1,
+			NumTicks: 1,
+			OnAction: func(sim *Simulation) {
+				if sim.RandomFloat("Inspiration") < uptime {
+					inspirationAura.Activate(sim)
+				}
+			},
+		})
+	})
 }
 
 func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) *Aura {
