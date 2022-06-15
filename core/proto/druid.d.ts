@@ -317,6 +317,10 @@ export interface FeralDruid_Rotation {
      * @generated from protobuf field: bool rake_trick = 7;
      */
     rakeTrick: boolean;
+    /**
+     * @generated from protobuf field: bool maintain_faerie_fire = 9;
+     */
+    maintainFaerieFire: boolean;
 }
 /**
  * @generated from protobuf enum proto.FeralDruid.Rotation.FinishingMove

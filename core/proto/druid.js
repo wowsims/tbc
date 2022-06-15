@@ -668,11 +668,12 @@ class FeralDruid_Rotation$Type extends MessageType {
             { no: 8, name: "ripweave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "rip_min_combo_points", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "bite_min_combo_points", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "rake_trick", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 7, name: "rake_trick", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "maintain_faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { finishingMove: 0, mangleTrick: false, biteweave: false, ripweave: false, ripMinComboPoints: 0, biteMinComboPoints: 0, rakeTrick: false };
+        const message = { finishingMove: 0, mangleTrick: false, biteweave: false, ripweave: false, ripMinComboPoints: 0, biteMinComboPoints: 0, rakeTrick: false, maintainFaerieFire: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -703,6 +704,9 @@ class FeralDruid_Rotation$Type extends MessageType {
                     break;
                 case /* bool rake_trick */ 7:
                     message.rakeTrick = reader.bool();
+                    break;
+                case /* bool maintain_faerie_fire */ 9:
+                    message.maintainFaerieFire = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -737,6 +741,9 @@ class FeralDruid_Rotation$Type extends MessageType {
         /* bool rake_trick = 7; */
         if (message.rakeTrick !== false)
             writer.tag(7, WireType.Varint).bool(message.rakeTrick);
+        /* bool maintain_faerie_fire = 9; */
+        if (message.maintainFaerieFire !== false)
+            writer.tag(9, WireType.Varint).bool(message.maintainFaerieFire);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

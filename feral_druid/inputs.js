@@ -205,5 +205,23 @@ export const FeralDruidRotationConfig = {
                 enableWhen: (player) => numThunderheartPieces(player) < 2,
             },
         },
+        {
+            type: 'boolean',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
+                    'maintain-faerie-fire-picker',
+                ],
+                label: 'Maintain Faerie Fire',
+                labelTooltip: 'Use Faerie Fire whenever it is not active on the target.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().maintainFaerieFire,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.maintainFaerieFire = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
     ],
 };
