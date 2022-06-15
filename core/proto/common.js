@@ -1669,11 +1669,12 @@ class IndividualBuffs$Type extends MessageType {
             { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 7, name: "unleashed_rage", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "innervates", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "power_infusions", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 6, name: "power_infusions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 10, name: "inspiration_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfSanctuary: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
+        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfSanctuary: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0, inspirationUptime: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1710,6 +1711,9 @@ class IndividualBuffs$Type extends MessageType {
                     break;
                 case /* int32 power_infusions */ 6:
                     message.powerInfusions = reader.int32();
+                    break;
+                case /* double inspiration_uptime */ 10:
+                    message.inspirationUptime = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1750,6 +1754,9 @@ class IndividualBuffs$Type extends MessageType {
         /* int32 power_infusions = 6; */
         if (message.powerInfusions !== 0)
             writer.tag(6, WireType.Varint).int32(message.powerInfusions);
+        /* double inspiration_uptime = 10; */
+        if (message.inspirationUptime !== 0)
+            writer.tag(10, WireType.Bit64).double(message.inspirationUptime);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

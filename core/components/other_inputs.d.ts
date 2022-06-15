@@ -94,6 +94,18 @@ export declare const ISBUptime: {
         setValue: (eventID: EventID, raid: Raid, newValue: number) => void;
     };
 };
+export declare const InspirationUptime: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => number;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+    };
+};
 export declare const ExposeWeaknessUptime: {
     type: "number";
     getModObject: (simUI: IndividualSimUI<any>) => Raid;

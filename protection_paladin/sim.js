@@ -273,6 +273,7 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
                     ProtectionPaladinInputs.UseAvengingWrath,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
+                    OtherInputs.InspirationUptime,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.SnapshotImprovedWrathOfAirTotem,
                     OtherInputs.TankAssignment,

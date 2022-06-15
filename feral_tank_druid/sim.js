@@ -244,6 +244,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
+                    OtherInputs.InspirationUptime,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.SnapshotBsSolarianSapphire,
                     OtherInputs.SnapshotBsT2,

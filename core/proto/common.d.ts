@@ -235,6 +235,10 @@ export interface IndividualBuffs {
      * @generated from protobuf field: int32 power_infusions = 6;
      */
     powerInfusions: number;
+    /**
+     * @generated from protobuf field: double inspiration_uptime = 10;
+     */
+    inspirationUptime: number;
 }
 /**
  * @generated from protobuf message proto.Consumes

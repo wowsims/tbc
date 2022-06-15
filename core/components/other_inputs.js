@@ -190,6 +190,24 @@ export const ISBUptime = {
         },
     },
 };
+export const InspirationUptime = {
+    type: 'number',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'inspiration-uptime-picker',
+        ],
+        label: 'Inspiration Uptime %',
+        labelTooltip: "Uptime for the Inspiration or Ancestral Fortitude (+25% armor) buffs.",
+        changedEvent: (player) => player.buffsChangeEmitter,
+        getValue: (player) => Math.round(player.getBuffs().inspirationUptime * 100),
+        setValue: (eventID, player, newValue) => {
+            const newBuffs = player.getBuffs();
+            newBuffs.inspirationUptime = newValue / 100;
+            player.setBuffs(eventID, newBuffs);
+        },
+    },
+};
 export const ExposeWeaknessUptime = {
     type: 'number',
     getModObject: (simUI) => simUI.sim.raid,

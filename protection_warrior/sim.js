@@ -249,6 +249,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     ProtectionWarriorInputs.PrecastShoutWithT2,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
+                    OtherInputs.InspirationUptime,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.TankAssignment,
                     OtherInputs.InFrontOfTarget,
