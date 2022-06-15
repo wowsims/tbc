@@ -165,7 +165,6 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 
 			character.RegisterAura(Aura{
 				Label:    "Gift of Arthas",
-				ActionID: actionID,
 				Duration: NeverExpires,
 				OnReset: func(aura *Aura, sim *Simulation) {
 					aura.Activate(sim)
