@@ -411,6 +411,8 @@ message IndividualBuffs {
     // How many of each of these buffs the player will be receiving.
     int32 innervates = 5;
     int32 power_infusions = 6;
+
+		double inspiration_uptime = 10;
 }
 
 message Consumes {
