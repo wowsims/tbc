@@ -18,6 +18,7 @@ import { PartyBuffs } from './common.js';
 import { RaidTarget } from './common.js';
 import { Debuffs } from './common.js';
 import { RaidBuffs } from './common.js';
+import { Faction } from './common.js';
 // @generated message type with reflection information, may provide speed optimized methods
 class SimSettings$Type extends MessageType {
     constructor() {
@@ -26,11 +27,12 @@ class SimSettings$Type extends MessageType {
             { no: 2, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "fixed_rng_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 4, name: "show_threat_metrics", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "show_experimental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "show_experimental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "faction", kind: "enum", T: () => ["proto.Faction", Faction] }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false, showExperimental: false };
+        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false, showExperimental: false, faction: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -55,6 +57,9 @@ class SimSettings$Type extends MessageType {
                     break;
                 case /* bool show_experimental */ 5:
                     message.showExperimental = reader.bool();
+                    break;
+                case /* proto.Faction faction */ 6:
+                    message.faction = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -83,6 +88,9 @@ class SimSettings$Type extends MessageType {
         /* bool show_experimental = 5; */
         if (message.showExperimental !== false)
             writer.tag(5, WireType.Varint).bool(message.showExperimental);
+        /* proto.Faction faction = 6; */
+        if (message.faction !== 0)
+            writer.tag(6, WireType.Varint).int32(message.faction);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -618,11 +626,13 @@ class SavedRaid$Type extends MessageType {
         super("proto.SavedRaid", [
             { no: 1, name: "raid", kind: "message", T: () => Raid },
             { no: 2, name: "buff_bots", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuffBot },
-            { no: 3, name: "blessings", kind: "message", T: () => BlessingsAssignments }
+            { no: 3, name: "blessings", kind: "message", T: () => BlessingsAssignments },
+            { no: 4, name: "faction", kind: "enum", T: () => ["proto.Faction", Faction] },
+            { no: 5, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { buffBots: [] };
+        const message = { buffBots: [], faction: 0, phase: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -641,6 +651,12 @@ class SavedRaid$Type extends MessageType {
                     break;
                 case /* proto.BlessingsAssignments blessings */ 3:
                     message.blessings = BlessingsAssignments.internalBinaryRead(reader, reader.uint32(), options, message.blessings);
+                    break;
+                case /* proto.Faction faction */ 4:
+                    message.faction = reader.int32();
+                    break;
+                case /* int32 phase */ 5:
+                    message.phase = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -663,6 +679,12 @@ class SavedRaid$Type extends MessageType {
         /* proto.BlessingsAssignments blessings = 3; */
         if (message.blessings)
             BlessingsAssignments.internalBinaryWrite(message.blessings, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Faction faction = 4; */
+        if (message.faction !== 0)
+            writer.tag(4, WireType.Varint).int32(message.faction);
+        /* int32 phase = 5; */
+        if (message.phase !== 0)
+            writer.tag(5, WireType.Varint).int32(message.phase);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

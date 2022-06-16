@@ -3,7 +3,7 @@ import { Drums } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { talentTreeIcons } from '/tbc/core/proto_utils/utils.js';

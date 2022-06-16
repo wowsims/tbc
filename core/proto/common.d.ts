@@ -959,6 +959,23 @@ export declare enum Race {
     RaceUndead = 11
 }
 /**
+ * @generated from protobuf enum proto.Faction
+ */
+export declare enum Faction {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Unknown = 0,
+    /**
+     * @generated from protobuf enum value: Alliance = 1;
+     */
+    Alliance = 1,
+    /**
+     * @generated from protobuf enum value: Horde = 2;
+     */
+    Horde = 2
+}
+/**
  * @generated from protobuf enum proto.ShattrathFaction
  */
 export declare enum ShattrathFaction {

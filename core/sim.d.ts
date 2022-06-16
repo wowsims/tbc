@@ -1,3 +1,4 @@
+import { Faction } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -31,6 +32,7 @@ export declare class Sim {
     private readonly workerPool;
     private iterations;
     private phase;
+    private faction;
     private fixedRngSeed;
     private show1hWeapons;
     private show2hWeapons;
@@ -46,6 +48,7 @@ export declare class Sim {
     private presetTargets;
     readonly iterationsChangeEmitter: TypedEvent<void>;
     readonly phaseChangeEmitter: TypedEvent<void>;
+    readonly factionChangeEmitter: TypedEvent<void>;
     readonly fixedRngSeedChangeEmitter: TypedEvent<void>;
     readonly lastUsedRngSeedChangeEmitter: TypedEvent<void>;
     readonly show1hWeaponsChangeEmitter: TypedEvent<void>;
@@ -83,6 +86,8 @@ export declare class Sim {
     getAllPresetTargets(): Array<PresetTarget>;
     getPhase(): number;
     setPhase(eventID: EventID, newPhase: number): void;
+    getFaction(): Faction;
+    setFaction(eventID: EventID, newFaction: Faction): void;
     getFixedRngSeed(): number;
     setFixedRngSeed(eventID: EventID, newFixedRngSeed: number): void;
     static MAX_RNG_SEED: number;

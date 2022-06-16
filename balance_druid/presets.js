@@ -4,7 +4,7 @@ import { Food } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { BalanceDruid_Rotation as BalanceDruidRotation, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';

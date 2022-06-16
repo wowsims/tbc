@@ -4,9 +4,9 @@ import { MAX_PARTY_SIZE } from "/tbc/core/party.js";
 import { BuffBot, RaidSimSettings } from "/tbc/core/proto/ui.js";
 import { TypedEvent } from "/tbc/core/typed_event.js";
 import { Party, Player, Raid } from "../core/proto/api.js";
-import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget } from "../core/proto/common.js";
+import { Encounter, EquipmentSpec, ItemSpec, MobType, Spec, Target, RaidTarget, Faction } from "../core/proto/common.js";
 import { nameToClass } from "../core/proto_utils/names.js";
-import { Faction, makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec } from "../core/proto_utils/utils.js";
+import { makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec } from "../core/proto_utils/utils.js";
 import { MAX_NUM_PARTIES } from "../core/raid.js";
 import { playerPresets } from "./presets.js";
 export function newRaidImporters(simUI) {

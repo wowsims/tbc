@@ -5,6 +5,7 @@ import { Gem } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
@@ -72,11 +73,6 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
     optionsFromPlayer: (player: Player) => SpecOptions<SpecType>;
 };
 export declare const specTypeFunctions: Record<Spec, SpecTypeFunctions<any>>;
-export declare enum Faction {
-    Unknown = 0,
-    Alliance = 1,
-    Horde = 2
-}
 export declare const raceToFaction: Record<Race, Faction>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;

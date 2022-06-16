@@ -19,6 +19,7 @@ import { PartyBuffs } from "./common";
 import { RaidTarget } from "./common";
 import { Debuffs } from "./common";
 import { RaidBuffs } from "./common";
+import { Faction } from "./common";
 /**
  * @generated from protobuf message proto.SimSettings
  */
@@ -43,6 +44,10 @@ export interface SimSettings {
      * @generated from protobuf field: bool show_experimental = 5;
      */
     showExperimental: boolean;
+    /**
+     * @generated from protobuf field: proto.Faction faction = 6;
+     */
+    faction: Faction;
 }
 /**
  * Contains all information that is imported/exported from an individual sim.
@@ -222,6 +227,14 @@ export interface SavedRaid {
      * @generated from protobuf field: proto.BlessingsAssignments blessings = 3;
      */
     blessings?: BlessingsAssignments;
+    /**
+     * @generated from protobuf field: proto.Faction faction = 4;
+     */
+    faction: Faction;
+    /**
+     * @generated from protobuf field: int32 phase = 5;
+     */
+    phase: number;
 }
 /**
  * Contains all information that is imported/exported from a raid sim.

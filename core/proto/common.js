@@ -124,6 +124,24 @@ export var Race;
     Race[Race["RaceUndead"] = 11] = "RaceUndead";
 })(Race || (Race = {}));
 /**
+ * @generated from protobuf enum proto.Faction
+ */
+export var Faction;
+(function (Faction) {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Faction[Faction["Unknown"] = 0] = "Unknown";
+    /**
+     * @generated from protobuf enum value: Alliance = 1;
+     */
+    Faction[Faction["Alliance"] = 1] = "Alliance";
+    /**
+     * @generated from protobuf enum value: Horde = 2;
+     */
+    Faction[Faction["Horde"] = 2] = "Horde";
+})(Faction || (Faction = {}));
+/**
  * @generated from protobuf enum proto.ShattrathFaction
  */
 export var ShattrathFaction;

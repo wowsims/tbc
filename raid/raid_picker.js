@@ -6,7 +6,8 @@ import { Player } from '/tbc/core/player.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { Faction, playerToSpec } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
@@ -58,7 +59,7 @@ export class RaidPicker extends Component {
         };
     }
     getCurrentFaction() {
-        return this.newPlayerPicker.currentFaction;
+        return this.raid.sim.getFaction();
     }
     getCurrentPhase() {
         return this.raid.sim.getPhase();
@@ -472,7 +473,6 @@ class NewPlayerPicker extends Component {
     constructor(parent, raidPicker) {
         super(parent, 'new-player-picker-root');
         this.raidPicker = raidPicker;
-        this.currentFaction = Faction.Alliance;
         this.rootElem.innerHTML = `
 			<div class="new-player-picker-controls">
 				<div class="faction-selector"></div>
@@ -493,10 +493,10 @@ class NewPlayerPicker extends Component {
                 { name: 'Alliance', value: Faction.Alliance },
                 { name: 'Horde', value: Faction.Horde },
             ],
-            changedEvent: (picker) => new TypedEvent(),
-            getValue: (picker) => picker.currentFaction,
+            changedEvent: (picker) => this.raidPicker.raid.sim.factionChangeEmitter,
+            getValue: (picker) => this.raidPicker.raid.sim.getFaction(),
             setValue: (eventID, picker, newValue) => {
-                picker.currentFaction = newValue;
+                this.raidPicker.raid.sim.setFaction(eventID, newValue);
             },
         });
         const phaseSelector = new EnumPicker(this.rootElem.getElementsByClassName('phase-selector')[0], this, {
