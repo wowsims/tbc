@@ -31,16 +31,16 @@ type Environment struct {
 	postFinalizeEffects []PostFinalizeEffect
 }
 
-func NewEnvironment(raidProto proto.Raid, encounterProto proto.Encounter) *Environment {
+func NewEnvironment(raidProto proto.Raid, encounterProto proto.Encounter) (*Environment, *proto.RaidStats) {
 	env := &Environment{
 		State: Created,
 	}
 
 	env.construct(raidProto, encounterProto)
-	env.initialize(raidProto, encounterProto)
-	env.finalize(raidProto, encounterProto)
+	raidStats := env.initialize(raidProto, encounterProto)
+	env.finalize(raidProto, encounterProto, raidStats)
 
-	return env
+	return env, raidStats
 }
 
 // The construction phase.
@@ -83,7 +83,7 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 }
 
 // The initialization phase.
-func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) {
+func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) *proto.RaidStats {
 	for _, target := range env.Encounter.Targets {
 		if target.Index < int32(len(encounterProto.Targets)) {
 			target.initialize(encounterProto.Targets[target.Index])
@@ -98,7 +98,7 @@ func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.En
 		}
 	}
 
-	env.Raid.applyCharacterEffects(raidProto)
+	raidStats := env.Raid.applyCharacterEffects(raidProto)
 
 	for _, party := range env.Raid.Parties {
 		for _, playerOrPet := range party.PlayersAndPets {
@@ -107,18 +107,19 @@ func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.En
 	}
 
 	env.State = Initialized
+	return raidStats
 }
 
 // The finalization phase.
-func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Encounter) {
+func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Encounter, raidStats *proto.RaidStats) {
 	for _, target := range env.Encounter.Targets {
 		target.finalize()
 	}
 
-	for _, party := range env.Raid.Parties {
+	for partyIdx, party := range env.Raid.Parties {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
-			character.Finalize()
+			character.Finalize(raidStats.Parties[partyIdx].Players[character.PartyIndex])
 
 			for _, petAgent := range character.Pets {
 				petAgent.GetPet().Finalize()

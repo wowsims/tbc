@@ -256,11 +256,14 @@ message ComputeStatsRequest {
 }
 message PlayerStats {
 	// Stats
-    repeated double base_stats = 6;
-    repeated double gear_stats = 1;
-    repeated double final_stats = 2;
+	repeated double base_stats = 6;
+	repeated double gear_stats = 1;
+	repeated double talents_stats = 7;
+	repeated double buffs_stats = 8;
+	repeated double consumes_stats = 9;
+	repeated double final_stats = 2;
 
-    repeated string sets = 3;
+	repeated string sets = 3;
 	IndividualBuffs buffs = 4;
 	repeated ActionID cooldowns = 5;
 }

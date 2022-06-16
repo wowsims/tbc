@@ -71,10 +71,13 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				Stat.StatSpellHaste,
 				Stat.StatMP5,
 			],
-			modifyDisplayStats: (player: Player<Spec.SpecShadowPriest>, stats: Stats) => {
-				return stats.withStat(Stat.StatSpellHit,
-					stats.getStat(Stat.StatSpellHit)
-					+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+			modifyDisplayStats: (player: Player<Spec.SpecShadowPriest>) => {
+				let stats = new Stats();
+				stats = stats.addStat(Stat.StatSpellHit, player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+
+				return {
+					talents: stats,
+				};
 			},
 
 			defaults: {

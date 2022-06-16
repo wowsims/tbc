@@ -1,4 +1,6 @@
+import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { TristateEffect } from '/tbc/core/proto/common.js'
 import { statNames, statOrder } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
@@ -19,7 +21,7 @@ const spellPowerTypeStats = [
 	Stat.StatShadowSpellPower,
 ];
 
-export type StatBreakdown = Array<{ label: string, value: number }>;
+export type StatMods = { talents: Stats };
 
 export class CharacterStats extends Component {
 	readonly stats: Array<Stat>;
@@ -27,15 +29,13 @@ export class CharacterStats extends Component {
 	readonly tooltipElems: Array<HTMLElement>;
 
 	private readonly player: Player<any>;
-	private readonly modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats;
-	private readonly statBreakdowns?: (player: Player<any>, stats: Stats) => Partial<Record<Stat, StatBreakdown>>;
+	private readonly modifyDisplayStats?: (player: Player<any>) => StatMods;
 
-	constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>, modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats, statBreakdowns?: (player: Player<any>, stats: Stats) => Partial<Record<Stat, StatBreakdown>>) {
+	constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>, modifyDisplayStats?: (player: Player<any>) => StatMods) {
 		super(parent, 'character-stats-root');
 		this.stats = statOrder.filter(stat => stats.includes(stat));
 		this.player = player;
 		this.modifyDisplayStats = modifyDisplayStats;
-		this.statBreakdowns = statBreakdowns;
 
 		const table = document.createElement('table');
 		table.classList.add('character-stats-table');
@@ -62,47 +62,78 @@ export class CharacterStats extends Component {
 			this.tooltipElems.push(tooltipElem);
 		});
 
-		this.updateStats(new Stats(player.getCurrentStats().finalStats));
+		this.updateStats(player);
 		TypedEvent.onAny([player.currentStatsEmitter, player.sim.changeEmitter]).on(() => {
-			this.updateStats(new Stats(player.getCurrentStats().finalStats));
+			this.updateStats(player);
 		});
 	}
 
-	private updateStats(newStats: Stats) {
-		if (this.modifyDisplayStats) {
-			newStats = this.modifyDisplayStats(this.player, newStats);
-		}
+	private updateStats(player: Player<any>) {
+		const playerStats = player.getCurrentStats();
 
-		const breakdowns = this.statBreakdowns ? this.statBreakdowns(this.player, newStats) : null;
+		const statMods = this.modifyDisplayStats ? this.modifyDisplayStats(this.player) : {
+			talents: new Stats(),
+		};
+
+		const baseStats = new Stats(playerStats.baseStats);
+		const gearStats = new Stats(playerStats.gearStats);
+		const talentsStats = new Stats(playerStats.talentsStats);
+		const buffsStats = new Stats(playerStats.buffsStats);
+		const consumesStats = new Stats(playerStats.consumesStats);
+		const debuffStats = CharacterStats.getDebuffStats(player);
+		const finalStats = new Stats(playerStats.finalStats).add(statMods.talents).add(debuffStats);
+
+		const gearDelta = gearStats.subtract(baseStats);
+		const talentsDelta = talentsStats.subtract(gearStats).add(statMods.talents);
+		const buffsDelta = buffsStats.subtract(talentsStats);
+		const consumesDelta = consumesStats.subtract(buffsStats);
 
 		this.stats.forEach((stat, idx) => {
-			let rawValue = newStats.getStat(stat);
-			if (spellPowerTypeStats.includes(stat)) {
-				rawValue = rawValue + newStats.getStat(Stat.StatSpellPower);
-			}
+			this.valueElems[idx].textContent = CharacterStats.statDisplayString(finalStats, stat);
 
-			const displayStr = CharacterStats.statDisplayString(stat, rawValue);
-			this.valueElems[idx].textContent = displayStr;
-
-			const breakdown = breakdowns ? breakdowns[stat] : null;
-			if (breakdown) {
-				tippy(this.tooltipElems[idx], {
-					'content': breakdown.map(item => `
-						<div class="character-stats-tooltip-row">
-							<span>${item.label}:</span>
-							<span>${CharacterStats.statDisplayString(stat, item.value)}</span>
-						</div>
-					`).join(''),
-					'allowHTML': true,
-				});
-				this.tooltipElems[idx].classList.remove('hide');
-			} else {
-				this.tooltipElems[idx].classList.add('hide');
-			}
+			tippy(this.tooltipElems[idx], {
+				'content': `
+					<div class="character-stats-tooltip-row">
+						<span>Base:</span>
+						<span>${CharacterStats.statDisplayString(baseStats, stat)}</span>
+					</div>
+					<div class="character-stats-tooltip-row">
+						<span>Gear:</span>
+						<span>${CharacterStats.statDisplayString(gearDelta, stat)}</span>
+					</div>
+					<div class="character-stats-tooltip-row">
+						<span>Talents:</span>
+						<span>${CharacterStats.statDisplayString(talentsDelta, stat)}</span>
+					</div>
+					<div class="character-stats-tooltip-row">
+						<span>Buffs:</span>
+						<span>${CharacterStats.statDisplayString(buffsDelta, stat)}</span>
+					</div>
+					<div class="character-stats-tooltip-row">
+						<span>Consumes:</span>
+						<span>${CharacterStats.statDisplayString(consumesDelta, stat)}</span>
+					</div>
+					${debuffStats.getStat(stat) == 0 ? '' : `
+					<div class="character-stats-tooltip-row">
+						<span>Debuffs:</span>
+						<span>${CharacterStats.statDisplayString(debuffStats, stat)}</span>
+					</div>
+					`}
+					<div class="character-stats-tooltip-row">
+						<span>Total:</span>
+						<span>${CharacterStats.statDisplayString(finalStats, stat)}</span>
+					</div>
+				`,
+				'allowHTML': true,
+			});
 		});
 	}
 
-	static statDisplayString(stat: Stat, rawValue: number): string {
+	static statDisplayString(stats: Stats, stat: Stat): string {
+		let rawValue = stats.getStat(stat);
+		if (spellPowerTypeStats.includes(stat)) {
+			rawValue = rawValue + stats.getStat(Stat.StatSpellPower);
+		}
 		let displayStr = String(Math.round(rawValue));
 
 		if (stat == Stat.StatMeleeHit) {
@@ -126,5 +157,20 @@ export class CharacterStats extends Component {
 		}
 
 		return displayStr;
+	}
+
+	static getDebuffStats(player: Player<any>): Stats {
+		let debuffStats = new Stats();
+
+		const debuffs = player.sim.raid.getDebuffs();
+		if (debuffs.faerieFire == TristateEffect.TristateEffectImproved) {
+			debuffStats = debuffStats.addStat(Stat.StatMeleeHit, 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
+		}
+		if (debuffs.improvedSealOfTheCrusader) {
+			debuffStats = debuffStats.addStat(Stat.StatMeleeCrit, 3 * Mechanics.MELEE_CRIT_RATING_PER_CRIT_CHANCE);
+			debuffStats = debuffStats.addStat(Stat.StatSpellCrit, 3 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE);
+		}
+
+		return debuffStats;
 	}
 }

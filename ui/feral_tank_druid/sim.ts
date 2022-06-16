@@ -74,10 +74,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 				Stat.StatArmor,
 				Stat.StatArmorPenetration,
 				Stat.StatDefense,
-				Stat.StatBlock,
-				Stat.StatBlockValue,
 				Stat.StatDodge,
-				Stat.StatParry,
 				Stat.StatResilience,
 			],
 			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
@@ -96,10 +93,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 				Stat.StatMeleeHaste,
 				Stat.StatArmorPenetration,
 				Stat.StatDefense,
-				Stat.StatBlock,
-				Stat.StatBlockValue,
 				Stat.StatDodge,
-				Stat.StatParry,
 				Stat.StatResilience,
 			],
 

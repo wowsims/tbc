@@ -319,12 +319,7 @@ func (sdm *StatDependencyManager) AddStatDependency(dep StatDependency) {
 
 // Populates sortedDeps. Panics if there are any dependency cycles.
 // TODO: Figure out if we need to separate additive / multiplicative dependencies.
-func (sdm *StatDependencyManager) Finalize() {
-	if sdm.finalized {
-		return
-	}
-	sdm.finalized = true
-
+func (sdm *StatDependencyManager) Sort() {
 	sdm.sortedDeps = []StatDependency{}
 
 	// Set of stats we're done processing.
@@ -381,18 +376,27 @@ func (sdm *StatDependencyManager) Finalize() {
 	}
 }
 
+func (sdm *StatDependencyManager) Finalize() {
+	if sdm.finalized {
+		return
+	}
+	sdm.finalized = true
+
+	sdm.Sort()
+}
+
 // Applies all stat dependencies and returns the new Stats.
 func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
-	if !sdm.finalized {
-		panic("StatDependencyManager not yet finalized, cannot calculate stats")
-	}
-
 	newStats := stats
 	for _, dep := range sdm.sortedDeps {
 		newStats[dep.ModifiedStat] = dep.Modifier(newStats[dep.SourceStat], newStats[dep.ModifiedStat])
 	}
 
 	return newStats
+}
+func (sdm *StatDependencyManager) SortAndApplyStatDependencies(stats Stats) Stats {
+	sdm.Sort()
+	return sdm.ApplyStatDependencies(stats)
 }
 
 type PseudoStats struct {
