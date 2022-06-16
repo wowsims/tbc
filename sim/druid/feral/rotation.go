@@ -115,23 +115,25 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 
 	time_to_next_tick := next_tick - sim.CurrentTime
 	cat.waitingForTick = true
+	markOOM := false
 
 	if cat.CurrentMana() < shift_cost {
-		// If this is the first time we're oom, log it
-		//if self.time_to_oom is None:
-		//    self.time_to_oom = time //TODO
-
 		// No-shift rotation
 		if rip_now && ((energy >= 30) || omen_proc) {
-			cat.Rip.Cast(sim, cat.CurrentTarget)
-			cat.waitingForTick = false
+			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
+			return cat.Rip.Cast(sim, cat.CurrentTarget)
 		} else if mangle_now &&
 			((energy >= mangle_cost) || omen_proc) {
+			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		} else if bite_now && ((energy >= 35) || omen_proc) {
+			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.FerociousBite.Cast(sim, cat.CurrentTarget)
 		} else if (energy >= 42) || omen_proc {
+			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
+		} else {
+			markOOM = true
 		}
 	} else if energy < 10 {
 		cat.shift(sim)
@@ -247,6 +249,9 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		cat.SetGCDTimer(sim, sim.CurrentTime+cat.latency)
 	} else if cat.waitingForTick {
 		cat.SetGCDTimer(sim, sim.CurrentTime+time_to_next_tick+cat.latency)
+		if markOOM {
+			cat.Metrics.MarkOOM(&cat.Unit, time_to_next_tick+cat.latency)
+		}
 	}
 
 	return false
