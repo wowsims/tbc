@@ -117,9 +117,8 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	cat.waitingForTick = true
 
 	if cat.CurrentMana() < shift_cost {
-		// If this is the first time we're oom, log it
-		//if self.time_to_oom is None:
-		//    self.time_to_oom = time //TODO
+		// Each of the following options will take 1 second, so add that to OOM time.
+		cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 
 		// No-shift rotation
 		if rip_now && ((energy >= 30) || omen_proc) {
