@@ -11,6 +11,7 @@ import { Race, ShattrathFaction } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
@@ -28,7 +29,6 @@ import {
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
 import {
-	Faction,
 	SpecRotation,
 	SpecTalents,
 	SpecTypeFunctions,

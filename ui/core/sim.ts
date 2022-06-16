@@ -1,4 +1,4 @@
-import { Class } from '/tbc/core/proto/common.js';
+import { Class, Faction } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
@@ -69,6 +69,7 @@ export class Sim {
 
 	private iterations: number = 3000;
 	private phase: number = OtherConstants.CURRENT_PHASE;
+	private faction: Faction = Faction.Alliance;
 	private fixedRngSeed: number = 0;
 	private show1hWeapons: boolean = true;
 	private show2hWeapons: boolean = true;
@@ -88,6 +89,7 @@ export class Sim {
 
 	readonly iterationsChangeEmitter = new TypedEvent<void>();
 	readonly phaseChangeEmitter = new TypedEvent<void>();
+	readonly factionChangeEmitter = new TypedEvent<void>();
 	readonly fixedRngSeedChangeEmitter = new TypedEvent<void>();
 	readonly lastUsedRngSeedChangeEmitter = new TypedEvent<void>();
 	readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
@@ -393,9 +395,19 @@ export class Sim {
 		return this.phase;
 	}
 	setPhase(eventID: EventID, newPhase: number) {
-		if (newPhase != this.phase) {
+		if (newPhase != this.phase && newPhase > 0) {
 			this.phase = newPhase;
 			this.phaseChangeEmitter.emit(eventID);
+		}
+	}
+
+	getFaction(): Faction {
+		return this.faction;
+	}
+	setFaction(eventID: EventID, newFaction: Faction) {
+		if (newFaction != this.faction && !!newFaction) {
+			this.faction = newFaction;
+			this.factionChangeEmitter.emit(eventID);
 		}
 	}
 
@@ -527,6 +539,7 @@ export class Sim {
 			fixedRngSeed: BigInt(this.getFixedRngSeed()),
 			showThreatMetrics: this.getShowThreatMetrics(),
 			showExperimental: this.getShowExperimental(),
+			faction: this.getFaction(),
 		});
 	}
 
@@ -537,6 +550,7 @@ export class Sim {
 			this.setFixedRngSeed(eventID, Number(proto.fixedRngSeed));
 			this.setShowThreatMetrics(eventID, proto.showThreatMetrics);
 			this.setShowExperimental(eventID, proto.showExperimental);
+			this.setFaction(eventID, proto.faction || Faction.Alliance)
 		});
 	}
 
@@ -544,6 +558,7 @@ export class Sim {
 		this.fromProto(eventID, SimSettingsProto.create({
 			iterations: 3000,
 			phase: OtherConstants.CURRENT_PHASE,
+			faction: Faction.Alliance,
 			showThreatMetrics: isTankSim,
 		}));
 	}

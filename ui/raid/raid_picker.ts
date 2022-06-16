@@ -13,8 +13,9 @@ import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
-import { Faction, playerToSpec, specNames } from '/tbc/core/proto_utils/utils.js';
+import { playerToSpec, specNames } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
@@ -91,7 +92,7 @@ export class RaidPicker extends Component {
 	}
 
 	getCurrentFaction(): Faction {
-		return this.newPlayerPicker.currentFaction;
+		return this.raid.sim.getFaction();
 	}
 
 	getCurrentPhase(): number {
@@ -583,12 +584,10 @@ class PlayerEditorModal extends Component {
 
 class NewPlayerPicker extends Component {
 	readonly raidPicker: RaidPicker;
-	currentFaction: Faction;
 
 	constructor(parent: HTMLElement, raidPicker: RaidPicker) {
 		super(parent, 'new-player-picker-root');
 		this.raidPicker = raidPicker;
-		this.currentFaction = Faction.Alliance;
 
 		this.rootElem.innerHTML = `
 			<div class="new-player-picker-controls">
@@ -611,10 +610,10 @@ class NewPlayerPicker extends Component {
 				{ name: 'Alliance', value: Faction.Alliance },
 				{ name: 'Horde', value: Faction.Horde },
 			],
-			changedEvent: (picker: NewPlayerPicker) => new TypedEvent<void>(),
-			getValue: (picker: NewPlayerPicker) => picker.currentFaction,
-			setValue: (eventID: EventID, picker: NewPlayerPicker, newValue: number) => {
-				picker.currentFaction = newValue;
+			changedEvent: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.factionChangeEmitter,
+			getValue: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.getFaction(),
+			setValue: (eventID: EventID, picker: NewPlayerPicker, newValue: Faction) => {
+				this.raidPicker.raid.sim.setFaction(eventID, newValue);
 			},
 		});
 

@@ -17,6 +17,7 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -800,12 +801,6 @@ export const specTypeFunctions: Record<Spec, SpecTypeFunctions<any>> = {
 			: SmitePriestOptions.create(),
 	},
 };
-
-export enum Faction {
-	Unknown,
-	Alliance,
-	Horde,
-}
 
 export const raceToFaction: Record<Race, Faction> = {
 	[Race.RaceUnknown]: Faction.Unknown,
