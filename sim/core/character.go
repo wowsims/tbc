@@ -130,12 +130,13 @@ func (character *Character) addUniversalStatDependencies() {
 }
 
 func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
-	agent.ApplyTalents()
 	applyRaceEffects(agent)
 
 	character.AddStats(character.Equip.Stats())
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
+
+	agent.ApplyTalents()
 
 	applyBuffEffects(agent, raidBuffs, partyBuffs, individualBuffs)
 	applyConsumeEffects(agent, raidBuffs, partyBuffs)

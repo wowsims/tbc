@@ -95,8 +95,8 @@ stat_weights_results: {
 dps_results: {
  key: "TestElemental-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1489.4234337896237
-  tps: 1233.1997202734497
+  dps: 1498.439545218038
+  tps: 1241.8126037760746
  }
 }
 dps_results: {
@@ -137,8 +137,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -172,8 +172,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -193,8 +193,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 1488.931867209092
-  tps: 1232.8203053546533
+  dps: 1498.0157777404688
+  tps: 1241.4605456689526
  }
 }
 dps_results: {
@@ -214,8 +214,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-BloodlustBrooch-29383"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -291,15 +291,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1489.3937674490508
-  tps: 1233.1904037721615
+  dps: 1495.615372676189
+  tps: 1239.0650604044713
  }
 }
 dps_results: {
@@ -410,8 +410,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -466,22 +466,22 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1501.6299497469847
-  tps: 1242.6424352738652
+  dps: 1511.1271888922604
+  tps: 1251.4063325921086
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1489.3039480249292
-  tps: 1233.1102348556678
+  dps: 1498.0548872246072
+  tps: 1241.4864449411514
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 1488.931867209092
-  tps: 1232.8203053546533
+  dps: 1490.0334784112608
+  tps: 1233.759361699248
  }
 }
 dps_results: {
@@ -515,8 +515,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 1559.3248142823347
-  tps: 1291.2689157874845
+  dps: 1557.0659307620144
+  tps: 1289.3967667751824
  }
 }
 dps_results: {
@@ -529,8 +529,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -550,8 +550,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 1488.931867209092
-  tps: 1232.8203053546533
+  dps: 1498.0157777404688
+  tps: 1241.4605456689526
  }
 }
 dps_results: {
@@ -606,8 +606,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-NaturalAlignmentCrystal-19344"
  value: {
-  dps: 1504.3384951418118
-  tps: 1245.3551377931137
+  dps: 1512.9594134482898
+  tps: 1253.1006830268211
  }
 }
 dps_results: {
@@ -697,8 +697,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1527.2560635777895
-  tps: 1263.2902107579491
+  dps: 1526.2898374880488
+  tps: 1262.5029157363433
  }
 }
 dps_results: {
@@ -746,8 +746,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1568.2170669089223
-  tps: 1295.6951013590317
+  dps: 1563.3909525219256
+  tps: 1291.532250155503
  }
 }
 dps_results: {
@@ -781,8 +781,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 1491.8075453442384
-  tps: 1236.331414868982
+  dps: 1498.0598122308384
+  tps: 1241.5132558851756
  }
 }
 dps_results: {
@@ -886,15 +886,15 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 1538.375471566407
-  tps: 1274.2111261670636
+  dps: 1539.3839017094072
+  tps: 1275.046906976127
  }
 }
 dps_results: {
  key: "TestElemental-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1589.1377445216724
-  tps: 1314.1112880402686
+  dps: 1579.387528396126
+  tps: 1303.6243541807705
  }
 }
 dps_results: {
@@ -970,8 +970,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1522.133659536649
-  tps: 1259.582398911336
+  dps: 1521.6295423092681
+  tps: 1259.0789292188388
  }
 }
 dps_results: {

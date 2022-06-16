@@ -367,7 +367,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 restart:
 	minExpires := NeverExpires
 	for _, aura := range at.activeAuras {
-		if aura.expires <= sim.CurrentTime {
+		if aura.expires <= sim.CurrentTime && aura.expires != 0 {
 			aura.Deactivate(sim)
 			goto restart // activeAuras have changed
 		}
@@ -548,6 +548,7 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.Log(sim, "Aura faded: %s", aura.ActionID)
 	}
 
+	aura.expires = 0
 	if aura.activeIndex != Inactive {
 		removeActiveIndex := aura.activeIndex
 		aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
