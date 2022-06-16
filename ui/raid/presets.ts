@@ -9,7 +9,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';

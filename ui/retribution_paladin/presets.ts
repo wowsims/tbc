@@ -6,7 +6,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 
 import {

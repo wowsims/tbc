@@ -13,6 +13,7 @@ message SimSettings {
 	int64 fixed_rng_seed = 3;
 	bool show_threat_metrics = 4;
 	bool show_experimental = 5;
+	Faction faction = 6;
 }
 
 // Contains all information that is imported/exported from an individual sim.
@@ -82,6 +83,8 @@ message SavedRaid {
 	Raid raid = 1;
 	repeated BuffBot buff_bots = 2;
 	BlessingsAssignments blessings = 3;
+	Faction faction = 4;
+	int32 phase = 5;
 }
 
 // Contains all information that is imported/exported from a raid sim.

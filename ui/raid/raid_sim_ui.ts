@@ -10,7 +10,7 @@ import * as Tooltips from "/tbc/core/constants/tooltips.js";
 import { Encounter } from "/tbc/core/encounter.js";
 import { Player } from "/tbc/core/player.js";
 import { Raid as RaidProto } from "/tbc/core/proto/api.js";
-import { Class, Encounter as EncounterProto, Stat, TristateEffect } from "/tbc/core/proto/common.js";
+import { Class, Encounter as EncounterProto, Faction, Stat, TristateEffect } from "/tbc/core/proto/common.js";
 import { Blessings } from "/tbc/core/proto/paladin.js";
 import { BlessingsAssignments, BuffBot as BuffBotProto, RaidSimSettings, SavedEncounter, SavedRaid } from "/tbc/core/proto/ui.js";
 import { playerToSpec } from "/tbc/core/proto_utils/utils.js";
@@ -150,15 +150,19 @@ export class RaidSimUI extends SimUI {
 				raid: this.sim.raid.toProto(),
 				buffBots: this.getBuffBots().map(b => b.toProto()),
 				blessings: this.blessingsPicker!.getAssignments(),
+				faction: this.sim.getFaction(),
+				phase: this.sim.getPhase(),
 			}),
 			setData: (eventID: EventID, raidSimUI: RaidSimUI, newRaid: SavedRaid) => {
 				TypedEvent.freezeAllAndDo(() => {
 					this.sim.raid.fromProto(eventID, newRaid.raid || RaidProto.create());
 					this.raidPicker!.setBuffBots(eventID, newRaid.buffBots);
 					this.blessingsPicker!.setAssignments(eventID, newRaid.blessings || BlessingsAssignments.create());
+					if(newRaid.faction) this.sim.setFaction(eventID, newRaid.faction);
+					if(newRaid.phase) this.sim.setPhase(eventID, newRaid.phase);
 				});
 			},
-			changeEmitters: [this.changeEmitter],
+			changeEmitters: [this.changeEmitter, this.sim.changeEmitter],
 			equals: (a: SavedRaid, b: SavedRaid) => {
 				return SavedRaid.equals(a, b);
 			},

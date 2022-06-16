@@ -8,7 +8,7 @@ import { Potions } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 

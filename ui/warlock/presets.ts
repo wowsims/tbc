@@ -5,7 +5,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents as WarlockTalents, Warlock_Options as WarlockOptions, Warlock_Rotation_PrimarySpell, Warlock_Rotation_Curse, Warlock_Options_Armor as Armor, Warlock_Options_Summon as Summon } from '/tbc/core/proto/warlock.js';
