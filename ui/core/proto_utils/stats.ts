@@ -38,6 +38,18 @@ export class Stats {
 		return new Stats(newStats);
 	}
 
+	addStat(stat: Stat, value: number): Stats {
+		return this.withStat(stat, this.getStat(stat) + value);
+	}
+
+	add(other: Stats): Stats {
+		return new Stats(this.stats.map((value, stat) => value + other.stats[stat]));
+	}
+
+	subtract(other: Stats): Stats {
+		return new Stats(this.stats.map((value, stat) => value - other.stats[stat]));
+	}
+
 	computeEP(epWeights: Stats): number {
 		let total = 0;
 		this.stats.forEach((stat, idx) => {

@@ -76,7 +76,6 @@ func NewFeralTankDruid(character core.Character, options proto.Player) *FeralTan
 	bear.AddStat(stats.AttackPower, 3*float64(core.CharacterLevel))
 
 	// Dire Bear Form bonuses.
-	bear.AddStat(stats.Armor, bear.Equip.Stats()[stats.Armor]*4)
 	bear.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Stamina,
 		ModifiedStat: stats.Stamina,
@@ -110,6 +109,10 @@ func (bear *FeralTankDruid) GetDruid() *druid.Druid {
 func (bear *FeralTankDruid) Initialize() {
 	bear.Druid.Initialize()
 	bear.RegisterBearSpells(float64(bear.Rotation.MaulRageThreshold))
+}
+
+func (bear *FeralTankDruid) ApplyGearBonuses() {
+	bear.AddStat(stats.Armor, bear.Equip.Stats()[stats.Armor]*4)
 }
 
 func (bear *FeralTankDruid) Reset(sim *core.Simulation) {

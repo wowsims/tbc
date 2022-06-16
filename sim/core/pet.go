@@ -95,7 +95,7 @@ func (pet *Pet) Finalize() {
 	inheritedStats := pet.statInheritance(pet.Owner.GetStats())
 	pet.AddStats(inheritedStats)
 	pet.currentStatInheritance = pet.statInheritance
-	pet.Character.Finalize()
+	pet.Character.Finalize(nil)
 }
 
 func (pet *Pet) reset(sim *Simulation, agent PetAgent) {

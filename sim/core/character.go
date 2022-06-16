@@ -129,21 +129,36 @@ func (character *Character) addUniversalStatDependencies() {
 	})
 }
 
-func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
+// Empty implementation so its optional for Agents.
+func (character *Character) ApplyGearBonuses() {}
+
+// Returns a partially-filled PlayerStats proto for use in the CharacterStats api call.
+func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) *proto.PlayerStats {
+	playerStats := &proto.PlayerStats{}
+
 	applyRaceEffects(agent)
+	playerStats.BaseStats = character.SortAndApplyStatDependencies(character.stats).ToFloatArray()
 
 	character.AddStats(character.Equip.Stats())
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
+	agent.ApplyGearBonuses()
+	playerStats.GearStats = character.SortAndApplyStatDependencies(character.stats).ToFloatArray()
 
 	agent.ApplyTalents()
+	playerStats.TalentsStats = character.SortAndApplyStatDependencies(character.stats).ToFloatArray()
 
 	applyBuffEffects(agent, raidBuffs, partyBuffs, individualBuffs)
+	playerStats.BuffsStats = character.SortAndApplyStatDependencies(character.stats).ToFloatArray()
+
 	applyConsumeEffects(agent, raidBuffs, partyBuffs)
+	playerStats.ConsumesStats = character.SortAndApplyStatDependencies(character.stats).ToFloatArray()
 
 	for _, petAgent := range character.Pets {
 		applyPetBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
 	}
+
+	return playerStats
 }
 
 // Apply effects from all equipped items.
@@ -287,7 +302,7 @@ func (character *Character) initialize(agent Agent) {
 	}
 }
 
-func (character *Character) Finalize() {
+func (character *Character) Finalize(playerStats *proto.PlayerStats) {
 	if character.Env.IsFinalized() {
 		return
 	}
@@ -300,6 +315,12 @@ func (character *Character) Finalize() {
 	character.Unit.finalize()
 
 	character.majorCooldownManager.finalize(character)
+
+	if playerStats != nil {
+		playerStats.FinalStats = character.GetStats().ToFloatArray()
+		playerStats.Sets = character.GetActiveSetBonusNames()
+		playerStats.Cooldowns = character.GetMajorCooldownIDs()
+	}
 }
 
 func (character *Character) init(sim *Simulation, agent Agent) {
@@ -421,20 +442,6 @@ func (character *Character) doneIteration(sim *Simulation) {
 	}
 
 	character.Unit.doneIteration(sim)
-}
-
-func (character *Character) GetStatsProto() *proto.PlayerStats {
-	gearStats := character.Equip.Stats()
-	finalStats := character.GetStats()
-
-	return &proto.PlayerStats{
-		BaseStats:  character.baseStats[:],
-		GearStats:  gearStats[:],
-		FinalStats: finalStats[:],
-
-		Sets:      character.GetActiveSetBonusNames(),
-		Cooldowns: character.GetMajorCooldownIDs(),
-	}
 }
 
 func (character *Character) GetMetricsProto(numIterations int32) *proto.UnitMetrics {

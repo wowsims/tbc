@@ -47,6 +47,7 @@ func (target *Target) initialize(config *proto.Target) {
 // TODO: Figure out how to get rid of these.
 func (target *Target) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (target *Target) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
+func (target *Target) ApplyGearBonuses()                          {}
 func (target *Target) ApplyTalents()                              {}
 func (target *Target) GetCharacter() *Character                   { return nil }
 func (target *Target) Initialize()                                {}

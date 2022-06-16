@@ -106,24 +106,6 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 
 	return metrics
 }
-func (party *Party) GetStats() *proto.PartyStats {
-	partyStats := &proto.PartyStats{}
-
-	playerIdx := 0
-	i := 0
-	for playerIdx < len(party.Players) {
-		player := party.Players[playerIdx]
-		if player.GetCharacter().PartyIndex == i {
-			partyStats.Players = append(partyStats.Players, player.GetCharacter().GetStatsProto())
-			playerIdx++
-		} else {
-			partyStats.Players = append(partyStats.Players, &proto.PlayerStats{})
-		}
-		i++
-	}
-
-	return partyStats
-}
 
 type Raid struct {
 	Parties []*Party
@@ -225,12 +207,16 @@ func (raid *Raid) updatePlayersAndPets() {
 	})
 }
 
-func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) {
+func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) *proto.RaidStats {
 	raidBuffs := raid.GetRaidBuffs(raidConfig.Buffs)
+	raidStats := &proto.RaidStats{}
 
 	for partyIdx, party := range raid.Parties {
 		partyConfig := *raidConfig.Parties[partyIdx]
 		partyBuffs := party.GetPartyBuffs(partyConfig.Buffs)
+		partyStats := &proto.PartyStats{
+			Players: make([]*proto.PlayerStats, 5),
+		}
 
 		// Apply all buffs to the players in this party.
 		for playerIdx, player := range party.Players {
@@ -240,9 +226,14 @@ func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) {
 				individualBuffs = *playerConfig.Buffs
 			}
 
-			player.GetCharacter().applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
+			char := player.GetCharacter()
+			partyStats.Players[char.PartyIndex] = char.applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
 		}
+
+		raidStats.Parties = append(raidStats.Parties, partyStats)
 	}
+
+	return raidStats
 }
 
 func (raid Raid) AddStats(s stats.Stats) {
@@ -293,14 +284,6 @@ func (raid *Raid) GetMetrics(numIterations int32) *proto.RaidMetrics {
 		metrics.Parties = append(metrics.Parties, party.GetMetrics(numIterations))
 	}
 	return metrics
-}
-
-func (raid *Raid) GetStats() *proto.RaidStats {
-	raidStats := &proto.RaidStats{}
-	for _, party := range raid.Parties {
-		raidStats.Parties = append(raidStats.Parties, party.GetStats())
-	}
-	return raidStats
 }
 
 func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, raidBuffs *proto.RaidBuffs, debuffs *proto.Debuffs) *proto.Raid {
