@@ -209,8 +209,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 1264.0548196288064
-  tps: 1290.0245904070812
+  dps: 1264.0548196288066
+  tps: 1290.0245904070814
  }
 }
 dps_results: {

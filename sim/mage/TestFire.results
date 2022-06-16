@@ -160,8 +160,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1518.964325294772
-  tps: 1276.2547506743279
+  dps: 1518.5373240825666
+  tps: 1275.9819500709373
  }
 }
 dps_results: {
@@ -188,8 +188,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1518.964325294772
-  tps: 1276.2547506743279
+  dps: 1518.5373240825666
+  tps: 1275.9819500709373
  }
 }
 dps_results: {
@@ -279,8 +279,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-Despair-28573"
  value: {
-  dps: 1296.3461225741398
-  tps: 1099.765246523157
+  dps: 1296.0351255737417
+  tps: 1099.4962067119307
  }
 }
 dps_results: {
@@ -419,15 +419,15 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1593.3229297962278
-  tps: 1345.0772290617329
+  dps: 1592.9824099190937
+  tps: 1344.5841821600088
  }
 }
 dps_results: {
  key: "TestFire-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 1296.3461225741398
-  tps: 1099.765246523157
+  dps: 1296.0351255737417
+  tps: 1099.4962067119307
  }
 }
 dps_results: {
@@ -440,15 +440,15 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1296.3461225741398
-  tps: 1099.765246523157
+  dps: 1296.0351255737417
+  tps: 1099.4962067119307
  }
 }
 dps_results: {
  key: "TestFire-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1296.3461225741398
-  tps: 1099.765246523157
+  dps: 1296.0351255737417
+  tps: 1099.4962067119307
  }
 }
 dps_results: {
@@ -594,8 +594,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-ShatteredSunPendantofMight-34679"
  value: {
-  dps: 1518.964325294772
-  tps: 1276.2547506743279
+  dps: 1518.5373240825666
+  tps: 1275.9819500709373
  }
 }
 dps_results: {
@@ -755,8 +755,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-Average-Default"
  value: {
-  dps: 1551.8428045134851
-  tps: 1302.4397007467019
+  dps: 1552.2885219181487
+  tps: 1302.7043252277203
  }
 }
 dps_results: {
@@ -776,8 +776,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-LongSingleTarget"
  value: {
-  dps: 289.9224681179652
-  tps: 276.801186849406
+  dps: 290.1081380081679
+  tps: 276.92881766614886
  }
 }
 dps_results: {
@@ -832,15 +832,15 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 482.6422166606228
-  tps: 641.9674605666049
+  dps: 483.40553721881895
+  tps: 642.7571222540029
  }
 }
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongSingleTarget"
  value: {
-  dps: 482.6422166606228
-  tps: 418.6946605666055
+  dps: 483.40553721881895
+  tps: 419.3598722540035
  }
 }
 dps_results: {

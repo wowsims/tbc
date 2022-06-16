@@ -104,8 +104,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 1959.9204243482195
-  tps: 1445.9385233724608
+  dps: 1959.9941724633538
+  tps: 1445.9910165466345
  }
 }
 dps_results: {
@@ -279,8 +279,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1960.4218737581045
-  tps: 1447.0071555760471
+  dps: 1960.4307633677838
+  tps: 1447.0134626004917
  }
 }
 dps_results: {
@@ -300,8 +300,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DesolationBattlegear"
  value: {
-  dps: 1620.912646223157
-  tps: 1206.708402103793
+  dps: 1620.9516550716073
+  tps: 1206.73632128009
  }
 }
 dps_results: {
@@ -440,8 +440,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-HandofJustice-11815"
  value: {
-  dps: 1932.4532625000868
-  tps: 1425.9188643664488
+  dps: 1938.5002002612343
+  tps: 1431.3615011639322
  }
 }
 dps_results: {
@@ -461,8 +461,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 1951.197248510845
-  tps: 1442.1328535625494
+  dps: 1951.5383754493187
+  tps: 1442.375387023707
  }
 }
 dps_results: {
@@ -657,8 +657,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-ShardofContempt-34472"
  value: {
-  dps: 2001.3116105150807
-  tps: 1476.387386581756
+  dps: 2001.4436297145126
+  tps: 1476.4809900696312
  }
 }
 dps_results: {
@@ -671,8 +671,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-ShatteredSunPendantofMight-34679"
  value: {
-  dps: 1973.4959281489678
-  tps: 1456.6885282849153
+  dps: 1973.6281325857653
+  tps: 1456.783490039397
  }
 }
 dps_results: {
@@ -881,15 +881,15 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1961.2911885889462
-  tps: 1446.2827438049542
+  dps: 1961.4672002050927
+  tps: 1450.7315603661516
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-WastewalkerArmor"
  value: {
-  dps: 1650.0185611609472
-  tps: 1232.113756600097
+  dps: 1650.0946907273947
+  tps: 1232.1677270215152
  }
 }
 dps_results: {
@@ -923,8 +923,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1952.9897883722097
-  tps: 1441.7996187144354
+  dps: 1952.390119469243
+  tps: 1441.3648563713355
  }
 }
 dps_results: {

@@ -48,8 +48,8 @@ character_stats_results: {
 dps_results: {
  key: "TestFeral-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 2241.8471476832274
-  tps: 1627.5024754579238
+  dps: 2236.2884058461245
+  tps: 1623.5231648433721
  }
 }
 dps_results: {
@@ -62,8 +62,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-Alchemist'sStone-13503"
  value: {
-  dps: 2246.008316943009
-  tps: 1630.0795700441988
+  dps: 2254.120322089646
+  tps: 1636.036745235881
  }
 }
 dps_results: {
@@ -104,8 +104,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 2266.0385924059365
-  tps: 1644.5588162205909
+  dps: 2264.617644439313
+  tps: 1643.5879923112634
  }
 }
 dps_results: {
@@ -146,8 +146,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 2240.6395671501828
-  tps: 1626.3596242729604
+  dps: 2232.742108552016
+  tps: 1620.8703046692824
  }
 }
 dps_results: {
@@ -328,15 +328,15 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-HandofJustice-11815"
  value: {
-  dps: 2234.4778797400595
-  tps: 1622.454408235056
+  dps: 2231.588216677794
+  tps: 1620.2526370199612
  }
 }
 dps_results: {
  key: "TestFeral-AllItems-Heartrazor-29962"
  value: {
-  dps: 2275.514875815446
-  tps: 1651.1610427029468
+  dps: 2270.842384489262
+  tps: 1647.8084678087246
  }
 }
 dps_results: {
@@ -370,8 +370,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-IdolofTerror-33509"
  value: {
-  dps: 2190.4057598021936
-  tps: 1590.5885175825501
+  dps: 2192.2974552827395
+  tps: 1592.0953390568407
  }
 }
 dps_results: {
@@ -545,15 +545,15 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-ShardofContempt-34472"
  value: {
-  dps: 2279.042626360543
-  tps: 1653.4479014186873
+  dps: 2269.551954460518
+  tps: 1646.758530654633
  }
 }
 dps_results: {
  key: "TestFeral-AllItems-ShatteredSunPendantofAcumen-34678"
  value: {
-  dps: 2216.9320786172993
-  tps: 1609.4802115189395
+  dps: 2213.5207253023978
+  tps: 1607.1658237668871
  }
 }
 dps_results: {
@@ -594,8 +594,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1845.8789873851003
-  tps: 1346.0059679179278
+  dps: 1852.8033654094916
+  tps: 1350.7911300716785
  }
 }
 dps_results: {
@@ -671,8 +671,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 2254.498910003149
-  tps: 1636.2470824915977
+  dps: 2259.659544107583
+  tps: 1639.8663103070708
  }
 }
 dps_results: {
@@ -713,8 +713,8 @@ dps_results: {
 dps_results: {
  key: "TestFeral-Average-Default"
  value: {
-  dps: 2237.5347362595676
-  tps: 1624.191225122395
+  dps: 2237.3608070207806
+  tps: 1624.0787427164846
  }
 }
 dps_results: {
@@ -741,22 +741,22 @@ dps_results: {
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-FullBuffs-ShortSingleTarget"
  value: {
-  dps: 2457.7100531938613
-  tps: 1782.2437332711636
+  dps: 2472.9745922313527
+  tps: 1794.303288549295
  }
 }
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-NoBuffs-LongMultiTarget"
  value: {
-  dps: 796.9607107012963
-  tps: 568.3225605979204
+  dps: 794.0324761089082
+  tps: 566.2435140373245
  }
 }
 dps_results: {
  key: "TestFeral-Settings-Tauren-P1-Default-NoBuffs-LongSingleTarget"
  value: {
-  dps: 796.9607107012963
-  tps: 568.3225605979204
+  dps: 794.0324761089082
+  tps: 566.2435140373245
  }
 }
 dps_results: {
@@ -769,7 +769,7 @@ dps_results: {
 dps_results: {
  key: "TestFeral-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 2067.919081659593
-  tps: 1504.1732396258924
+  dps: 2066.623075822349
+  tps: 1503.181965561906
  }
 }

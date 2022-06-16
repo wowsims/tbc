@@ -21,7 +21,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 2694
   final_stats: 385.85
-  final_stats: 695.6792
+  final_stats: 695.6791999999999
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -104,8 +104,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1185.4502449829906
-  tps: 829.6350328844007
+  dps: 1185.595231571982
+  tps: 829.7379733625844
  }
 }
 dps_results: {

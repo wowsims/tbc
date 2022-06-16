@@ -17,6 +17,9 @@ func (bear *FeralTankDruid) OnAutoAttack(sim *core.Simulation, spell *core.Spell
 }
 
 func (bear *FeralTankDruid) doRotation(sim *core.Simulation) {
+	if sim.Log != nil {
+		sim.Log("Cur time: " + sim.CurrentTime.String())
+	}
 	if bear.GCD.IsReady(sim) {
 		if bear.shouldSaveLacerateStacks(sim) && bear.CanLacerate(sim) {
 			bear.Lacerate.Cast(sim, bear.CurrentTarget)

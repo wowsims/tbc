@@ -21,7 +21,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 3427.05
   final_stats: 113.31
-  final_stats: 856.14232
+  final_stats: 856.1423199999999
   final_stats: 133
   final_stats: 0
   final_stats: 73
@@ -146,8 +146,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 2084.5535056320414
-  tps: 1511.7512312251163
+  dps: 2084.5528591904704
+  tps: 1511.7507787160168
  }
 }
 dps_results: {
@@ -286,8 +286,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-DarkmoonCard:Vengeance-31858"
  value: {
-  dps: 2049.4912686572097
-  tps: 1486.1651628974162
+  dps: 2049.490468030643
+  tps: 1486.1646024588197
  }
 }
 dps_results: {
@@ -307,8 +307,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Despair-28573"
  value: {
-  dps: 1913.0296654077968
-  tps: 1393.328848662731
+  dps: 1913.0188294622444
+  tps: 1393.321263500844
  }
 }
 dps_results: {
@@ -447,8 +447,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 1912.014900141382
-  tps: 1390.7748957748252
+  dps: 1912.008532463767
+  tps: 1390.7704384004946
  }
 }
 dps_results: {
@@ -468,8 +468,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-HandofJustice-11815"
  value: {
-  dps: 2081.5208752314984
-  tps: 1508.5508139355536
+  dps: 2081.512506303302
+  tps: 1508.5449325262566
  }
 }
 dps_results: {
@@ -692,8 +692,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 2057.9243756907185
-  tps: 1492.035607351513
+  dps: 2057.918549370461
+  tps: 1492.0315289273326
  }
 }
 dps_results: {
@@ -790,8 +790,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-StormGauntlets-12632"
  value: {
-  dps: 2034.7690170672347
-  tps: 1476.9814901463399
+  dps: 2034.768281610464
+  tps: 1476.9809753266006
  }
 }
 dps_results: {
@@ -846,8 +846,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 2089.782147027144
-  tps: 1514.363964918974
+  dps: 2089.779208649201
+  tps: 1514.3619080544136
  }
 }
 dps_results: {
@@ -951,8 +951,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Average-Default"
  value: {
-  dps: 2125.139652589159
-  tps: 1540.326540016408
+  dps: 2125.1396525891605
+  tps: 1540.326540016409
  }
 }
 dps_results: {
