@@ -67,6 +67,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestDestruction-AllItems-CorruptorRaiment"
+ value: {
+  dps: 1374.1319665239869
+  tps: 946.1995910968031
+ }
+}
+dps_results: {
  key: "TestDestruction-AllItems-DestructiveSkyfireDiamond"
  value: {
   dps: 1740.2662388332883
@@ -120,6 +127,13 @@ dps_results: {
  value: {
   dps: 1728.0140473533104
   tps: 1170.233246124697
+ }
+}
+dps_results: {
+ key: "TestDestruction-AllItems-OblivionRaiment"
+ value: {
+  dps: 1233.538374198607
+  tps: 857.5056253512043
  }
 }
 dps_results: {

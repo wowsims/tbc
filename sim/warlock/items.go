@@ -8,31 +8,20 @@ import (
 )
 
 func init() {
-	core.AddItemSet(&ItemSetMaleficRaiment)
+	core.AddItemSet(&ItemSetOblivionRaiment)
 	core.AddItemSet(&ItemSetVoidheartRaiment)
+	core.AddItemSet(&ItemSetCorruptorRaiment)
+	core.AddItemSet(&ItemSetMaleficRaiment)
 }
 
-var ItemSetMaleficRaiment = core.ItemSet{
-	Name: "Malefic Raiment",
+var ItemSetOblivionRaiment = core.ItemSet{
+	Name: "Oblivion Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			// heals... not implemented yet
+			// in pet.go constructor
 		},
 		4: func(agent core.Agent) {
-			// Increases damage done by shadowbolt and incinerate by 6%.
-			// Implemented in shadowbolt.go and incinerate.go
-		},
-	},
-}
-
-var ItemSetCorruptorRaiment = core.ItemSet{
-	Name: "Corruptor Raiment",
-	Bonuses: map[int32]core.ApplyEffect{
-		2: func(agent core.Agent) {
-			// heals pet
-		},
-		4: func(agent core.Agent) {
-			// TODO: increase corruption tick damage on target whenever shadowbolt hits.
+			// in seed.go
 		},
 	},
 }
@@ -72,14 +61,27 @@ var ItemSetVoidheartRaiment = core.ItemSet{
 	},
 }
 
-var ItemSetOblivionRaiment = core.ItemSet{
-	Name: "Oblivion Raiment",
+var ItemSetCorruptorRaiment = core.ItemSet{
+	Name: "Corruptor Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			// in pet.go constructor
+			// heals pet
 		},
 		4: func(agent core.Agent) {
-			// in seed.go
+			// TODO: increase corruption tick damage on target whenever shadowbolt hits.
+		},
+	},
+}
+
+var ItemSetMaleficRaiment = core.ItemSet{
+	Name: "Malefic Raiment",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// heals... not implemented yet
+		},
+		4: func(agent core.Agent) {
+			// Increases damage done by shadowbolt and incinerate by 6%.
+			// Implemented in shadowbolt.go and incinerate.go
 		},
 	},
 }
