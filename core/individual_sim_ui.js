@@ -176,7 +176,7 @@ export class IndividualSimUI extends SimUI {
     addSidebarComponents() {
         this.raidSimResultsManager = addRaidSimAction(this);
         addStatWeightsAction(this, this.individualConfig.epStats, this.individualConfig.epReferenceStat);
-        const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.player, this.individualConfig.displayStats, this.individualConfig.modifyDisplayStats, this.individualConfig.statBreakdowns);
+        const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.player, this.individualConfig.displayStats, this.individualConfig.modifyDisplayStats);
     }
     addTopbarComponents() {
         this.addToolbarItem(newIndividualImporters(this));

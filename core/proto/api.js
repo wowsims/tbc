@@ -1606,6 +1606,9 @@ class PlayerStats$Type extends MessageType {
         super("proto.PlayerStats", [
             { no: 6, name: "base_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 1, name: "gear_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 7, name: "talents_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "buffs_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 9, name: "consumes_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "final_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "buffs", kind: "message", T: () => IndividualBuffs },
@@ -1613,7 +1616,7 @@ class PlayerStats$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { baseStats: [], gearStats: [], finalStats: [], sets: [], cooldowns: [] };
+        const message = { baseStats: [], gearStats: [], talentsStats: [], buffsStats: [], consumesStats: [], finalStats: [], sets: [], cooldowns: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1637,6 +1640,27 @@ class PlayerStats$Type extends MessageType {
                             message.gearStats.push(reader.double());
                     else
                         message.gearStats.push(reader.double());
+                    break;
+                case /* repeated double talents_stats */ 7:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.talentsStats.push(reader.double());
+                    else
+                        message.talentsStats.push(reader.double());
+                    break;
+                case /* repeated double buffs_stats */ 8:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.buffsStats.push(reader.double());
+                    else
+                        message.buffsStats.push(reader.double());
+                    break;
+                case /* repeated double consumes_stats */ 9:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.consumesStats.push(reader.double());
+                    else
+                        message.consumesStats.push(reader.double());
                     break;
                 case /* repeated double final_stats */ 2:
                     if (wireType === WireType.LengthDelimited)
@@ -1678,6 +1702,27 @@ class PlayerStats$Type extends MessageType {
             writer.tag(1, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.gearStats.length; i++)
                 writer.double(message.gearStats[i]);
+            writer.join();
+        }
+        /* repeated double talents_stats = 7; */
+        if (message.talentsStats.length) {
+            writer.tag(7, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.talentsStats.length; i++)
+                writer.double(message.talentsStats[i]);
+            writer.join();
+        }
+        /* repeated double buffs_stats = 8; */
+        if (message.buffsStats.length) {
+            writer.tag(8, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.buffsStats.length; i++)
+                writer.double(message.buffsStats[i]);
+            writer.join();
+        }
+        /* repeated double consumes_stats = 9; */
+        if (message.consumesStats.length) {
+            writer.tag(9, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.consumesStats.length; i++)
+                writer.double(message.consumesStats[i]);
             writer.join();
         }
         /* repeated double final_stats = 2; */

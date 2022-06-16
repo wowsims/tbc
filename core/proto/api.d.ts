@@ -648,6 +648,18 @@ export interface PlayerStats {
      */
     gearStats: number[];
     /**
+     * @generated from protobuf field: repeated double talents_stats = 7;
+     */
+    talentsStats: number[];
+    /**
+     * @generated from protobuf field: repeated double buffs_stats = 8;
+     */
+    buffsStats: number[];
+    /**
+     * @generated from protobuf field: repeated double consumes_stats = 9;
+     */
+    consumesStats: number[];
+    /**
      * @generated from protobuf field: repeated double final_stats = 2;
      */
     finalStats: number[];

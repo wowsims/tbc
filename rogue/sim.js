@@ -15,7 +15,6 @@ import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
-import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as RogueInputs from './inputs.js';
 import * as Presets from './presets.js';
@@ -62,33 +61,6 @@ export class RogueSimUI extends IndividualSimUI {
                 Stat.StatArmorPenetration,
                 Stat.StatExpertise,
             ],
-            modifyDisplayStats: (player, stats) => {
-                const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
-                if (hasImpFF) {
-                    stats = stats.withStat(Stat.StatMeleeHit, stats.getStat(Stat.StatMeleeHit)
-                        + 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
-                }
-                return stats;
-            },
-            statBreakdowns: (player, stats) => {
-                const totalHit = stats.getStat(Stat.StatMeleeHit);
-                const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
-                const debuffsHit = hasImpFF ? 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
-                const talentsHit = player.getTalents().precision * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE;
-                const consumesHit = player.getConsumes().food == Food.FoodSpicyHotTalbuk ? 20 : 0;
-                const buffsHit = player.getParty()?.getBuffs().draeneiRacialMelee ? 1 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
-                const gearHit = totalHit - debuffsHit - buffsHit - consumesHit - talentsHit;
-                return {
-                    [Stat.StatMeleeHit]: [
-                        { label: 'Gear', value: gearHit },
-                        { label: 'Talents', value: talentsHit },
-                        { label: 'Consumes', value: consumesHit },
-                        { label: 'Buffs', value: buffsHit },
-                        { label: 'Debuffs', value: debuffsHit },
-                        { label: 'Total', value: totalHit },
-                    ].filter(b => b.value != 0),
-                };
-            },
             defaults: {
                 // Default equipped gear.
                 gear: Presets.P1_PRESET.gear,

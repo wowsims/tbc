@@ -52,9 +52,12 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                 Stat.StatSpellHaste,
                 Stat.StatMP5,
             ],
-            modifyDisplayStats: (player, stats) => {
-                return stats.withStat(Stat.StatSpellHit, stats.getStat(Stat.StatSpellHit)
-                    + player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+            modifyDisplayStats: (player) => {
+                let stats = new Stats();
+                stats = stats.addStat(Stat.StatSpellHit, player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+                return {
+                    talents: stats,
+                };
             },
             defaults: {
                 // Default equipped gear.

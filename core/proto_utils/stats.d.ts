@@ -10,6 +10,9 @@ export declare class Stats {
     equals(other: Stats): boolean;
     getStat(stat: Stat): number;
     withStat(stat: Stat, value: number): Stats;
+    addStat(stat: Stat, value: number): Stats;
+    add(other: Stats): Stats;
+    subtract(other: Stats): Stats;
     computeEP(epWeights: Stats): number;
     asArray(): Array<number>;
     toJson(): Object;
