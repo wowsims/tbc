@@ -12,14 +12,9 @@ func init() {
 	core.AddItemEffect(30892, ApplyBeasttamersShoulders)
 	core.AddItemEffect(32336, ApplyBlackBowOfTheBetrayer)
 	core.AddItemEffect(32487, ApplyAshtongueTalismanOfSwiftness)
-
-	core.AddItemSet(&ItemSetBeastLord)
-	core.AddItemSet(&ItemSetDemonStalker)
-	core.AddItemSet(&ItemSetRiftStalker)
-	core.AddItemSet(&ItemSetGronnstalker)
 }
 
-var ItemSetBeastLord = core.ItemSet{
+var ItemSetBeastLord = core.NewItemSet(core.ItemSet{
 	Name: "Beast Lord Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -28,9 +23,9 @@ var ItemSetBeastLord = core.ItemSet{
 			// Handled in kill_command.go
 		},
 	},
-}
+})
 
-var ItemSetDemonStalker = core.ItemSet{
+var ItemSetDemonStalker = core.NewItemSet(core.ItemSet{
 	Name: "Demon Stalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -39,9 +34,9 @@ var ItemSetDemonStalker = core.ItemSet{
 			// Handled in multi_shot.go
 		},
 	},
-}
+})
 
-var ItemSetRiftStalker = core.ItemSet{
+var ItemSetRiftStalker = core.NewItemSet(core.ItemSet{
 	Name: "Rift Stalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -50,9 +45,9 @@ var ItemSetRiftStalker = core.ItemSet{
 			// Handled in steady_shot.go
 		},
 	},
-}
+})
 
-var ItemSetGronnstalker = core.ItemSet{
+var ItemSetGronnstalker = core.NewItemSet(core.ItemSet{
 	Name: "Gronnstalker's Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -62,7 +57,7 @@ var ItemSetGronnstalker = core.ItemSet{
 			// Handled in steady_shot.go
 		},
 	},
-}
+})
 
 func ApplyTalonOfAlar(agent core.Agent) {
 	hunter := agent.(HunterAgent).GetHunter()

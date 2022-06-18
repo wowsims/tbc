@@ -15,21 +15,12 @@ func init() {
 	core.AddItemEffect(33506, ApplySkycallTotem)
 	core.AddItemEffect(33507, ApplyStonebreakersTotem)
 
-	core.AddItemSet(&ItemSetTidefury)
-	core.AddItemSet(&ItemSetCycloneRegalia)
-	core.AddItemSet(&ItemSetCataclysmRegalia)
-	core.AddItemSet(&ItemSetSkyshatterRegalia)
-
-	core.AddItemSet(&ItemSetCycloneHarness)
-	core.AddItemSet(&ItemSetCataclysmHarness)
-	core.AddItemSet(&ItemSetSkyshatterHarness)
-
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
 	core.AddItemEffect(TotemOfThePulsingEarth, func(core.Agent) {})
 }
 
-var ItemSetTidefury = core.ItemSet{
+var ItemSetTidefury = core.NewItemSet(core.ItemSet{
 	Name: "Tidefury Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -43,9 +34,9 @@ var ItemSetTidefury = core.ItemSet{
 			}
 		},
 	},
-}
+})
 
-var ItemSetCycloneRegalia = core.ItemSet{
+var ItemSetCycloneRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Cyclone Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -86,9 +77,9 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetCataclysmRegalia = core.ItemSet{
+var ItemSetCataclysmRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Cataclysm Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
@@ -112,9 +103,9 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetSkyshatterRegalia = core.ItemSet{
+var ItemSetSkyshatterRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Skyshatter Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -136,7 +127,52 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			// Implemented in lightning_bolt.go.
 		},
 	},
-}
+})
+
+// Cyclone Harness
+// (2) Set : Your Strength of Earth Totem ability grants an additional 12 strength.
+// (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
+
+var ItemSetCycloneHarness = core.NewItemSet(core.ItemSet{
+	Name: "Cyclone Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// shaman.go
+		},
+		4: func(agent core.Agent) {
+			// stormstrike.go
+		},
+	},
+})
+
+// Cataclysm Harness
+// (2) Set : Your melee attacks have a chance to reduce the cast time of your next Lesser Healing Wave by 1.5 sec. (Proc chance: 2%)
+// (4) Set : You gain 5% additional haste from your Flurry ability.
+
+var ItemSetCataclysmHarness = core.NewItemSet(core.ItemSet{
+	Name: "Cataclysm Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		4: func(agent core.Agent) {
+			// shaman.go
+		},
+	},
+})
+
+// Skyshatter Harness
+// 2 pieces: Your Earth Shock, Flame Shock, and Frost Shock abilities cost 10% less mana.
+// 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
+
+var ItemSetSkyshatterHarness = core.NewItemSet(core.ItemSet{
+	Name: "Skyshatter Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// implemented in shocks.go
+		},
+		4: func(agent core.Agent) {
+			// implemented in stormstrike.go
+		},
+	},
+})
 
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	shaman := agent.(ShamanAgent).GetShaman()
@@ -291,49 +327,4 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 			procAura.Activate(sim)
 		},
 	})
-}
-
-// Cyclone Harness
-// (2) Set : Your Strength of Earth Totem ability grants an additional 12 strength.
-// (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
-
-var ItemSetCycloneHarness = core.ItemSet{
-	Name: "Cyclone Harness",
-	Bonuses: map[int32]core.ApplyEffect{
-		2: func(agent core.Agent) {
-			// shaman.go
-		},
-		4: func(agent core.Agent) {
-			// stormstrike.go
-		},
-	},
-}
-
-// Cataclysm Harness
-// (2) Set : Your melee attacks have a chance to reduce the cast time of your next Lesser Healing Wave by 1.5 sec. (Proc chance: 2%)
-// (4) Set : You gain 5% additional haste from your Flurry ability.
-
-var ItemSetCataclysmHarness = core.ItemSet{
-	Name: "Cataclysm Harness",
-	Bonuses: map[int32]core.ApplyEffect{
-		4: func(agent core.Agent) {
-			// shaman.go
-		},
-	},
-}
-
-// Skyshatter Harness
-// 2 pieces: Your Earth Shock, Flame Shock, and Frost Shock abilities cost 10% less mana.
-// 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
-
-var ItemSetSkyshatterHarness = core.ItemSet{
-	Name: "Skyshatter Harness",
-	Bonuses: map[int32]core.ApplyEffect{
-		2: func(agent core.Agent) {
-			// implemented in shocks.go
-		},
-		4: func(agent core.Agent) {
-			// implemented in stormstrike.go
-		},
-	},
 }

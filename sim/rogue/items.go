@@ -10,14 +10,9 @@ import (
 func init() {
 	core.AddItemEffect(30450, ApplyWarpSpringCoil)
 	core.AddItemEffect(32492, ApplyAshtongueTalismanOfLethality)
-
-	core.AddItemSet(&ItemSetAssassination)
-	core.AddItemSet(&ItemSetNetherblade)
-	core.AddItemSet(&ItemSetDeathmantle)
-	core.AddItemSet(&ItemSetSlayers)
 }
 
-var ItemSetAssassination = core.ItemSet{
+var ItemSetAssassination = core.NewItemSet(core.ItemSet{
 	Name: "Assassination Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -27,9 +22,9 @@ var ItemSetAssassination = core.ItemSet{
 			// Handled in eviscerate.go.
 		},
 	},
-}
+})
 
-var ItemSetNetherblade = core.ItemSet{
+var ItemSetNetherblade = core.NewItemSet(core.ItemSet{
 	Name: "Netherblade",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -41,9 +36,9 @@ var ItemSetNetherblade = core.ItemSet{
 			// Handled in talents.go.
 		},
 	},
-}
+})
 
-var ItemSetDeathmantle = core.ItemSet{
+var ItemSetDeathmantle = core.NewItemSet(core.ItemSet{
 	Name: "Deathmantle",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -87,7 +82,7 @@ var ItemSetDeathmantle = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
 func (rogue *Rogue) deathmantleActive() bool {
 	return rogue.DeathmantleProcAura != nil && rogue.DeathmantleProcAura.IsActive()
@@ -100,7 +95,7 @@ func (rogue *Rogue) applyDeathmantle(sim *core.Simulation, _ *core.Spell, cast *
 	}
 }
 
-var ItemSetSlayers = core.ItemSet{
+var ItemSetSlayers = core.NewItemSet(core.ItemSet{
 	Name: "Slayer's Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -112,7 +107,7 @@ var ItemSetSlayers = core.ItemSet{
 			// Handled in the corresponding ability files.
 		},
 	},
-}
+})
 
 func ApplyWarpSpringCoil(agent core.Agent) {
 	rogue := agent.(RogueAgent).GetRogue()

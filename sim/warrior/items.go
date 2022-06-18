@@ -9,17 +9,9 @@ import (
 
 func init() {
 	core.AddItemEffect(32485, ApplyAshtongueTalismanOfValor)
-
-	core.AddItemSet(&ItemSetBoldArmor)
-	core.AddItemSet(&ItemSetWarbringerArmor)
-	core.AddItemSet(&ItemSetWarbringerBattlegear)
-	core.AddItemSet(&ItemSetDestroyerArmor)
-	core.AddItemSet(&ItemSetDestroyerBattlegear)
-	core.AddItemSet(&ItemSetOnslaughtArmor)
-	core.AddItemSet(&ItemSetOnslaughtBattlegear)
 }
 
-var ItemSetBoldArmor = core.ItemSet{
+var ItemSetBoldArmor = core.NewItemSet(core.ItemSet{
 	Name: "Bold Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -30,9 +22,9 @@ var ItemSetBoldArmor = core.ItemSet{
 			// Your Charge ability generates an additional 5 rage.
 		},
 	},
-}
+})
 
-var ItemSetWarbringerArmor = core.ItemSet{
+var ItemSetWarbringerArmor = core.NewItemSet(core.ItemSet{
 	Name: "Warbringer Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -74,9 +66,9 @@ var ItemSetWarbringerArmor = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetWarbringerBattlegear = core.ItemSet{
+var ItemSetWarbringerBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Warbringer Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -102,9 +94,9 @@ var ItemSetWarbringerBattlegear = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetDestroyerArmor = core.ItemSet{
+var ItemSetDestroyerArmor = core.NewItemSet(core.ItemSet{
 	Name: "Destroyer Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -161,9 +153,9 @@ var ItemSetDestroyerArmor = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetDestroyerBattlegear = core.ItemSet{
+var ItemSetDestroyerBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Destroyer Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -189,9 +181,9 @@ var ItemSetDestroyerBattlegear = core.ItemSet{
 			// Handled in bloodthirst.go and mortal_strike.go.
 		},
 	},
-}
+})
 
-var ItemSetOnslaughtArmor = core.ItemSet{
+var ItemSetOnslaughtArmor = core.NewItemSet(core.ItemSet{
 	Name: "Onslaught Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -202,9 +194,9 @@ var ItemSetOnslaughtArmor = core.ItemSet{
 			// Handled in shield_slam.go.
 		},
 	},
-}
+})
 
-var ItemSetOnslaughtBattlegear = core.ItemSet{
+var ItemSetOnslaughtBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Onslaught Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -215,7 +207,7 @@ var ItemSetOnslaughtBattlegear = core.ItemSet{
 			// Handled in bloodthirst.go and mortal_strike.go.
 		},
 	},
-}
+})
 
 func ApplyAshtongueTalismanOfValor(agent core.Agent) {
 	warrior := agent.(WarriorAgent).GetWarrior()

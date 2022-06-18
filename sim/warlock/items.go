@@ -7,14 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	core.AddItemSet(&ItemSetOblivionRaiment)
-	core.AddItemSet(&ItemSetVoidheartRaiment)
-	core.AddItemSet(&ItemSetCorruptorRaiment)
-	core.AddItemSet(&ItemSetMaleficRaiment)
-}
-
-var ItemSetOblivionRaiment = core.ItemSet{
+var ItemSetOblivionRaiment = core.NewItemSet(core.ItemSet{
 	Name: "Oblivion Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -24,9 +17,9 @@ var ItemSetOblivionRaiment = core.ItemSet{
 			// in seed.go
 		},
 	},
-}
+})
 
-var ItemSetVoidheartRaiment = core.ItemSet{
+var ItemSetVoidheartRaiment = core.NewItemSet(core.ItemSet{
 	Name: "Voidheart Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -59,9 +52,9 @@ var ItemSetVoidheartRaiment = core.ItemSet{
 			// TODO: add to corruption.go
 		},
 	},
-}
+})
 
-var ItemSetCorruptorRaiment = core.ItemSet{
+var ItemSetCorruptorRaiment = core.NewItemSet(core.ItemSet{
 	Name: "Corruptor Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -71,9 +64,9 @@ var ItemSetCorruptorRaiment = core.ItemSet{
 			// TODO: increase corruption tick damage on target whenever shadowbolt hits.
 		},
 	},
-}
+})
 
-var ItemSetMaleficRaiment = core.ItemSet{
+var ItemSetMaleficRaiment = core.NewItemSet(core.ItemSet{
 	Name: "Malefic Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -84,4 +77,4 @@ var ItemSetMaleficRaiment = core.ItemSet{
 			// Implemented in shadowbolt.go and incinerate.go
 		},
 	},
-}
+})

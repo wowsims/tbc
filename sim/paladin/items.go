@@ -9,20 +9,13 @@ import (
 )
 
 func init() {
-	core.AddItemSet(&ItemSetJusticarBattlegear)
-	core.AddItemSet(&ItemSetJusticarArmor)
-	core.AddItemSet(&ItemSetCrystalforgeBattlegear)
-	core.AddItemSet(&ItemSetCrystalforgeArmor)
-	core.AddItemSet(&ItemSetLightbringerBattlegear)
-	core.AddItemSet(&ItemSetLightbringerArmor)
-
 	core.AddItemEffect(27484, ApplyLibramOfAvengement)
 	core.AddItemEffect(32368, ApplyTomeOfTheLightbringer)
 	core.AddItemEffect(30447, ApplyTomeOfFieryRedemption)
 	core.AddItemEffect(32489, ApplyAshtongueTalismanOfZeal)
 }
 
-var ItemSetJusticarBattlegear = core.ItemSet{
+var ItemSetJusticarBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Justicar Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -32,9 +25,9 @@ var ItemSetJusticarBattlegear = core.ItemSet{
 			// TODO: if we ever implemented judgement of command, add bonus from 4p
 		},
 	},
-}
+})
 
-var ItemSetJusticarArmor = core.ItemSet{
+var ItemSetJusticarArmor = core.NewItemSet(core.ItemSet{
 	Name: "Justicar Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -47,9 +40,9 @@ var ItemSetJusticarArmor = core.ItemSet{
 			// Implemented in holy_shield.go.
 		},
 	},
-}
+})
 
-var ItemSetCrystalforgeBattlegear = core.ItemSet{
+var ItemSetCrystalforgeBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Crystalforge Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -59,9 +52,9 @@ var ItemSetCrystalforgeBattlegear = core.ItemSet{
 			// TODO: if we implement healing, this heals party.
 		},
 	},
-}
+})
 
-var ItemSetCrystalforgeArmor = core.ItemSet{
+var ItemSetCrystalforgeArmor = core.NewItemSet(core.ItemSet{
 	Name: "Crystalforge Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -104,9 +97,9 @@ var ItemSetCrystalforgeArmor = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetLightbringerBattlegear = core.ItemSet{
+var ItemSetLightbringerBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Lightbringer Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -134,9 +127,9 @@ var ItemSetLightbringerBattlegear = core.ItemSet{
 			// TODO: if we implemented hammer of wrath.. this ups dmg
 		},
 	},
-}
+})
 
-var ItemSetLightbringerArmor = core.ItemSet{
+var ItemSetLightbringerArmor = core.NewItemSet(core.ItemSet{
 	Name: "Lightbringer Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -146,7 +139,7 @@ var ItemSetLightbringerArmor = core.ItemSet{
 			// Increases the damage dealt by Consecration by 10%.
 		},
 	},
-}
+})
 
 // Librams implemented in seals.go and judgement.go
 
