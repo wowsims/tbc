@@ -47,11 +47,11 @@ func (set ItemSet) CharacterHasSetBonus(character *Character, numItems int32) bo
 	return count >= numItems
 }
 
-var sets = []ItemSet{}
+var sets = []*ItemSet{}
 
-func GetAllItemSets() []ItemSet {
+func GetAllItemSets() []*ItemSet {
 	// Defensive copy to prevent modifications.
-	tmp := make([]ItemSet, len(sets))
+	tmp := make([]*ItemSet, len(sets))
 	copy(tmp, sets)
 	return tmp
 }
@@ -59,8 +59,11 @@ func GetAllItemSets() []ItemSet {
 // cache for mapping item to set for fast resetting of sim.
 var itemSetLookup = map[int32]*ItemSet{}
 
-// Modifies ItemSet with item IDs populated.
-func AddItemSet(set *ItemSet) {
+// Registers a new ItemSet with item IDs populated.
+func NewItemSet(setStruct ItemSet) *ItemSet {
+	set := &ItemSet{}
+	*set = setStruct
+
 	if len(set.Items) > 0 {
 		panic(set.Name + " supplied item IDs, set items are detected automatically!")
 	}
@@ -76,11 +79,11 @@ func AddItemSet(set *ItemSet) {
 		panic("No items found for set " + set.Name)
 	}
 
-	setIdx := len(sets)
-	sets = append(sets, *set)
+	sets = append(sets, set)
 	for itemID := range set.Items {
-		itemSetLookup[itemID] = &sets[setIdx]
+		itemSetLookup[itemID] = set
 	}
+	return set
 }
 
 type ActiveSetBonus struct {

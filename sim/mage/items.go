@@ -15,16 +15,12 @@ func init() {
 
 	core.AddItemEffect(32488, ApplyAshtongueTalismanOfInsight)
 
-	core.AddItemSet(&ItemSetAldorRegalia)
-	core.AddItemSet(&ItemSetTirisfalRegalia)
-	core.AddItemSet(&ItemSetTempestRegalia)
-
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
 	core.AddItemEffect(SerpentCoilBraidID, func(core.Agent) {})
 }
 
-var ItemSetAldorRegalia = core.ItemSet{
+var ItemSetAldorRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Aldor Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -34,9 +30,9 @@ var ItemSetAldorRegalia = core.ItemSet{
 			// Reduces the cooldown on PoM/Blast Wave/Ice Block.
 		},
 	},
-}
+})
 
-var ItemSetTirisfalRegalia = core.ItemSet{
+var ItemSetTirisfalRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Tirisfal Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -64,9 +60,9 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetTempestRegalia = core.ItemSet{
+var ItemSetTempestRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Tempest Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -78,7 +74,7 @@ var ItemSetTempestRegalia = core.ItemSet{
 			// Implemented in the files for those spells.
 		},
 	},
-}
+})
 
 func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 	mage := agent.(MageAgent).GetMage()

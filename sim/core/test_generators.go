@@ -251,8 +251,8 @@ func (filter *ItemFilter) FindAllItems() []items.Item {
 	return filteredItems
 }
 
-func (filter *ItemFilter) FindAllSets() []ItemSet {
-	filteredSets := []ItemSet{}
+func (filter *ItemFilter) FindAllSets() []*ItemSet {
+	filteredSets := []*ItemSet{}
 
 	for _, set := range GetAllItemSets() {
 		firstItem := items.ByID[set.ItemIDs()[0]]
@@ -291,7 +291,7 @@ type ItemsTestGenerator struct {
 	initialized bool
 
 	items []items.Item
-	sets  []ItemSet
+	sets  []*ItemSet
 
 	metagems []items.Gem
 

@@ -8,32 +8,18 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Keep these (and their functions) in alphabetical order.
-func init() {
-	core.AddItemSet(&ItemSetBurningRage)
-	core.AddItemSet(&ItemSetDesolationBattlegear)
-	core.AddItemSet(&ItemSetDoomplateBattlegear)
-	core.AddItemSet(&ItemSetEbonNetherscale)
-	core.AddItemSet(&ItemSetFaithInFelsteel)
-	core.AddItemSet(&ItemSetFelstalker)
-	core.AddItemSet(&ItemSetFistsOfFury)
-	core.AddItemSet(&ItemSetFlameGuard)
-	core.AddItemSet(&ItemSetPrimalstrike)
-	core.AddItemSet(&ItemSetStrengthOfTheClefthoof)
-	core.AddItemSet(&ItemSetTwinBladesOfAzzinoth)
-	core.AddItemSet(&ItemSetWastewalkerArmor)
-}
+// Keep these in alphabetical order.
 
-var ItemSetBurningRage = core.ItemSet{
+var ItemSetBurningRage = core.NewItemSet(core.ItemSet{
 	Name: "Burning Rage",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MeleeHit, 20)
 		},
 	},
-}
+})
 
-var ItemSetDesolationBattlegear = core.ItemSet{
+var ItemSetDesolationBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Desolation Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -74,9 +60,9 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetDoomplateBattlegear = core.ItemSet{
+var ItemSetDoomplateBattlegear = core.NewItemSet(core.ItemSet{
 	Name: "Doomplate Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -108,36 +94,36 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetEbonNetherscale = core.ItemSet{
+var ItemSetEbonNetherscale = core.NewItemSet(core.ItemSet{
 	Name: "Netherscale Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MeleeHit, 20)
 		},
 	},
-}
+})
 
-var ItemSetFaithInFelsteel = core.ItemSet{
+var ItemSetFaithInFelsteel = core.NewItemSet(core.ItemSet{
 	Name: "Faith in Felsteel",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.Strength, 25)
 		},
 	},
-}
+})
 
-var ItemSetFelstalker = core.ItemSet{
+var ItemSetFelstalker = core.NewItemSet(core.ItemSet{
 	Name: "Felstalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MeleeHit, 20)
 		},
 	},
-}
+})
 
-var ItemSetFistsOfFury = core.ItemSet{
+var ItemSetFistsOfFury = core.NewItemSet(core.ItemSet{
 	Name: "The Fists of Fury",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -177,18 +163,18 @@ var ItemSetFistsOfFury = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetFlameGuard = core.ItemSet{
+var ItemSetFlameGuard = core.NewItemSet(core.ItemSet{
 	Name: "Flame Guard",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.Parry, 20)
 		},
 	},
-}
+})
 
-var ItemSetPrimalstrike = core.ItemSet{
+var ItemSetPrimalstrike = core.NewItemSet(core.ItemSet{
 	Name: "Primal Intent",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
@@ -196,18 +182,18 @@ var ItemSetPrimalstrike = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.RangedAttackPower, 40)
 		},
 	},
-}
+})
 
-var ItemSetStrengthOfTheClefthoof = core.ItemSet{
+var ItemSetStrengthOfTheClefthoof = core.NewItemSet(core.ItemSet{
 	Name: "Strength of the Clefthoof",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.Strength, 20)
 		},
 	},
-}
+})
 
-var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
+var ItemSetTwinBladesOfAzzinoth = core.NewItemSet(core.ItemSet{
 	Name: "The Twin Blades of Azzinoth",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -253,9 +239,9 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetWastewalkerArmor = core.ItemSet{
+var ItemSetWastewalkerArmor = core.NewItemSet(core.ItemSet{
 	Name: "Wastewalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -296,4 +282,4 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 			})
 		},
 	},
-}
+})

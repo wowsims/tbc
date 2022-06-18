@@ -13,16 +13,9 @@ func init() {
 	core.AddItemEffect(32257, ApplyIdolOfTheWhiteStag)
 	core.AddItemEffect(33509, ApplyIdolOfTerror)
 	core.AddItemEffect(33510, ApplyIdolOfTheUnseenMoon)
-
-	core.AddItemSet(&ItemSetMalorneRegalia)
-	core.AddItemSet(&ItemSetMalorneHarness)
-	core.AddItemSet(&ItemSetNordrassilRegalia)
-	core.AddItemSet(&ItemSetNordrassilHarness)
-	core.AddItemSet(&ItemSetThunderheartRegalia)
-	core.AddItemSet(&ItemSetThunderheartHarness)
 }
 
-var ItemSetMalorneRegalia = core.ItemSet{
+var ItemSetMalorneRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Malorne Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -53,9 +46,9 @@ var ItemSetMalorneRegalia = core.ItemSet{
 			// Currently this is handled in druid.go (reducing CD of innervate)
 		},
 	},
-}
+})
 
-var ItemSetMalorneHarness = core.ItemSet{
+var ItemSetMalorneHarness = core.NewItemSet(core.ItemSet{
 	Name: "Malorne Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -93,27 +86,27 @@ var ItemSetMalorneHarness = core.ItemSet{
 			}
 		},
 	},
-}
+})
 
-var ItemSetNordrassilRegalia = core.ItemSet{
+var ItemSetNordrassilRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			// Implemented in starfire.go.
 		},
 	},
-}
+})
 
-var ItemSetNordrassilHarness = core.ItemSet{
+var ItemSetNordrassilHarness = core.NewItemSet(core.ItemSet{
 	Name: "Nordrassil Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			// Implemented in lacerate.go.
 		},
 	},
-}
+})
 
-var ItemSetThunderheartRegalia = core.ItemSet{
+var ItemSetThunderheartRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Thunderheart Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -123,9 +116,9 @@ var ItemSetThunderheartRegalia = core.ItemSet{
 			// handled in starfire.go in template construction
 		},
 	},
-}
+})
 
-var ItemSetThunderheartHarness = core.ItemSet{
+var ItemSetThunderheartHarness = core.NewItemSet(core.ItemSet{
 	Name: "Thunderheart Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -135,7 +128,7 @@ var ItemSetThunderheartHarness = core.ItemSet{
 			// Implemented in swipe.go.
 		},
 	},
-}
+})
 
 func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druid := agent.(DruidAgent).GetDruid()

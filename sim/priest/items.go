@@ -9,13 +9,9 @@ import (
 
 func init() {
 	core.AddItemEffect(32490, ApplyAshtongueTalismanOfAcumen)
-
-	core.AddItemSet(&ItemSetIncarnate)
-	core.AddItemSet(&ItemSetAvatar)
-	core.AddItemSet(&ItemSetAbsolution)
 }
 
-var ItemSetIncarnate = core.ItemSet{
+var ItemSetIncarnate = core.NewItemSet(core.ItemSet{
 	Name: "Incarnate Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -27,9 +23,9 @@ var ItemSetIncarnate = core.ItemSet{
 			// Implemented in mind_flay.go.
 		},
 	},
-}
+})
 
-var ItemSetAvatar = core.ItemSet{
+var ItemSetAvatar = core.NewItemSet(core.ItemSet{
 	Name: "Avatar Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -80,9 +76,9 @@ var ItemSetAvatar = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetAbsolution = core.ItemSet{
+var ItemSetAbsolution = core.NewItemSet(core.ItemSet{
 	Name: "Absolution Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -92,7 +88,7 @@ var ItemSetAbsolution = core.ItemSet{
 			// this is implemented in mindblast.go
 		},
 	},
-}
+})
 
 func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 	priest := agent.(PriestAgent).GetPriest()

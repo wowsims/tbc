@@ -7,17 +7,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Keep these (and their functions) in alphabetical order.
-func init() {
-	core.AddItemSet(&ItemSetManaEtched)
-	core.AddItemSet(&ItemSetNetherstrike)
-	core.AddItemSet(&ItemSetSpellstrike)
-	core.AddItemSet(&ItemSetTheTwinStars)
-	core.AddItemSet(&ItemSetWindhawk)
-	core.AddItemSet(&ItemSetSpellfire)
-}
+// Keep these in alphabetical order.
 
-var ItemSetManaEtched = core.ItemSet{
+var ItemSetManaEtched = core.NewItemSet(core.ItemSet{
 	Name: "Mana-Etched Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -42,18 +34,18 @@ var ItemSetManaEtched = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetNetherstrike = core.ItemSet{
+var ItemSetNetherstrike = core.NewItemSet(core.ItemSet{
 	Name: "Netherstrike Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 23)
 		},
 	},
-}
+})
 
-var ItemSetSpellstrike = core.ItemSet{
+var ItemSetSpellstrike = core.NewItemSet(core.ItemSet{
 	Name: "Spellstrike Infusion",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -75,27 +67,27 @@ var ItemSetSpellstrike = core.ItemSet{
 			})
 		},
 	},
-}
+})
 
-var ItemSetTheTwinStars = core.ItemSet{
+var ItemSetTheTwinStars = core.NewItemSet(core.ItemSet{
 	Name: "The Twin Stars",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 15)
 		},
 	},
-}
+})
 
-var ItemSetWindhawk = core.ItemSet{
+var ItemSetWindhawk = core.NewItemSet(core.ItemSet{
 	Name: "Windhawk Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MP5, 8)
 		},
 	},
-}
+})
 
-var ItemSetSpellfire = core.ItemSet{
+var ItemSetSpellfire = core.NewItemSet(core.ItemSet{
 	Name: "Wrath of Spellfire",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
@@ -109,4 +101,4 @@ var ItemSetSpellfire = core.ItemSet{
 			})
 		},
 	},
-}
+})
