@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	core.AddItemEffect(32485, ApplyAshtongueTalismanOfValor)
-}
-
 var ItemSetBoldArmor = core.NewItemSet(core.ItemSet{
 	Name: "Bold Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -209,24 +205,28 @@ var ItemSetOnslaughtBattlegear = core.NewItemSet(core.ItemSet{
 	},
 })
 
-func ApplyAshtongueTalismanOfValor(agent core.Agent) {
-	warrior := agent.(WarriorAgent).GetWarrior()
-	procAura := warrior.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
+func init() {
 
-	warrior.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell != warrior.ShieldSlam && spell != warrior.Bloodthirst && spell != warrior.MortalStrike {
-				return
-			}
+	core.NewItemEffect(32485, func(agent core.Agent) {
+		warrior := agent.(WarriorAgent).GetWarrior()
+		procAura := warrior.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
 
-			if sim.RandomFloat("AshtongueTalismanOfValor") < 0.25 {
-				procAura.Activate(sim)
-			}
-		},
+		warrior.RegisterAura(core.Aura{
+			Label:    "Ashtongue Talisman",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spell != warrior.ShieldSlam && spell != warrior.Bloodthirst && spell != warrior.MortalStrike {
+					return
+				}
+
+				if sim.RandomFloat("AshtongueTalismanOfValor") < 0.25 {
+					procAura.Activate(sim)
+				}
+			},
+		})
 	})
+
 }

@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	core.AddItemEffect(32490, ApplyAshtongueTalismanOfAcumen)
-}
-
 var ItemSetIncarnate = core.NewItemSet(core.ItemSet{
 	Name: "Incarnate Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -90,30 +86,34 @@ var ItemSetAbsolution = core.NewItemSet(core.ItemSet{
 	},
 })
 
-func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
-	priest := agent.(PriestAgent).GetPriest()
-	// Not in the game yet so cant test; this logic assumes that:
-	// - procrate is 10%
-	// - no ICD on proc
-	const procrate = 0.1
-	procAura := priest.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
+func init() {
 
-	priest.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell != priest.ShadowWordPain {
-				return
-			}
+	core.NewItemEffect(32490, func(agent core.Agent) {
+		priest := agent.(PriestAgent).GetPriest()
+		// Not in the game yet so cant test; this logic assumes that:
+		// - procrate is 10%
+		// - no ICD on proc
+		const procrate = 0.1
+		procAura := priest.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
 
-			if sim.RandomFloat("Ashtongue Talisman of Acumen") > procrate {
-				return
-			}
+		priest.RegisterAura(core.Aura{
+			Label:    "Ashtongue Talisman",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spell != priest.ShadowWordPain {
+					return
+				}
 
-			procAura.Activate(sim)
-		},
+				if sim.RandomFloat("Ashtongue Talisman of Acumen") > procrate {
+					return
+				}
+
+				procAura.Activate(sim)
+			},
+		})
 	})
+
 }

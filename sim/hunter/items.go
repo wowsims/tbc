@@ -7,13 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	core.AddItemEffect(30448, ApplyTalonOfAlar)
-	core.AddItemEffect(30892, ApplyBeasttamersShoulders)
-	core.AddItemEffect(32336, ApplyBlackBowOfTheBetrayer)
-	core.AddItemEffect(32487, ApplyAshtongueTalismanOfSwiftness)
-}
-
 var ItemSetBeastLord = core.NewItemSet(core.ItemSet{
 	Name: "Beast Lord Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -59,30 +52,6 @@ var ItemSetGronnstalker = core.NewItemSet(core.ItemSet{
 	},
 })
 
-func ApplyTalonOfAlar(agent core.Agent) {
-	hunter := agent.(HunterAgent).GetHunter()
-
-	procAura := hunter.GetOrRegisterAura(core.Aura{
-		Label:    "Talon of Alar Proc",
-		ActionID: core.ActionID{ItemID: 30448},
-		// Add 1 in case we use arcane shot exactly off CD.
-		Duration: time.Second*6 + 1,
-	})
-
-	hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(core.Aura{
-		Label:    "Talon of Alar",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell == hunter.ArcaneShot {
-				procAura.Activate(sim)
-			}
-		},
-	})
-}
-
 func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
 	if hunter.HasTrinketEquipped(30448) {
 		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
@@ -100,53 +69,80 @@ func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfi
 	}
 }
 
-func ApplyBeasttamersShoulders(agent core.Agent) {
-	hunter := agent.(HunterAgent).GetHunter()
+func init() {
+	core.NewItemEffect(30448, func(agent core.Agent) {
+		hunter := agent.(HunterAgent).GetHunter()
 
-	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
-	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
-}
+		procAura := hunter.GetOrRegisterAura(core.Aura{
+			Label:    "Talon of Alar Proc",
+			ActionID: core.ActionID{ItemID: 30448},
+			// Add 1 in case we use arcane shot exactly off CD.
+			Duration: time.Second*6 + 1,
+		})
 
-func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
-	hunter := agent.(HunterAgent).GetHunter()
-	const manaGain = 8.0
-	manaMetrics := hunter.NewManaMetrics(core.ActionID{SpellID: 46939})
-
-	hunter.RegisterAura(core.Aura{
-		Label:    "Black Bow of the Betrayer",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
-				return
-			}
-			hunter.AddMana(sim, manaGain, manaMetrics, false)
-		},
+		hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(core.Aura{
+			Label:    "Talon of Alar",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spell == hunter.ArcaneShot {
+					procAura.Activate(sim)
+				}
+			},
+		})
 	})
-}
 
-func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
-	hunter := agent.(HunterAgent).GetHunter()
+	core.NewItemEffect(30892, func(agent core.Agent) {
+		hunter := agent.(HunterAgent).GetHunter()
 
-	procAura := hunter.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
-	const procChance = 0.15
-
-	hunter.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell != hunter.SteadyShot {
-				return
-			}
-			if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
-				return
-			}
-			procAura.Activate(sim)
-		},
+		hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
+		hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
 	})
+
+	core.NewItemEffect(32336, func(agent core.Agent) {
+		hunter := agent.(HunterAgent).GetHunter()
+		const manaGain = 8.0
+		manaMetrics := hunter.NewManaMetrics(core.ActionID{SpellID: 46939})
+
+		hunter.RegisterAura(core.Aura{
+			Label:    "Black Bow of the Betrayer",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
+					return
+				}
+				hunter.AddMana(sim, manaGain, manaMetrics, false)
+			},
+		})
+	})
+
+	core.NewItemEffect(32487, func(agent core.Agent) {
+		hunter := agent.(HunterAgent).GetHunter()
+
+		procAura := hunter.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
+		const procChance = 0.15
+
+		hunter.RegisterAura(core.Aura{
+			Label:    "Ashtongue Talisman",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spell != hunter.SteadyShot {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
+					return
+				}
+				procAura.Activate(sim)
+			},
+		})
+	})
+
 }
