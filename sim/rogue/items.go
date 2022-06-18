@@ -7,11 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	core.AddItemEffect(30450, ApplyWarpSpringCoil)
-	core.AddItemEffect(32492, ApplyAshtongueTalismanOfLethality)
-}
-
 var ItemSetAssassination = core.NewItemSet(core.ItemSet{
 	Name: "Assassination Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -109,82 +104,85 @@ var ItemSetSlayers = core.NewItemSet(core.ItemSet{
 	},
 })
 
-func ApplyWarpSpringCoil(agent core.Agent) {
-	rogue := agent.(RogueAgent).GetRogue()
-	procAura := rogue.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
-	const procChance = 0.25
+func init() {
+	core.NewItemEffect(30450, func(agent core.Agent) {
+		rogue := agent.(RogueAgent).GetRogue()
+		procAura := rogue.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
+		const procChance = 0.25
 
-	icd := core.Cooldown{
-		Timer:    rogue.NewTimer(),
-		Duration: time.Second * 30,
-	}
+		icd := core.Cooldown{
+			Timer:    rogue.NewTimer(),
+			Duration: time.Second * 30,
+		}
 
-	rogue.RegisterAura(core.Aura{
-		Label:    "Warp Spring Coil",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() {
-				return
-			}
+		rogue.RegisterAura(core.Aura{
+			Label:    "Warp Spring Coil",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 
-			// https://tbc.wowhead.com/spell=37173/armor-penetration, proc mask = 16.
-			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
-				return
-			}
+				// https://tbc.wowhead.com/spell=37173/armor-penetration, proc mask = 16.
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
+					return
+				}
 
-			if !icd.IsReady(sim) {
-				return
-			}
+				if !icd.IsReady(sim) {
+					return
+				}
 
-			if sim.RandomFloat("WarpSpringCoil") > procChance {
-				return
-			}
+				if sim.RandomFloat("WarpSpringCoil") > procChance {
+					return
+				}
 
-			icd.Use(sim)
-			procAura.Activate(sim)
-		},
+				icd.Use(sim)
+				procAura.Activate(sim)
+			},
+		})
 	})
-}
 
-func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
-	rogue := agent.(RogueAgent).GetRogue()
-	procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
+	core.NewItemEffect(32492, func(agent core.Agent) {
+		rogue := agent.(RogueAgent).GetRogue()
+		procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 
-	var numPoints int32
+		var numPoints int32
 
-	rogue.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			numPoints = 0
-			aura.Activate(sim)
-		},
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if !spell.Flags.Matches(SpellFlagFinisher) {
-				return
-			}
+		rogue.RegisterAura(core.Aura{
+			Label:    "Ashtongue Talisman",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				numPoints = 0
+				aura.Activate(sim)
+			},
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if !spell.Flags.Matches(SpellFlagFinisher) {
+					return
+				}
 
-			// Need to store the points because they get spent before OnSpellHit is called.
-			numPoints = rogue.ComboPoints()
+				// Need to store the points because they get spent before OnSpellHit is called.
+				numPoints = rogue.ComboPoints()
 
-			if spell.SameActionIgnoreTag(rogue.SliceAndDice[1].ActionID) {
-				// SND won't call OnSpellHit so we have to add the effect now.
+				if spell.SameActionIgnoreTag(rogue.SliceAndDice[1].ActionID) {
+					// SND won't call OnSpellHit so we have to add the effect now.
+					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
+						procAura.Activate(sim)
+					}
+				}
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.Flags.Matches(SpellFlagFinisher) {
+					return
+				}
+
 				if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
 					procAura.Activate(sim)
 				}
-			}
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.Flags.Matches(SpellFlagFinisher) {
-				return
-			}
-
-			if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-				procAura.Activate(sim)
-			}
-		},
+			},
+		})
 	})
+
 }

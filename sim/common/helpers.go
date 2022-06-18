@@ -8,8 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func AddSimpleStatItemActiveEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration, sharedCDFunc func(*core.Character) core.Cooldown) {
-	core.AddItemEffect(itemID, core.MakeTemporaryStatsOnUseCDRegistration(
+func NewSimpleStatItemActiveEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration, sharedCDFunc func(*core.Character) core.Cooldown) {
+	core.NewItemEffect(itemID, core.MakeTemporaryStatsOnUseCDRegistration(
 		"ItemActive-"+strconv.Itoa(int(itemID)),
 		bonus,
 		duration,
@@ -27,14 +27,14 @@ func AddSimpleStatItemActiveEffect(itemID int32, bonus stats.Stats, duration tim
 }
 
 // No shared CD
-func AddSimpleStatItemEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
-	AddSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
+func NewSimpleStatItemEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
+	NewSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
 		return core.Cooldown{}
 	})
 }
 
-func AddSimpleStatOffensiveTrinketEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
-	AddSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
+func NewSimpleStatOffensiveTrinketEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
+	NewSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
 		return core.Cooldown{
 			Timer:    character.GetOffensiveTrinketCD(),
 			Duration: duration,
@@ -42,8 +42,8 @@ func AddSimpleStatOffensiveTrinketEffect(itemID int32, bonus stats.Stats, durati
 	})
 }
 
-func AddSimpleStatDefensiveTrinketEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
-	AddSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
+func NewSimpleStatDefensiveTrinketEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
+	NewSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
 		return core.Cooldown{
 			Timer:    character.GetDefensiveTrinketCD(),
 			Duration: duration,

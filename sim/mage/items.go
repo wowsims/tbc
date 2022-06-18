@@ -10,16 +10,6 @@ import (
 
 const SerpentCoilBraidID = 30720
 
-func init() {
-	common.AddSimpleStatOffensiveTrinketEffect(19339, stats.Stats{stats.SpellHaste: 330}, time.Second*20, time.Minute*5) // MQG
-
-	core.AddItemEffect(32488, ApplyAshtongueTalismanOfInsight)
-
-	// Even though these item effects are handled elsewhere, add them so they are
-	// detected for automatic testing.
-	core.AddItemEffect(SerpentCoilBraidID, func(core.Agent) {})
-}
-
 var ItemSetAldorRegalia = core.NewItemSet(core.ItemSet{
 	Name: "Aldor Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -76,29 +66,37 @@ var ItemSetTempestRegalia = core.NewItemSet(core.ItemSet{
 	},
 })
 
-func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
-	mage := agent.(MageAgent).GetMage()
-	procAura := mage.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
+func init() {
+	common.NewSimpleStatOffensiveTrinketEffect(19339, stats.Stats{stats.SpellHaste: 330}, time.Second*20, time.Minute*5) // MQG
 
-	mage.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-				return
-			}
-			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				return
-			}
+	core.NewItemEffect(32488, func(agent core.Agent) {
+		mage := agent.(MageAgent).GetMage()
+		procAura := mage.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
-			if sim.RandomFloat("Ashtongue Talisman of Insight") > 0.5 {
-				return
-			}
+		mage.RegisterAura(core.Aura{
+			Label:    "Ashtongue Talisman",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					return
+				}
 
-			procAura.Activate(sim)
-		},
+				if sim.RandomFloat("Ashtongue Talisman of Insight") > 0.5 {
+					return
+				}
+
+				procAura.Activate(sim)
+			},
+		})
 	})
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.NewItemEffect(SerpentCoilBraidID, func(core.Agent) {})
 }
