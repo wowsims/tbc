@@ -46,6 +46,13 @@ character_stats_results: {
  }
 }
 dps_results: {
+ key: "TestDestruction-AllItems-AshtongueTalismanofShadows-32493"
+ value: {
+  dps: 1726.4257069173732
+  tps: 1168.7132919469557
+ }
+}
+dps_results: {
  key: "TestDestruction-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1730.333251272062
@@ -186,10 +193,24 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestDestruction-AllItems-TheBlackBook-19337"
+ value: {
+  dps: 1726.4257069173732
+  tps: 1168.7132919469557
+ }
+}
+dps_results: {
  key: "TestDestruction-AllItems-ThunderingSkyfireDiamond"
  value: {
   dps: 1728.0140473533104
   tps: 1170.233246124697
+ }
+}
+dps_results: {
+ key: "TestDestruction-AllItems-VoidStarTalisman-30449"
+ value: {
+  dps: 1761.1768906506293
+  tps: 1191.167613560185
  }
 }
 dps_results: {

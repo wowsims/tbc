@@ -45,6 +45,8 @@ type Warlock struct {
 	NightfallProcAura *core.Aura
 	ImpShadowboltAura *core.Aura
 
+	Pet *WarlockPet
+
 	DoingRegen bool
 }
 
@@ -134,8 +136,7 @@ func NewWarlock(character core.Character, options proto.Player) *Warlock {
 			warlock.PseudoStats.ShadowDamageDealtMultiplier *= 1.10
 		}
 	} else if warlock.Options.Summon != proto.Warlock_Options_NoSummon {
-		// Create the pet
-		warlock.NewWarlockPet()
+		warlock.Pet = warlock.NewWarlockPet()
 	}
 
 	return warlock
