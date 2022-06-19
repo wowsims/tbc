@@ -224,6 +224,13 @@ export class ActionId {
 					name += ' (Explosion)';
 				}
 				break;
+			case 'Thunderfury':
+				if (this.tag == 1) {
+					name += ' (ST)';
+				} else if (this.tag == 2) {
+					name += ' (MT)';
+				}
+				break;
 			default:
 				if (this.tag) {
 					name += ' (??)';

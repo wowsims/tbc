@@ -89,6 +89,7 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 
 	{ID: 17782, Filter: true}, // talisman of the binding shard
 	{ID: 17783, Filter: true}, // talisman of the binding fragment
+	{ID: 17802, Filter: true}, // Deprecated version of Thunderfury
 	{ID: 18582, Filter: true},
 	{ID: 18583, Filter: true},
 	{ID: 18584, Filter: true},

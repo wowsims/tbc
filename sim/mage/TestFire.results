@@ -704,6 +704,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-Thunderfury,BlessedBladeoftheWindseeker-19019"
+ value: {
+  dps: 1569.76282485599
+  tps: 1315.6470790656233
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-ThunderingSkyfireDiamond"
  value: {
   dps: 1523.734745152226

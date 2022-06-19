@@ -114,6 +114,88 @@ func init() {
 		})
 	})
 
+	core.NewItemEffect(19019, func(agent core.Agent) {
+		character := agent.GetCharacter()
+		mh, oh := character.GetWeaponHands(19019)
+		procMask := core.GetMeleeProcMaskForHands(mh, oh)
+		ppmm := character.AutoAttacks.NewPPMManager(6.0, procMask)
+
+		procActionID := core.ActionID{SpellID: 21992}
+
+		singleTargetSpell := character.RegisterSpell(core.SpellConfig{
+			ActionID:    procActionID.WithTag(1),
+			SpellSchool: core.SpellSchoolNature,
+			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+				ProcMask:         core.ProcMaskEmpty,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 0.5,
+
+				BaseDamage:     core.BaseDamageConfigFlat(300),
+				OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			}),
+		})
+
+		makeDebuffAura := func(target *core.Unit) *core.Aura {
+			return target.GetOrRegisterAura(core.Aura{
+				Label:    "Thunderfury",
+				ActionID: procActionID,
+				Duration: time.Second * 12,
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
+					target.AddStatDynamic(sim, stats.NatureResistance, -25)
+				},
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+					target.AddStatDynamic(sim, stats.NatureResistance, 25)
+				},
+			})
+		}
+
+		baseBounceEffect := core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  63,
+			OutcomeApplier:   character.OutcomeFuncMagicHit(),
+		}
+
+		numHits := core.MinInt32(5, character.Env.GetNumTargets())
+		bounceEffects := make([]core.SpellEffect, 0, numHits)
+		for i := int32(0); i < numHits; i++ {
+			bounceEffects = append(bounceEffects, baseBounceEffect)
+			bounceEffects[i].Target = character.Env.GetTargetUnit(i)
+
+			debuffAura := makeDebuffAura(bounceEffects[i].Target)
+			bounceEffects[i].OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					debuffAura.Activate(sim)
+				}
+			}
+		}
+
+		bounceSpell := character.RegisterSpell(core.SpellConfig{
+			ActionID:     procActionID.WithTag(2),
+			SpellSchool:  core.SpellSchoolNature,
+			ApplyEffects: core.ApplyEffectFuncDamageMultiple(bounceEffects),
+		})
+
+		character.RegisterAura(core.Aura{
+			Label:    "Thunderfury",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
+					return
+				}
+				if !ppmm.Proc(sim, spellEffect.ProcMask, "Thunderfury") {
+					return
+				}
+
+				singleTargetSpell.Cast(sim, spellEffect.Target)
+				bounceSpell.Cast(sim, spellEffect.Target)
+			},
+		})
+	})
+
 	core.NewItemEffect(23541, func(agent core.Agent) {
 		character := agent.GetCharacter()
 
