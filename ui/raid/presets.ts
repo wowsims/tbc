@@ -975,7 +975,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		buffBotId: 'Resto Shaman',
 		spec: Spec.SpecElementalShaman,
 		name: 'Resto Shaman',
-		tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Mana Tide Totem, and Drums of Battle. Chooses air totem based on party composition.',
+		tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Mana Tide Totem, Strength of Earth Totem, and Drums of Battle. Chooses air totem based on party composition.',
 		iconUrl: talentTreeIcons[Class.ClassShaman][2],
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			partyProto.buffs!.drums = Drums.DrumsOfBattle;
