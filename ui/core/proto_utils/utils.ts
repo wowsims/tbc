@@ -819,8 +819,6 @@ export const raceToFaction: Record<Race, Faction> = {
 
 export const specToClass: Record<Spec, Class> = {
 	[Spec.SpecBalanceDruid]: Class.ClassDruid,
-	[Spec.SpecElementalShaman]: Class.ClassShaman,
-	[Spec.SpecEnhancementShaman]: Class.ClassShaman,
 	[Spec.SpecFeralDruid]: Class.ClassDruid,
 	[Spec.SpecFeralTankDruid]: Class.ClassDruid,
 	[Spec.SpecHunter]: Class.ClassHunter,
@@ -829,10 +827,12 @@ export const specToClass: Record<Spec, Class> = {
 	[Spec.SpecRetributionPaladin]: Class.ClassPaladin,
 	[Spec.SpecProtectionPaladin]: Class.ClassPaladin,
 	[Spec.SpecShadowPriest]: Class.ClassPriest,
+	[Spec.SpecSmitePriest]: Class.ClassPriest,
+	[Spec.SpecElementalShaman]: Class.ClassShaman,
+	[Spec.SpecEnhancementShaman]: Class.ClassShaman,
 	[Spec.SpecWarlock]: Class.ClassWarlock,
 	[Spec.SpecWarrior]: Class.ClassWarrior,
 	[Spec.SpecProtectionWarrior]: Class.ClassWarrior,
-	[Spec.SpecSmitePriest]: Class.ClassPriest,
 };
 
 const druidRaces = [

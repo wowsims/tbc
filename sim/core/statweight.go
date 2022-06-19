@@ -100,6 +100,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		go RunSim(*simRequest, reporter) // RunRaidSim(simRequest)
 
 		var localIterations int32
+		var errorStr string
 		var simResult *proto.RaidSimResult
 	statsim:
 		for {
@@ -123,10 +124,14 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 					}
 				}
 				if metrics.FinalRaidResult != nil {
-					// TODO: get stack trace out if final result error is set.
+					errorStr = metrics.FinalRaidResult.ErrorResult
 					break statsim
 				}
 			}
+		}
+		// TODO: get stack trace out if final result error is set.
+		if errorStr != "" {
+			panic("Stat weights error: " + errorStr)
 		}
 		dpsMetrics := simResult.RaidMetrics.Parties[0].Players[0].Dps
 		tpsMetrics := simResult.RaidMetrics.Parties[0].Players[0].Dps
