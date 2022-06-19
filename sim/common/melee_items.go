@@ -186,7 +186,7 @@ func init() {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 					return
 				}
-				if !ppmm.ProcWithWeaponSpecials(sim, spellEffect.ProcMask, "Thunderfury") {
+				if !ppmm.Proc(sim, spellEffect.ProcMask, "Thunderfury") {
 					return
 				}
 
