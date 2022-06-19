@@ -4,6 +4,7 @@ import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto/common.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { talentTreeIcons } from '/tbc/core/proto_utils/utils.js';
@@ -917,14 +918,49 @@ export const buffBotPresets = [
         buffBotId: 'Resto Shaman',
         spec: Spec.SpecElementalShaman,
         name: 'Resto Shaman',
-        tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Wrath of Air Totem, Mana Tide Totem, and Drums of Battle.',
+        tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Mana Tide Totem, Strength of Earth Totem, and Drums of Battle. Chooses air totem based on party composition.',
         iconUrl: talentTreeIcons[Class.ClassShaman][2],
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
+            partyProto.buffs.drums = Drums.DrumsOfBattle;
             partyProto.buffs.bloodlust++;
             partyProto.buffs.manaSpringTotem = TristateEffect.TristateEffectImproved;
-            partyProto.buffs.wrathOfAirTotem = Math.max(partyProto.buffs.wrathOfAirTotem, TristateEffect.TristateEffectRegular);
             partyProto.buffs.manaTideTotems++;
-            partyProto.buffs.drums = Drums.DrumsOfBattle;
+            // Choose which air totem to drop based on party composition.
+            const woaSpecs = [
+                Spec.SpecBalanceDruid,
+                Spec.SpecMage,
+                Spec.SpecShadowPriest,
+                Spec.SpecSmitePriest,
+                Spec.SpecProtectionPaladin,
+                Spec.SpecEnhancementShaman,
+                Spec.SpecElementalShaman,
+                Spec.SpecWarlock,
+            ];
+            const wfSpecs = [
+                Spec.SpecRetributionPaladin,
+                Spec.SpecRogue,
+                Spec.SpecWarrior,
+                Spec.SpecProtectionWarrior,
+            ];
+            const goaSpecs = [
+                Spec.SpecFeralDruid,
+                Spec.SpecFeralTankDruid,
+                Spec.SpecHunter,
+            ];
+            const [woaVotes, wfVotes, goaVotes] = [woaSpecs, wfSpecs, goaSpecs]
+                .map(specs => partyProto.players
+                .map(player => playerToSpec(player))
+                .filter(playerSpec => specs.includes(playerSpec))
+                .length);
+            if (woaVotes >= wfVotes && woaVotes >= goaVotes) {
+                partyProto.buffs.wrathOfAirTotem = Math.max(partyProto.buffs.wrathOfAirTotem, TristateEffect.TristateEffectRegular);
+            }
+            else if (wfVotes >= goaVotes) {
+                partyProto.buffs.windfuryTotemRank = 5;
+            }
+            else {
+                partyProto.buffs.graceOfAirTotem = Math.max(partyProto.buffs.graceOfAirTotem, TristateEffect.TristateEffectRegular);
+            }
         },
     },
     {
