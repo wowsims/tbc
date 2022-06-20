@@ -45,15 +45,6 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecProtectionWarrior>) => {
-					return {
-						updateOn: new TypedEvent(),
-						shouldDisplay: () => true,
-						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [

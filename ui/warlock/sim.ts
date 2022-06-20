@@ -37,15 +37,6 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			knownIssues: [
 
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecWarlock>) => {
-					return {
-						updateOn: new TypedEvent(),
-						shouldDisplay: () => true,
-						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
