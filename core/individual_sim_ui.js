@@ -728,11 +728,6 @@ export class IndividualSimUI extends SimUI {
     }
     fromProto(eventID, settings) {
         TypedEvent.freezeAllAndDo(() => {
-            // TODO: Deprecate this
-            if (settings.encounter.targets[0] && settings.encounter.targets[0].debuffs) {
-                settings.debuffs = settings.encounter.targets[0].debuffs;
-                settings.encounter.targets[0].debuffs = undefined;
-            }
             if (!settings.player) {
                 return;
             }

@@ -464,12 +464,6 @@ export interface Target {
      */
     name: string;
     /**
-     * TODO: Deprecate this after 1 month (2022/6/6)
-     *
-     * @generated from protobuf field: double armor = 1;
-     */
-    armor: number;
-    /**
      * @generated from protobuf field: int32 level = 4;
      */
     level: number;
@@ -522,12 +516,6 @@ export interface Target {
      * @generated from protobuf field: int32 tank_index = 6;
      */
     tankIndex: number;
-    /**
-     * TODO: Deprecate after 1 month (2022/06/14).
-     *
-     * @generated from protobuf field: proto.Debuffs debuffs = 2;
-     */
-    debuffs?: Debuffs;
 }
 /**
  * @generated from protobuf message proto.Encounter
