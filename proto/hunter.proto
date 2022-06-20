@@ -58,87 +58,87 @@ message HunterTalents {
 }
 
 message Hunter {
-    message Rotation {
-			bool use_multi_shot = 1;
-			bool use_arcane_shot = 2;
-			bool precast_aimed_shot = 3;
-			bool lazy_rotation = 12; // Restricts to 1 action between each auto shot.
+	message Rotation {
+		bool use_multi_shot = 1;
+		bool use_arcane_shot = 2;
+		bool precast_aimed_shot = 3;
+		bool lazy_rotation = 12; // Restricts to 1 action between each auto shot.
 
-			enum StingType {
-					NoSting = 0;
-					ScorpidSting = 1;
-					SerpentSting = 2;
-			}
-			StingType sting = 5;
+		enum StingType {
+			NoSting = 0;
+			ScorpidSting = 1;
+			SerpentSting = 2;
+		}
+		StingType sting = 5;
 
-			// Switch to Aspect of the Viper when mana goes below this percent.
-			double viper_start_mana_percent = 6;
-			// Switch back to Aspect of the Hawk when mana goes above this percent.
-			double viper_stop_mana_percent = 7;
+		// Switch to Aspect of the Viper when mana goes below this percent.
+		double viper_start_mana_percent = 6;
+		// Switch back to Aspect of the Hawk when mana goes above this percent.
+		double viper_stop_mana_percent = 7;
 
-			enum WeaveType {
-					WeaveNone = 0;
-					WeaveAutosOnly = 1;
-					WeaveRaptorOnly = 2;
-					WeaveFull = 3;
-			}
-			WeaveType weave = 11;
+		enum WeaveType {
+			WeaveNone = 0;
+			WeaveAutosOnly = 1;
+			WeaveRaptorOnly = 2;
+			WeaveFull = 3;
+		}
+		WeaveType weave = 11;
 
-			// Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
-			int32 time_to_weave_ms = 9;
+		// Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
+		int32 time_to_weave_ms = 9;
 
-			// Percent of fight (0-1) to use melee weaving.
-			double percent_weaved = 10;
-    }
-    Rotation rotation = 1;
+		// Percent of fight (0-1) to use melee weaving.
+		double percent_weaved = 10;
+	}
+	Rotation rotation = 1;
 
-    HunterTalents talents = 2;
-    
-    message Options {
-			enum QuiverBonus {
-					QuiverNone = 0;
-					Speed10 = 1;
-					Speed11 = 2;
-					Speed12 = 3;
-					Speed13 = 4;
-					Speed14 = 5;
-					Speed15 = 6;
-			}
-			QuiverBonus quiver_bonus = 1;
+	HunterTalents talents = 2;
+	
+	message Options {
+		enum QuiverBonus {
+			QuiverNone = 0;
+			Speed10 = 1;
+			Speed11 = 2;
+			Speed12 = 3;
+			Speed13 = 4;
+			Speed14 = 5;
+			Speed15 = 6;
+		}
+		QuiverBonus quiver_bonus = 1;
 
-			enum Ammo {
-					AmmoNone = 0;
-					TimelessArrow = 1;
-					MysteriousArrow = 2;
-					AdamantiteStinger = 3;
-					WardensArrow = 4;
-					HalaaniRazorshaft = 5;
-					BlackflightArrow = 6;
-			}
-			Ammo ammo = 2;
+		enum Ammo {
+			AmmoNone = 0;
+			TimelessArrow = 1;
+			MysteriousArrow = 2;
+			AdamantiteStinger = 3;
+			WardensArrow = 4;
+			HalaaniRazorshaft = 5;
+			BlackflightArrow = 6;
+		}
+		Ammo ammo = 2;
 
-			enum PetType {
-					PetNone = 0;
-					Bat = 5;
-					Bear = 7;
-					Cat = 2;
-					Crab = 8;
-					Owl = 4;
-					Raptor = 3;
-					Ravager = 1;
-					WindSerpent = 6;
-			}
+		enum PetType {
+			PetNone = 0;
+			Bat = 5;
+			Bear = 7;
+			Cat = 2;
+			Crab = 8;
+			Owl = 4;
+			Raptor = 3;
+			Ravager = 1;
+			WindSerpent = 6;
+		}
 
-			PetType pet_type = 3;
-			double pet_uptime = 4;
-			bool pet_single_ability = 6;
+		PetType pet_type = 3;
+		double pet_uptime = 4;
+		bool pet_single_ability = 6;
 
-			int32 latency_ms = 5;
+		int32 latency_ms = 5;
 
-			// For internal use only.
-			// Used for hunter presims to avoid artifacts caused by randomness when
-			// calculating average ability damage from a low sample size.
-			bool remove_randomness = 7;
-    }
-    Options options = 3;
+		// For internal use only.
+		// Used for hunter presims to avoid artifacts caused by randomness when
+		// calculating average ability damage from a low sample size.
+		bool remove_randomness = 7;
+	}
+	Options options = 3;
 }

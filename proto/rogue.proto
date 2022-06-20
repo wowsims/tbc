@@ -61,33 +61,33 @@ message RogueTalents {
 }
 
 message Rogue {
-    message Rotation {
-      enum Builder {
-          Unknown = 0;
-          Auto = 1;
-          SinisterStrike = 2;
-          Backstab = 3;
-          Hemorrhage = 4;
-          Mutilate = 5;
-      }
-			Builder builder = 3;
+	message Rotation {
+		enum Builder {
+			Unknown = 0;
+			Auto = 1;
+			SinisterStrike = 2;
+			Backstab = 3;
+			Hemorrhage = 4;
+			Mutilate = 5;
+		}
+		Builder builder = 3;
 
-			bool maintain_expose_armor = 1;
+		bool maintain_expose_armor = 1;
 
-			// Allows use of rupture when sensible.
-			bool use_rupture = 2;
+		// Allows use of rupture when sensible.
+		bool use_rupture = 2;
 
-			// Shiv instead of regular builder if deadly poison is about to fall.
-			bool use_shiv = 5;
+		// Shiv instead of regular builder if deadly poison is about to fall.
+		bool use_shiv = 5;
 
-			// Don't use damage finishers (eviscerate, rupture) unless >= this many CPs.
-			int32 min_combo_points_for_damage_finisher = 4;
-    }
-    Rotation rotation = 1;
+		// Don't use damage finishers (eviscerate, rupture) unless >= this many CPs.
+		int32 min_combo_points_for_damage_finisher = 4;
+	}
+	Rotation rotation = 1;
 
-    RogueTalents talents = 2;
-    
-    message Options {
-    }
-    Options options = 3;
+	RogueTalents talents = 2;
+	
+	message Options {
+	}
+	Options options = 3;
 }

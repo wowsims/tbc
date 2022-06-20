@@ -89,36 +89,36 @@ enum PaladinJudgement {
 }
 
 message RetributionPaladin {
-    message Rotation {
-			enum ConsecrationRank {
-				None = 0;
-				Rank1 = 1;
-				Rank4 = 2;
-				Rank6 = 3;
-			}
-			ConsecrationRank consecration_rank = 1;
+	message Rotation {
+		enum ConsecrationRank {
+			None = 0;
+			Rank1 = 1;
+			Rank4 = 2;
+			Rank6 = 3;
+		}
+		ConsecrationRank consecration_rank = 1;
 
-			bool use_exorcism = 2;
-    }
-    Rotation rotation = 1;
+		bool use_exorcism = 2;
+	}
+	Rotation rotation = 1;
 
-    PaladinTalents talents = 2;
-    
-    message Options {
-			enum Judgement {
-				None = 0;
-				Wisdom = 1;
-				Crusader = 2;
-			};
-			Judgement judgement = 1;
+	PaladinTalents talents = 2;
+	
+	message Options {
+		enum Judgement {
+			None = 0;
+			Wisdom = 1;
+			Crusader = 2;
+		}
+		Judgement judgement = 1;
 
-			PaladinAura aura = 5;
+		PaladinAura aura = 5;
 
-			int32 crusader_strike_delay_ms = 2;
-			int32 haste_leeway_ms = 3;
-			double damage_taken_per_second = 4;
-    }
-    Options options = 3;
+		int32 crusader_strike_delay_ms = 2;
+		int32 haste_leeway_ms = 3;
+		double damage_taken_per_second = 4;
+	}
+	Options options = 3;
 }
 
 message ProtectionPaladin {
