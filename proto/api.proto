@@ -18,33 +18,33 @@ message Player {
 	// Label used for logging.
 	string name = 16;
 
-    Race race = 1;
-    ShattrathFaction shatt_faction = 24;
-    Class class = 2;
+	Race race = 1;
+	ShattrathFaction shatt_faction = 24;
+	Class class = 2;
 
-    EquipmentSpec equipment = 3;
-    Consumes consumes = 4;
-    repeated double bonus_stats = 5;
+	EquipmentSpec equipment = 3;
+	Consumes consumes = 4;
+	repeated double bonus_stats = 5;
 
 	IndividualBuffs buffs = 15;
 
-    oneof spec {
-        BalanceDruid balance_druid = 6;
+	oneof spec {
+		BalanceDruid balance_druid = 6;
 		FeralDruid feral_druid = 22;
 		FeralTankDruid feral_tank_druid = 26;
-        Hunter hunter = 7;
-        Mage mage = 8;
-        RetributionPaladin retribution_paladin = 9;
-        ProtectionPaladin protection_paladin = 25;
-        ShadowPriest shadow_priest = 10;
-        SmitePriest smite_priest = 20;
-        Rogue rogue = 11;
-        ElementalShaman elemental_shaman = 12;
-        EnhancementShaman enhancement_shaman = 18;
-        Warlock warlock = 13;
-        Warrior warrior = 14;
-        ProtectionWarrior protection_warrior = 21;
-    }
+		Hunter hunter = 7;
+		Mage mage = 8;
+		RetributionPaladin retribution_paladin = 9;
+		ProtectionPaladin protection_paladin = 25;
+		ShadowPriest shadow_priest = 10;
+		SmitePriest smite_priest = 20;
+		Rogue rogue = 11;
+		ElementalShaman elemental_shaman = 12;
+		EnhancementShaman enhancement_shaman = 18;
+		Warlock warlock = 13;
+		Warrior warrior = 14;
+		ProtectionWarrior protection_warrior = 21;
+	}
 
 	// Only used by the UI. Sim uses talents within the spec protos.
 	string talentsString = 17;
@@ -55,13 +55,13 @@ message Player {
 }
 
 message Party {
-    repeated Player players = 1;
+	repeated Player players = 1;
 
 	PartyBuffs buffs = 2;
 }
 
 message Raid {
-    repeated Party parties = 1; 
+	repeated Party parties = 1; 
 
 	RaidBuffs buffs = 2;
 
@@ -77,11 +77,11 @@ message Raid {
 }
 
 message SimOptions {
-    int32 iterations = 1;
-    int64 random_seed = 2;
-    bool debug = 3; // Enables debug logging.
-    bool debug_first_iteration = 6;
-		bool is_test = 5; // Only used internally.
+	int32 iterations = 1;
+	int64 random_seed = 2;
+	bool debug = 3; // Enables debug logging.
+	bool debug_first_iteration = 6;
+	bool is_test = 5; // Only used internally.
 }
 
 // The aggregated results from all uses of a particular action.
@@ -99,41 +99,41 @@ message ActionMetrics {
 
 // Metrics for a specific action, when cast at a particular target.
 message TargetedActionMetrics {
-		// Raid/Target Index of the unit these metrics are targeted at.
-		int32 unit_index = 12;
+	// Raid/Target Index of the unit these metrics are targeted at.
+	int32 unit_index = 12;
 
-		// # of times this action was used by the agent.
-    int32 casts = 1;
+	// # of times this action was used by the agent.
+	int32 casts = 1;
 
-		// # of times this action hit a target. For cleave spells this can be larger than casts.
-    int32 hits = 2;
+	// # of times this action hit a target. For cleave spells this can be larger than casts.
+	int32 hits = 2;
 
-		// # of times this action was a critical strike.
-    int32 crits = 3;
+	// # of times this action was a critical strike.
+	int32 crits = 3;
 
-		// # of times this action was a crushing blow.
-    int32 crushes = 11;
+	// # of times this action was a crushing blow.
+	int32 crushes = 11;
 
-		// # of times this action was a Miss or Resist.
-    int32 misses = 4;
+	// # of times this action was a Miss or Resist.
+	int32 misses = 4;
 
-		// # of times this action was a Dodge.
-    int32 dodges = 5;
+	// # of times this action was a Dodge.
+	int32 dodges = 5;
 
-		// # of times this action was a Parry.
-    int32 parries = 6;
+	// # of times this action was a Parry.
+	int32 parries = 6;
 
-		// # of times this action was a Block.
-    int32 blocks = 7;
+	// # of times this action was a Block.
+	int32 blocks = 7;
 
-		// # of times this action was a Glance.
-    int32 glances = 8;
+	// # of times this action was a Glance.
+	int32 glances = 8;
 
-		// Total damage done to all targets by this action.
-    double damage = 9;
+	// Total damage done to all targets by this action.
+	double damage = 9;
 
-		// Total threat done to all targets by this action.
-    double threat = 10;
+	// Total threat done to all targets by this action.
+	double threat = 10;
 }
 
 message AuraMetrics {
@@ -168,10 +168,10 @@ message ResourceMetrics {
 }
 
 message DistributionMetrics {
-    double avg   = 1;
-    double stdev = 2;
-    double max   = 3;
-    map<int32, int32> hist = 4;
+	double avg   = 1;
+	double stdev = 2;
+	double max   = 3;
+	map<int32, int32> hist = 4;
 }
 
 // All the results for a single Unit (player, target, or pet).
@@ -182,10 +182,10 @@ message UnitMetrics {
 	DistributionMetrics threat = 8;
 	DistributionMetrics dtps = 11;
 
-    // average seconds spent oom per iteration
-    double seconds_oom_avg = 3; 
+	// average seconds spent oom per iteration
+	double seconds_oom_avg = 3; 
 
-    repeated ActionMetrics actions = 5;
+	repeated ActionMetrics actions = 5;
 	repeated AuraMetrics auras = 6;
 	repeated ResourceMetrics resources = 10;
 
@@ -212,8 +212,8 @@ message EncounterMetrics {
 
 // RPC RaidSim
 message RaidSimRequest {
-    Raid raid = 1;
-    Encounter encounter = 2;
+	Raid raid = 1;
+	Encounter encounter = 2;
 	SimOptions sim_options = 3;
 }
 
@@ -236,9 +236,9 @@ message RaidSimResult {
 message GearListRequest {
 }
 message GearListResult {
-    repeated Item items = 1;
-    repeated Enchant enchants = 2;
-    repeated Gem gems = 3;
+	repeated Item items = 1;
+	repeated Enchant enchants = 2;
+	repeated Gem gems = 3;
 	repeated PresetEncounter encounters = 4;
 }
 message PresetTarget {
@@ -252,7 +252,7 @@ message PresetEncounter {
 
 // RPC ComputeStats
 message ComputeStatsRequest {
-    Raid raid = 1;
+	Raid raid = 1;
 }
 message PlayerStats {
 	// Stats
@@ -268,10 +268,10 @@ message PlayerStats {
 	repeated ActionID cooldowns = 5;
 }
 message PartyStats {
-    repeated PlayerStats players = 1;
+	repeated PlayerStats players = 1;
 }
 message RaidStats {
-    repeated PartyStats parties = 1;
+	repeated PartyStats parties = 1;
 }
 message ComputeStatsResult {
 	RaidStats raid_stats = 1;
@@ -280,16 +280,16 @@ message ComputeStatsResult {
 
 // RPC StatWeights
 message StatWeightsRequest {
-    Player player = 1;
-    RaidBuffs raid_buffs = 2;
-    PartyBuffs party_buffs = 3;
-    Debuffs debuffs = 9;
-    Encounter encounter = 4;
+	Player player = 1;
+	RaidBuffs raid_buffs = 2;
+	PartyBuffs party_buffs = 3;
+	Debuffs debuffs = 9;
+	Encounter encounter = 4;
 	SimOptions sim_options = 5;
 	repeated RaidTarget tanks = 8;
 
-    repeated Stat stats_to_weigh = 6;
-    Stat ep_reference_stat = 7;
+	repeated Stat stats_to_weigh = 6;
+	Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
 	StatWeightValues dps = 1;
@@ -309,16 +309,16 @@ message AsyncAPIResult {
 
 // ProgressMetrics are used by all async APIs
 message ProgressMetrics {
-    int32 completed_iterations = 1;
-    int32 total_iterations = 2;
-    int32 completed_sims = 3;
-    int32 total_sims = 4;
+	int32 completed_iterations = 1;
+	int32 total_iterations = 2;
+	int32 completed_sims = 3;
+	int32 total_sims = 4;
 	bool presim_running = 8;
 
-    // Partial Results 
-    double dps = 5;
+	// Partial Results 
+	double dps = 5;
 
-    // Final Results
-    RaidSimResult final_raid_result = 6; // only set when completed
-    StatWeightsResult final_weight_result = 7;
+	// Final Results
+	RaidSimResult final_raid_result = 6; // only set when completed
+	StatWeightsResult final_weight_result = 7;
 }

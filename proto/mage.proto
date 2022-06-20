@@ -60,88 +60,88 @@ message MageTalents {
 }
 
 message Mage {
-    message Rotation {
-			// Just used for controlling which options are displayed in the UI. Is not
-			// used by the sim.
-			enum Type {
-				Arcane = 0;
-				Fire = 1;
-				Frost = 2;
+	message Rotation {
+		// Just used for controlling which options are displayed in the UI. Is not
+		// used by the sim.
+		enum Type {
+			Arcane = 0;
+			Fire = 1;
+			Frost = 2;
+		}
+		Type type = 1;
+
+		message ArcaneRotation {
+			enum Filler {
+				Frostbolt = 0;
+				ArcaneMissiles = 1;
+				Scorch = 2;
+				Fireball = 3;
+				ArcaneMissilesFrostbolt = 4;
+				ArcaneMissilesScorch = 5;
+				ScorchTwoFireball = 6;
 			}
-			Type type = 1;
+			// The spells to use to fill time while waiting for arcane blast stacks to drop.
+			Filler filler = 1;
 
-			message ArcaneRotation {
-				enum Filler {
-					Frostbolt = 0;
-					ArcaneMissiles = 1;
-					Scorch = 2;
-					Fireball = 3;
-					ArcaneMissilesFrostbolt = 4;
-					ArcaneMissilesScorch = 5;
-					ScorchTwoFireball = 6;
-				}
-				// The spells to use to fill time while waiting for arcane blast stacks to drop.
-				Filler filler = 1;
+			// Number of arcane blasts to cast before switching to filler.
+			int32 arcane_blasts_between_fillers = 2;
 
-				// Number of arcane blasts to cast before switching to filler.
-				int32 arcane_blasts_between_fillers = 2;
+			// Percentage of mana (0-1) below which to switch to regen rotation.
+			double start_regen_rotation_percent = 3;
 
-				// Percentage of mana (0-1) below which to switch to regen rotation.
-				double start_regen_rotation_percent = 3;
+			// Percentage of mana (0-1) above which to switch to regular rotation.
+			double stop_regen_rotation_percent = 4;
 
-				// Percentage of mana (0-1) above which to switch to regular rotation.
-				double stop_regen_rotation_percent = 4;
+			// Prevents DPS cooldowns from being using during regen rotation.
+			bool disable_dps_cooldowns_during_regen = 5;
+		}
+		ArcaneRotation arcane = 2;
 
-				// Prevents DPS cooldowns from being using during regen rotation.
-				bool disable_dps_cooldowns_during_regen = 5;
+		message FireRotation {
+			enum PrimarySpell {
+				Fireball = 0;
+				Scorch = 1;
 			}
-			ArcaneRotation arcane = 2;
+			PrimarySpell primary_spell = 1;
 
-			message FireRotation {
-				enum PrimarySpell {
-					Fireball = 0;
-					Scorch = 1;
-				}
-				PrimarySpell primary_spell = 1;
+			bool maintain_improved_scorch = 2;
 
-				bool maintain_improved_scorch = 2;
+			bool weave_fire_blast = 3;
+		}
+		FireRotation fire = 3;
 
-				bool weave_fire_blast = 3;
+		message FrostRotation {
+			// Chance for water elemental to disobey, doing nothing rather than cast.
+			double water_elemental_disobey_chance = 3;
+		}
+		FrostRotation frost = 4;
+
+		message AoeRotation {
+			enum Rotation {
+				ArcaneExplosion = 0;
+				Flamestrike = 1;
+				Blizzard = 2;
 			}
-			FireRotation fire = 3;
+			Rotation rotation = 1;
+		}
+		AoeRotation aoe = 5;
 
-			message FrostRotation {
-				// Chance for water elemental to disobey, doing nothing rather than cast.
-				double water_elemental_disobey_chance = 3;
-			}
-			FrostRotation frost = 4;
+		bool multi_target_rotation = 6;
+	}
+	Rotation rotation = 1;
 
-			message AoeRotation {
-				enum Rotation {
-					ArcaneExplosion = 0;
-					Flamestrike = 1;
-					Blizzard = 2;
-				}
-				Rotation rotation = 1;
-			}
-			AoeRotation aoe = 5;
+	MageTalents talents = 2;
+	
+	message Options {
+		enum ArmorType {
+			NoArmor = 0;
+			MageArmor = 1;
+			MoltenArmor = 2;
+		}
+		ArmorType armor = 1;
 
-			bool multi_target_rotation = 6;
-    }
-    Rotation rotation = 1;
-
-    MageTalents talents = 2;
-    
-    message Options {
-			enum ArmorType {
-				NoArmor = 0;
-				MageArmor = 1;
-				MoltenArmor = 2;
-			}
-			ArmorType armor = 1;
-
-			// Number of Evocation ticks to use. If 0, use all of them.
-			int32 evocation_ticks = 2;
-    }
-    Options options = 3;
+		// Number of Evocation ticks to use. If 0, use all of them.
+		int32 evocation_ticks = 2;
+	}
+	Options options = 3;
 }
