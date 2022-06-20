@@ -255,11 +255,6 @@ export class Target {
 
 	fromProto(eventID: EventID, proto: TargetProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			let stats = new Stats(proto.stats);
-			if (proto.armor) {
-				stats = stats.withStat(Stat.StatArmor, proto.armor);
-			}
-
 			this.setId(eventID, proto.id);
 			this.setName(eventID, proto.name);
 			this.setLevel(eventID, proto.level);
@@ -273,7 +268,7 @@ export class Target {
 			this.setSuppressDodge(eventID, proto.suppressDodge);
 			this.setParryHaste(eventID, proto.parryHaste);
 			this.setSpellSchool(eventID, proto.spellSchool);
-			this.setStats(eventID, stats);
+			this.setStats(eventID, new Stats(proto.stats));
 		});
 	}
 

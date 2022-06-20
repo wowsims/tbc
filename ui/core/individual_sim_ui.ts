@@ -985,12 +985,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	fromProto(eventID: EventID, settings: IndividualSimSettings) {
 		TypedEvent.freezeAllAndDo(() => {
-			// TODO: Deprecate this
-			if (settings.encounter!.targets[0] && settings.encounter!.targets[0].debuffs) {
-				settings.debuffs = settings.encounter!.targets[0].debuffs;
-				settings.encounter!.targets[0].debuffs = undefined;
-			}
-
 			if (!settings.player) {
 				return;
 			}
