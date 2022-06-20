@@ -19,7 +19,7 @@ import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -45,7 +45,7 @@ import * as DruidInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecFeralTankDruid>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecFeralTankDruid>) {
 		super(parentElem, player, {
 			cssClass: 'feral-tank-druid-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.

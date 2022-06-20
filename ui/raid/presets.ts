@@ -1006,11 +1006,11 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 				Spec.SpecHunter,
 			];
 			const [woaVotes, wfVotes, goaVotes] = [woaSpecs, wfSpecs, goaSpecs]
-					.map(specs => partyProto.players
-							.filter(player => player.class != Class.ClassUnknown)
-							.map(player => playerToSpec(player))
-							.filter(playerSpec => specs.includes(playerSpec))
-							.length);
+				.map(specs => partyProto.players
+					.filter(player => player.class != Class.ClassUnknown)
+					.map(player => playerToSpec(player))
+					.filter(playerSpec => specs.includes(playerSpec))
+					.length);
 
 			if (woaVotes >= wfVotes && woaVotes >= goaVotes) {
 				partyProto.buffs!.wrathOfAirTotem = Math.max(partyProto.buffs!.wrathOfAirTotem, TristateEffect.TristateEffectRegular);

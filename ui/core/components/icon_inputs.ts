@@ -214,7 +214,7 @@ function makeBooleanIndividualBuffInput(id: ActionId, buffsFieldName: keyof Indi
 	return {
 		id: id,
 		states: 2,
-		extraCssClasses: buffsFieldName == 'blessingOfSalvation' ? [ 'threat-metrics' ] : [],
+		extraCssClasses: buffsFieldName == 'blessingOfSalvation' ? ['threat-metrics'] : [],
 		exclusivityTags: exclusivityTags,
 		changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
 		getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as boolean,

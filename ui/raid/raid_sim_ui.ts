@@ -158,8 +158,8 @@ export class RaidSimUI extends SimUI {
 					this.sim.raid.fromProto(eventID, newRaid.raid || RaidProto.create());
 					this.raidPicker!.setBuffBots(eventID, newRaid.buffBots);
 					this.blessingsPicker!.setAssignments(eventID, newRaid.blessings || BlessingsAssignments.create());
-					if(newRaid.faction) this.sim.setFaction(eventID, newRaid.faction);
-					if(newRaid.phase) this.sim.setPhase(eventID, newRaid.phase);
+					if (newRaid.faction) this.sim.setFaction(eventID, newRaid.faction);
+					if (newRaid.phase) this.sim.setPhase(eventID, newRaid.phase);
 				});
 			},
 			changeEmitters: [this.changeEmitter, this.sim.changeEmitter],
@@ -354,7 +354,7 @@ export class RaidSimUI extends SimUI {
 	setBuffBots(eventID: EventID, buffBotProtos: BuffBotProto[]): void {
 		this.raidPicker!.setBuffBots(eventID, buffBotProtos);
 	}
-	
+
 	clearBuffBots(eventID: EventID): void {
 		this.raidPicker!.setBuffBots(eventID, []);
 	}

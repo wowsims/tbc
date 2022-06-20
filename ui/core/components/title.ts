@@ -42,8 +42,8 @@ export class Title extends Component {
 		});
 
 		const orderedLaunchedSpecs: Array<Spec | null> = (naturalSpecOrder
-				.filter(spec => launchedSpecs.includes(spec)) as Array<Spec | null>)
-				.concat([null]); // Null represents the raid sim.
+			.filter(spec => launchedSpecs.includes(spec)) as Array<Spec | null>)
+			.concat([null]); // Null represents the raid sim.
 
 		dropdownPanel.style.gridTemplateRows = `repeat(${Math.ceil(orderedLaunchedSpecs.length / 2)}, 1fr)`;
 

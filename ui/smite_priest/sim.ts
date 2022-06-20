@@ -74,8 +74,8 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 			modifyDisplayStats: (player: Player<Spec.SpecSmitePriest>) => {
 				let stats = new Stats();
 				stats = stats.addStat(Stat.StatSpellHit,
-						player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE +
-						player.getTalents().focusedPower * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+					player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE +
+					player.getTalents().focusedPower * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
 
 				return {
 					talents: stats,

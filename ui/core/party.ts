@@ -100,7 +100,7 @@ export class Party {
 			} else {
 				this.players[playerIndex] = null;
 			}
-			
+
 			this.compChangeEmitter.emit(eventID);
 		});
 	}

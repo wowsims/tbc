@@ -66,7 +66,7 @@ export class EncounterPicker extends Component {
 				});
 			});
 		}
-		
+
 		const advancedButton = document.createElement('button');
 		advancedButton.classList.add('sim-button', 'advanced-button');
 		advancedButton.textContent = 'ADVANCED';
@@ -128,7 +128,7 @@ class AdvancedEncounterPicker extends Popup {
 				setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
 					encounter.setUseHealth(eventID, newValue);
 				},
-			});		
+			});
 		}
 		new ListPicker<Encounter, Target>(targetsElem, this.encounter, {
 			extraCssClasses: [
@@ -207,7 +207,7 @@ class TargetPicker extends Component {
 			},
 		});
 		new EnumPicker<Target>(section1, modTarget, {
-			extraCssClasses: [ 'threat-metrics' ],
+			extraCssClasses: ['threat-metrics'],
 			label: 'Tanked By',
 			labelTooltip: 'Determines which player in the raid this enemy will attack. If no player is assigned to the specified tank slot, this enemy will not attack.',
 			values: [
@@ -361,16 +361,16 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	}
 }
 
-const ALL_TARGET_STATS: Array<{ stat: Stat, tooltip: string, extraCssClasses: Array<string>}> = [
-	{ stat: Stat.StatHealth, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatArmor, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatArcaneResistance, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatFireResistance, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatFrostResistance, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatNatureResistance, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatShadowResistance, tooltip: '', extraCssClasses: []},
-	{ stat: Stat.StatAttackPower, tooltip: '', extraCssClasses: ['threat-metrics']},
-	{ stat: Stat.StatBlockValue, tooltip: '', extraCssClasses: ['threat-metrics']},
+const ALL_TARGET_STATS: Array<{ stat: Stat, tooltip: string, extraCssClasses: Array<string> }> = [
+	{ stat: Stat.StatHealth, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatArmor, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatArcaneResistance, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatFireResistance, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatFrostResistance, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatNatureResistance, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatShadowResistance, tooltip: '', extraCssClasses: [] },
+	{ stat: Stat.StatAttackPower, tooltip: '', extraCssClasses: ['threat-metrics'] },
+	{ stat: Stat.StatBlockValue, tooltip: '', extraCssClasses: ['threat-metrics'] },
 ];
 
 const mobTypeEnumValues = [
