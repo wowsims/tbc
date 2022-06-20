@@ -51,15 +51,6 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecFeralTankDruid>) => {
-					return {
-						updateOn: new TypedEvent(),
-						shouldDisplay: () => true,
-						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
