@@ -507,9 +507,6 @@ message Target {
 		int32 id = 14;
 		string name = 15;
 
-		// TODO: Deprecate this after 1 month (2022/6/6)
-		double armor = 1;
-
 		int32 level = 4;
 		MobType mob_type = 3;
     repeated double stats = 5;
@@ -527,9 +524,6 @@ message Target {
 		// Index in Raid.tanks indicating the player tanking this mob.
 		// -1 or invalid index indicates not being tanked.
     int32 tank_index = 6;
-
-		//TODO: Deprecate after 1 month (2022/06/14).
-		Debuffs debuffs = 2;
 }
 
 message Encounter {
