@@ -78,7 +78,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			defaults: {
 				// Default equipped gear.
 				gear: Presets.P4_DESTRO.gear,
-				
+
 				// TODO: FIND EPS FOR WARLOCKS
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
@@ -253,7 +253,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				talents: [
 					Presets.AfflicationTalents,
 					Presets.DemonologistTalents,
-					Presets.DestructionTalents,	
+					Presets.DestructionTalents,
 					Presets.T6DestroTalents,
 				],
 				// Preset gear configurations that the user can quickly select.

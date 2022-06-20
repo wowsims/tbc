@@ -39,7 +39,7 @@ export const SelfInnervate = {
 		player.setSpecOptions(eventID, newOptions);
 	},
 };
-		
+
 export const LatencyMs = {
 	type: 'number' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,

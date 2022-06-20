@@ -32,7 +32,7 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 			<div class="list-picker-items"></div>
 			<button class="list-picker-new-button sim-button">NEW ${config.itemLabel.toUpperCase()}</button>
 		`;
-		
+
 		this.itemsDiv = this.rootElem.getElementsByClassName('list-picker-items')[0] as HTMLElement;
 
 		const newItemButton = this.rootElem.getElementsByClassName('list-picker-new-button')[0] as HTMLElement;
@@ -62,8 +62,8 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		// Add items that were missing.
 		const curItems = this.getInputValue();
 		newValue
-				.filter(newItem => !curItems.includes(newItem))
-				.forEach(newItem => this.addNewPicker(newItem));
+			.filter(newItem => !curItems.includes(newItem))
+			.forEach(newItem => this.addNewPicker(newItem));
 
 		// Reorder to match the new list.
 		this.itemPickerPairs = newValue.map(item => this.itemPickerPairs.find(ipp => ipp.item == item)!);

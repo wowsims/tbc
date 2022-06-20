@@ -711,8 +711,8 @@ export class Timeline extends ResultComponent {
 
 		// If there are any auras that correspond to this cast, visualize them in the same row.
 		aurasById
-				.filter(auraUptimeLogs => auraUptimeLogs[0].actionId!.equalsIgnoringTag(actionId))
-				.forEach(auraUptimeLogs => this.applyAuraUptimeLogsToRow(auraUptimeLogs, rowElem, duration));
+			.filter(auraUptimeLogs => auraUptimeLogs[0].actionId!.equalsIgnoringTag(actionId))
+			.forEach(auraUptimeLogs => this.applyAuraUptimeLogsToRow(auraUptimeLogs, rowElem, duration));
 
 		this.rotationTimeline.appendChild(rowElem);
 	}
@@ -991,7 +991,7 @@ const idToCategoryMap: Record<number, number> = {
 	[11585]: MELEE_ACTION_CATEGORY + 0.3, // Overpower
 	[25212]: MELEE_ACTION_CATEGORY + 0.4, // Hamstring
 	[25236]: MELEE_ACTION_CATEGORY + 0.5, // Execute
-	[71]:   DEFAULT_ACTION_CATEGORY + 0.1, // Defensive Stance
+	[71]: DEFAULT_ACTION_CATEGORY + 0.1, // Defensive Stance
 	[2457]: DEFAULT_ACTION_CATEGORY + 0.1, // Battle Stance
 	[2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
 

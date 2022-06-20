@@ -49,7 +49,7 @@ export const Sacrifice = {
 		'sac-picker',
 	],
 	changedEvent: (player: Player<Spec.SpecWarlock>) => player.changeEmitter,
-	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon&&player.getTalents().demonicSacrifice&&player.getSpecOptions().summon != Summon.NoSummon,
+	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon && player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon,
 	setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
 		const newOptions = player.getSpecOptions();
 		newOptions.sacrificeSummon = newValue;
@@ -83,127 +83,127 @@ export const DemonSummon = {
 
 export const WarlockRotationConfig = {
 	inputs: [
-	{
-		type: 'enum' as const,
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			extraCssClasses: [
-				'primary-spell-enum-picker',
-			],
-			label: 'Primary Spell',
-			labelTooltip: 'Choose primary spell to cast',
-			values: [
-				{
-					name: 'Shadowbolt', value: PrimarySpell.Shadowbolt,
+		{
+			type: 'enum' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'primary-spell-enum-picker',
+				],
+				label: 'Primary Spell',
+				labelTooltip: 'Choose primary spell to cast',
+				values: [
+					{
+						name: 'Shadowbolt', value: PrimarySpell.Shadowbolt,
+					},
+					{
+						name: 'Incinerate', value: PrimarySpell.Incinerate,
+					},
+					{
+						name: 'Seed of Corruption', value: PrimarySpell.Seed,
+					},
+				],
+				changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.primarySpell = newValue;
+					player.setRotation(eventID, newRotation);
 				},
-				{
-					name: 'Incinerate', value: PrimarySpell.Incinerate,
-				},
-				{
-					name: 'Seed of Corruption', value: PrimarySpell.Seed,
-				},
-			],
-			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => {
-				const newRotation = player.getRotation();
-				newRotation.primarySpell = newValue;
-				player.setRotation(eventID, newRotation);
 			},
 		},
-	},
-	{
-		type: 'boolean' as const,
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			extraCssClasses: [
-				'immolate-picker',
-			],
-			label: 'Use Immolate',
-			labelTooltip: 'Use Immolate as the next cast after the dot expires.',
-			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().immolate,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.immolate = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'immolate-picker',
+				],
+				label: 'Use Immolate',
+				labelTooltip: 'Use Immolate as the next cast after the dot expires.',
+				changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().immolate,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.immolate = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'boolean' as const,
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			extraCssClasses: [
-				'corruption-picker',
-			],
-			label: 'Use Corruption',
-			labelTooltip: 'Use Corruption as the next cast after the dot expires.',
-			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().corruption,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.corruption = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'corruption-picker',
+				],
+				label: 'Use Corruption',
+				labelTooltip: 'Use Corruption as the next cast after the dot expires.',
+				changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().corruption,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.corruption = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'boolean' as const,
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			extraCssClasses: [
-				'detonate-seed-picker',
-			],
-			label: 'Detonate Seed on Cast',
-			labelTooltip: 'Simulates raid doing damage to targets such that seed detonates immediately on cast.',
-			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().detonateSeed,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.detonateSeed = newValue;
-				player.setRotation(eventID, newRotation);
-			},
-			enableWhen: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell == PrimarySpell.Seed,
-		},
-	},
-	{
-		type: 'enum' as const,
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			extraCssClasses: [
-				'curse-enum-picker',
-			],
-			label: 'Curse',
-			labelTooltip: 'No tooltip yet',
-			values: [
-				{
-					name: "None", value: Curse.NoCurse,
+		{
+			type: 'boolean' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'detonate-seed-picker',
+				],
+				label: 'Detonate Seed on Cast',
+				labelTooltip: 'Simulates raid doing damage to targets such that seed detonates immediately on cast.',
+				changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().detonateSeed,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.detonateSeed = newValue;
+					player.setRotation(eventID, newRotation);
 				},
-				{
-					name: "Elements", value: Curse.Elements,
-				},
-				{
-					name: "Recklessness", value: Curse.Recklessness,
-				},
-				{
-					name: "Doom", value: Curse.Doom,
-				},
-				{
-					name: "Agony", value: Curse.Agony,
-				},
-				{
-					name: "Tongues", value: Curse.Tongues,
-				}
-			],
-			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().curse,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => {
-				const newRotation = player.getRotation();
-				newRotation.curse = newValue;
-				player.setRotation(eventID, newRotation);
+				enableWhen: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell == PrimarySpell.Seed,
 			},
 		},
-	},
+		{
+			type: 'enum' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'curse-enum-picker',
+				],
+				label: 'Curse',
+				labelTooltip: 'No tooltip yet',
+				values: [
+					{
+						name: "None", value: Curse.NoCurse,
+					},
+					{
+						name: "Elements", value: Curse.Elements,
+					},
+					{
+						name: "Recklessness", value: Curse.Recklessness,
+					},
+					{
+						name: "Doom", value: Curse.Doom,
+					},
+					{
+						name: "Agony", value: Curse.Agony,
+					},
+					{
+						name: "Tongues", value: Curse.Tongues,
+					}
+				],
+				changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().curse,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.curse = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 	],
 };

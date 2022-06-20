@@ -90,7 +90,7 @@ export abstract class Importer extends Popup {
 			uploadInput.addEventListener('change', async event => {
 				const data: string = await (event as any).target.files[0].text();
 				this.textElem.textContent = data;
-			});	
+			});
 		}
 
 		this.importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLButtonElement;

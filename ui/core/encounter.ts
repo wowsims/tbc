@@ -148,7 +148,7 @@ export class Encounter {
 					return target;
 				}));
 			} else {
-				this.setTargets(eventID, [ Target.fromDefaults(eventID, this.sim) ]);
+				this.setTargets(eventID, [Target.fromDefaults(eventID, this.sim)]);
 			}
 		});
 	}
@@ -158,7 +158,7 @@ export class Encounter {
 			duration: 180,
 			durationVariation: 5,
 			executeProportion: 0.2,
-			targets: [ Target.defaultProto() ],
+			targets: [Target.defaultProto()],
 		}));
 	}
 }

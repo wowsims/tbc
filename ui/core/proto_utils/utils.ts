@@ -465,61 +465,61 @@ export const specTypeFunctions: Record<Spec, SpecTypeFunctions<any>> = {
 			: EnhancementShamanOptions.create(),
 	},
 	[Spec.SpecFeralDruid]: {
-			rotationCreate: () => FeralDruidRotation.create(),
-			rotationEquals: (a, b) => FeralDruidRotation.equals(a as FeralDruidRotation, b as FeralDruidRotation),
-			rotationCopy: (a) => FeralDruidRotation.clone(a as FeralDruidRotation),
-			rotationToJson: (a) => FeralDruidRotation.toJson(a as FeralDruidRotation),
-			rotationFromJson: (obj) => FeralDruidRotation.fromJson(obj),
-			rotationFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
-		? player.spec.feralDruid.rotation || FeralDruidRotation.create()
-		: FeralDruidRotation.create(),
+		rotationCreate: () => FeralDruidRotation.create(),
+		rotationEquals: (a, b) => FeralDruidRotation.equals(a as FeralDruidRotation, b as FeralDruidRotation),
+		rotationCopy: (a) => FeralDruidRotation.clone(a as FeralDruidRotation),
+		rotationToJson: (a) => FeralDruidRotation.toJson(a as FeralDruidRotation),
+		rotationFromJson: (obj) => FeralDruidRotation.fromJson(obj),
+		rotationFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
+			? player.spec.feralDruid.rotation || FeralDruidRotation.create()
+			: FeralDruidRotation.create(),
 
-			talentsCreate: () => DruidTalents.create(),
-			talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
-			talentsCopy: (a) => DruidTalents.clone(a as DruidTalents),
-			talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
-			talentsFromJson: (obj) => DruidTalents.fromJson(obj),
-			talentsFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
-		? player.spec.feralDruid.talents || DruidTalents.create()
-		: DruidTalents.create(),
+		talentsCreate: () => DruidTalents.create(),
+		talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
+		talentsCopy: (a) => DruidTalents.clone(a as DruidTalents),
+		talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
+		talentsFromJson: (obj) => DruidTalents.fromJson(obj),
+		talentsFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
+			? player.spec.feralDruid.talents || DruidTalents.create()
+			: DruidTalents.create(),
 
-			optionsCreate: () => FeralDruidOptions.create(),
-			optionsEquals: (a, b) => FeralDruidOptions.equals(a as FeralDruidOptions, b as FeralDruidOptions),
-			optionsCopy: (a) => FeralDruidOptions.clone(a as FeralDruidOptions),
-			optionsToJson: (a) => FeralDruidOptions.toJson(a as FeralDruidOptions),
-			optionsFromJson: (obj) => FeralDruidOptions.fromJson(obj),
-			optionsFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
-		? player.spec.feralDruid.options || FeralDruidOptions.create()
-		: FeralDruidOptions.create(),
-  },
+		optionsCreate: () => FeralDruidOptions.create(),
+		optionsEquals: (a, b) => FeralDruidOptions.equals(a as FeralDruidOptions, b as FeralDruidOptions),
+		optionsCopy: (a) => FeralDruidOptions.clone(a as FeralDruidOptions),
+		optionsToJson: (a) => FeralDruidOptions.toJson(a as FeralDruidOptions),
+		optionsFromJson: (obj) => FeralDruidOptions.fromJson(obj),
+		optionsFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
+			? player.spec.feralDruid.options || FeralDruidOptions.create()
+			: FeralDruidOptions.create(),
+	},
 	[Spec.SpecFeralTankDruid]: {
-			rotationCreate: () => FeralTankDruidRotation.create(),
-			rotationEquals: (a, b) => FeralTankDruidRotation.equals(a as FeralTankDruidRotation, b as FeralTankDruidRotation),
-			rotationCopy: (a) => FeralTankDruidRotation.clone(a as FeralTankDruidRotation),
-			rotationToJson: (a) => FeralTankDruidRotation.toJson(a as FeralTankDruidRotation),
-			rotationFromJson: (obj) => FeralTankDruidRotation.fromJson(obj),
-			rotationFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
-		? player.spec.feralTankDruid.rotation || FeralTankDruidRotation.create()
-		: FeralTankDruidRotation.create(),
+		rotationCreate: () => FeralTankDruidRotation.create(),
+		rotationEquals: (a, b) => FeralTankDruidRotation.equals(a as FeralTankDruidRotation, b as FeralTankDruidRotation),
+		rotationCopy: (a) => FeralTankDruidRotation.clone(a as FeralTankDruidRotation),
+		rotationToJson: (a) => FeralTankDruidRotation.toJson(a as FeralTankDruidRotation),
+		rotationFromJson: (obj) => FeralTankDruidRotation.fromJson(obj),
+		rotationFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+			? player.spec.feralTankDruid.rotation || FeralTankDruidRotation.create()
+			: FeralTankDruidRotation.create(),
 
-			talentsCreate: () => DruidTalents.create(),
-			talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
-			talentsCopy: (a) => DruidTalents.clone(a as DruidTalents),
-			talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
-			talentsFromJson: (obj) => DruidTalents.fromJson(obj),
-			talentsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
-		? player.spec.feralTankDruid.talents || DruidTalents.create()
-		: DruidTalents.create(),
+		talentsCreate: () => DruidTalents.create(),
+		talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
+		talentsCopy: (a) => DruidTalents.clone(a as DruidTalents),
+		talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
+		talentsFromJson: (obj) => DruidTalents.fromJson(obj),
+		talentsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+			? player.spec.feralTankDruid.talents || DruidTalents.create()
+			: DruidTalents.create(),
 
-			optionsCreate: () => FeralTankDruidOptions.create(),
-			optionsEquals: (a, b) => FeralTankDruidOptions.equals(a as FeralTankDruidOptions, b as FeralTankDruidOptions),
-			optionsCopy: (a) => FeralTankDruidOptions.clone(a as FeralTankDruidOptions),
-			optionsToJson: (a) => FeralTankDruidOptions.toJson(a as FeralTankDruidOptions),
-			optionsFromJson: (obj) => FeralTankDruidOptions.fromJson(obj),
-			optionsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
-		? player.spec.feralTankDruid.options || FeralTankDruidOptions.create()
-		: FeralTankDruidOptions.create(),
-  },
+		optionsCreate: () => FeralTankDruidOptions.create(),
+		optionsEquals: (a, b) => FeralTankDruidOptions.equals(a as FeralTankDruidOptions, b as FeralTankDruidOptions),
+		optionsCopy: (a) => FeralTankDruidOptions.clone(a as FeralTankDruidOptions),
+		optionsToJson: (a) => FeralTankDruidOptions.toJson(a as FeralTankDruidOptions),
+		optionsFromJson: (obj) => FeralTankDruidOptions.fromJson(obj),
+		optionsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+			? player.spec.feralTankDruid.options || FeralTankDruidOptions.create()
+			: FeralTankDruidOptions.create(),
+	},
 	[Spec.SpecHunter]: {
 		rotationCreate: () => HunterRotation.create(),
 		rotationEquals: (a, b) => HunterRotation.equals(a as HunterRotation, b as HunterRotation),
@@ -1499,8 +1499,8 @@ export function makeBlessingsAssignments(numPaladins: number, data: Array<{ spec
 export function makeDefaultBlessings(numPaladins: number): BlessingsAssignments {
 	return makeBlessingsAssignments(numPaladins, [
 		{ spec: Spec.SpecBalanceDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-		{ spec: Spec.SpecFeralDruid, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom ] },
-		{ spec: Spec.SpecFeralTankDruid, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSanctuary ] },
+		{ spec: Spec.SpecFeralDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
+		{ spec: Spec.SpecFeralTankDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSanctuary] },
 		{ spec: Spec.SpecHunter, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
 		{ spec: Spec.SpecMage, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
 		{ spec: Spec.SpecRetributionPaladin, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },

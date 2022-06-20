@@ -382,7 +382,7 @@ export class PlayerPicker extends Component {
 		};
 		this.rootElem.ondrop = event => {
 			var dropData = event.dataTransfer!.getData("text/plain");
-			
+
 			event.preventDefault();
 			dragEnterCounter = 0;
 			this.rootElem.classList.remove('dragto');
@@ -673,7 +673,7 @@ class NewPlayerPicker extends Component {
 						event.dataTransfer!.setDragImage(dragImage, 30, 30);
 						event.dataTransfer!.setData("text/plain", "");
 						event.dataTransfer!.dropEffect = 'copy';
-						
+
 
 						const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
 						newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);

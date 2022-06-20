@@ -290,8 +290,8 @@ export class UnitMetrics {
 		this.name = metrics.name;
 		this.spec = player ? playerToSpec(player) : 0;
 		this.petActionId = petActionId;
-		this.iconUrl = this.isPlayer ? getTalentTreeIcon(this.spec, player!.talentsString) : 
-				(this.isTarget ? defaultTargetIcon : '');
+		this.iconUrl = this.isPlayer ? getTalentTreeIcon(this.spec, player!.talentsString) :
+			(this.isTarget ? defaultTargetIcon : '');
 		this.classColor = this.isTarget ? 'black' : classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
 		this.tps = this.metrics.threat!;

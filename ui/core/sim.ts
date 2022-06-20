@@ -226,15 +226,15 @@ export class Sim {
 		if (window.confirm("Simulation Failure:\n" + errorStr + "\nPress Ok to file crash report")) {
 			// Splice out just the line numbers
 			var filteredError = errorStr.substring(0, errorStr.indexOf("Stack Trace:"));
-			const rExp : RegExp = /(.*\.go:\d+)/g;
+			const rExp: RegExp = /(.*\.go:\d+)/g;
 			filteredError += errorStr.match(rExp)?.join(" ");
 			var hash = this.hashCode(filteredError);
-			fetch('https://api.github.com/search/issues?q=is:issue+is:open+repo:wowsims/tbc+'+hash).then(resp => {
+			fetch('https://api.github.com/search/issues?q=is:issue+is:open+repo:wowsims/tbc+' + hash).then(resp => {
 				resp.json().then((issues) => {
 					if (issues.total_count > 0) {
 						window.open(issues.items[0].html_url, "_blank");
 					} else {
-						window.open("https://github.com/wowsims/tbc/issues/new?assignees=&labels=&title=Crash%20Report%20" + hash + "&body="+encodeURIComponent(errorStr+"\n\nRequest:\n"+extra), '_blank');
+						window.open("https://github.com/wowsims/tbc/issues/new?assignees=&labels=&title=Crash%20Report%20" + hash + "&body=" + encodeURIComponent(errorStr + "\n\nRequest:\n" + extra), '_blank');
 					}
 				});
 			}).catch(fetchErr => {
@@ -285,7 +285,7 @@ export class Sim {
 		// request is in-flight.
 		const players = this.raid.getPlayers();
 
-		const req = ComputeStatsRequest.create({raid: this.getModifiedRaidProto()});
+		const req = ComputeStatsRequest.create({ raid: this.getModifiedRaidProto() });
 		const result = await this.workerPool.computeStats(req);
 
 		if (result.errorResult != "") {
@@ -322,8 +322,8 @@ export class Sim {
 			return StatWeightsResult.create();
 		} else {
 			const tanks = this.raid.getTanks().map(tank => tank.targetIndex).includes(player.getRaidIndex())
-					? [RaidTarget.create({ targetIndex: 0 })]
-					: [];
+				? [RaidTarget.create({ targetIndex: 0 })]
+				: [];
 			const request = StatWeightsRequest.create({
 				player: player.toProto(),
 				raidBuffs: this.raid.getBuffs(),
