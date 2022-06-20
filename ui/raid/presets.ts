@@ -1007,6 +1007,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			];
 			const [woaVotes, wfVotes, goaVotes] = [woaSpecs, wfSpecs, goaSpecs]
 					.map(specs => partyProto.players
+							.filter(player => player.class != Class.ClassUnknown)
 							.map(player => playerToSpec(player))
 							.filter(playerSpec => specs.includes(playerSpec))
 							.length);
