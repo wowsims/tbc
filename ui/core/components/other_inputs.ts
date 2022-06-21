@@ -415,7 +415,7 @@ export const IncomingHps = {
 			<p>If set to 0, defaults to 125% of DTPS.</p>
 		`,
 		changedEvent: (player: Player<any>) => player.getRaid()!.changeEmitter,
-		getValue: (player: Player<any>) => player.getHealingModel().cadenceSeconds,
+		getValue: (player: Player<any>) => player.getHealingModel().hps,
 		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
 			const healingModel = player.getHealingModel();
 			healingModel.hps = newValue;
