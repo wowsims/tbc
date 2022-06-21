@@ -98,6 +98,8 @@ export class RaidSimResultsManager {
 						<span class="results-sim-reference-tps-diff threat-metrics"></span>
 						<span class="results-sim-reference-diff-separator threat-metrics">/</span>
 						<span class="results-sim-reference-dtps-diff threat-metrics"></span>
+						<span class="results-sim-reference-diff-separator threat-metrics">/</span>
+						<span class="results-sim-reference-chanceOfDeath-diff threat-metrics"></span>
 						<span class="results-sim-reference-text"> vs. reference</span>
 						<span class="results-sim-reference-swap fa fa-retweet"></span>
 						<span class="results-sim-reference-delete fa fa-times"></span>
@@ -106,10 +108,30 @@ export class RaidSimResultsManager {
       </div>
     `);
 
+		const setResultTippy = (cssClass: string, tippyContent: string) => {
+			const resultDivElem = this.simUI.resultsViewer.contentElem.getElementsByClassName(cssClass)[0] as HTMLElement | undefined;
+			if (resultDivElem) {
+				tippy(resultDivElem, {
+					'content': tippyContent,
+					'allowHTML': true,
+					placement: 'right',
+				});
+			}
+		};
+		setResultTippy('results-sim-dps', 'Damage Per Second');
+		setResultTippy('results-sim-tps', 'Threat Per Second');
+		setResultTippy('results-sim-dtps', 'Damage Taken Per Second');
+		setResultTippy('results-sim-chanceOfDeath', `
+			<p>Chance of Death</p>
+			<p>The percentage of iterations in which the player died, based on incoming damage from the enemies and incoming healing (see the <b>Incoming HPS</b> and <b>Healing Cadence</b> options).</p>
+			<p>DTPS alone is not a good measure of tankiness because it is not affected by health and ignores damage spikes. Chance of Death attempts to capture overall tankiness.</p>
+		`);
+
 		if (!this.simUI.isIndividualSim()) {
 			Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-diff-separator')).forEach(e => e.remove());
 			Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-tps-diff')).forEach(e => e.remove());
 			Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-dtps-diff')).forEach(e => e.remove());
+			Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-chanceOfDeath-diff')).forEach(e => e.remove());
 		}
 
 		const simReferenceElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
@@ -180,11 +202,13 @@ export class RaidSimResultsManager {
 		if (this.simUI.isIndividualSim()) {
 			const simReferenceTpsDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-tps-diff')[0] as HTMLSpanElement;
 			const simReferenceDtpsDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-dtps-diff')[0] as HTMLSpanElement;
+			const simReferenceCodDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-chanceOfDeath-diff')[0] as HTMLSpanElement;
 
 			const curPlayerMetrics = this.currentData.simResult.getPlayers()[0]!;
 			const refPlayerMetrics = this.referenceData.simResult.getPlayers()[0]!;
 			formatDeltaTextElem(simReferenceTpsDiffElem, refPlayerMetrics.tps.avg, curPlayerMetrics.tps.avg, 2);
 			formatDeltaTextElem(simReferenceDtpsDiffElem, refPlayerMetrics.dtps.avg, curPlayerMetrics.dtps.avg, 2);
+			formatDeltaTextElem(simReferenceCodDiffElem, refPlayerMetrics.chanceOfDeath, curPlayerMetrics.chanceOfDeath, 1);
 		}
 	}
 
@@ -237,7 +261,7 @@ export class RaidSimResultsManager {
 				const dpsMetrics = simResult.raidMetrics.dps;
 				const tpsMetrics = playerMetrics.tps;
 				const dtpsMetrics = playerMetrics.dtps;
-				content = `
+				content += `
 					<div class="results-sim-dps">
 						<span class="topline-result-avg">${dpsMetrics.avg.toFixed(2)}</span>
 						<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
@@ -249,6 +273,9 @@ export class RaidSimResultsManager {
 					<div class="results-sim-dtps threat-metrics">
 						<span class="topline-result-avg">${dtpsMetrics.avg.toFixed(2)}</span>
 						<span class="topline-result-stdev">${dtpsMetrics.stdev.toFixed(2)}</span>
+					</div>
+					<div class="results-sim-chanceOfDeath threat-metrics">
+						<span class="topline-result-avg">${playerMetrics.chanceOfDeath.toFixed(2)}</span>
 					</div>
 				`;
 			} else {

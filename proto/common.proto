@@ -677,3 +677,11 @@ message Cooldown {
 message Cooldowns {
 	repeated Cooldown cooldowns = 1;
 }
+
+message HealingModel {
+	// Healing per second to apply.
+	double hps = 1;
+
+	// How often healing is applied.
+	double cadence_seconds = 2;
+}

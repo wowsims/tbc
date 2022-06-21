@@ -14,7 +14,7 @@ import (
 //
 // If you don't know what this is, you probably don't need it.
 type Presimmer interface {
-	GetPresimOptions() *PresimOptions
+	GetPresimOptions(proto.Player) *PresimOptions
 }
 
 // Controls the presim behavior for 1 Agent.
@@ -44,7 +44,10 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) *proto.RaidSimRe
 				continue
 			}
 
-			presimOptions := presimmer.GetPresimOptions()
+			partyConfig := request.Raid.Parties[player.GetCharacter().Party.Index]
+			playerConfig := partyConfig.Players[player.GetCharacter().PartyIndex]
+
+			presimOptions := presimmer.GetPresimOptions(*playerConfig)
 			if presimOptions == nil {
 				continue
 			}

@@ -4,6 +4,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
+import { HealingModel } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -78,6 +79,7 @@ export class Player<SpecType extends Spec> {
 	private specOptions: SpecOptions<SpecType>;
 	private cooldowns: Cooldowns = Cooldowns.create();
 	private inFrontOfTarget: boolean = false;
+	private healingModel: HealingModel = HealingModel.create();
 
 	private itemEPCache: Map<number, number> = new Map<number, number>();
 	private gemEPCache: Map<number, number> = new Map<number, number>();
@@ -100,6 +102,7 @@ export class Player<SpecType extends Spec> {
 	readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
 	readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
 	readonly inFrontOfTargetChangeEmitter = new TypedEvent<void>('PlayerInFrontOfTarget');
+	readonly healingModelChangeEmitter = new TypedEvent<void>('PlayerHealingModel');
 	readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
 
 	readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
@@ -131,6 +134,7 @@ export class Player<SpecType extends Spec> {
 			this.specOptionsChangeEmitter,
 			this.cooldownsChangeEmitter,
 			this.inFrontOfTargetChangeEmitter,
+			this.healingModelChangeEmitter,
 			this.epWeightsChangeEmitter,
 		], 'PlayerChange');
 	}
@@ -478,6 +482,20 @@ export class Player<SpecType extends Spec> {
 		this.inFrontOfTargetChangeEmitter.emit(eventID);
 	}
 
+	getHealingModel(): HealingModel {
+		// Make a defensive copy
+		return HealingModel.clone(this.healingModel);
+	}
+
+	setHealingModel(eventID: EventID, newHealingModel: HealingModel) {
+		if (HealingModel.equals(this.healingModel, newHealingModel))
+			return;
+
+		// Make a defensive copy
+		this.healingModel = HealingModel.clone(newHealingModel);
+		this.healingModelChangeEmitter.emit(eventID);
+	}
+
 	computeStatsEP(stats?: Stats): number {
 		if (stats == undefined) {
 			return 0;
@@ -615,6 +633,7 @@ export class Player<SpecType extends Spec> {
 				cooldowns: this.getCooldowns(),
 				talentsString: this.getTalentsString(),
 				inFrontOfTarget: this.getInFrontOfTarget(),
+				healingModel: this.getHealingModel(),
 			}),
 			this.getRotation(),
 			forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(),
@@ -633,6 +652,7 @@ export class Player<SpecType extends Spec> {
 			this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
 			this.setTalentsString(eventID, proto.talentsString);
 			this.setInFrontOfTarget(eventID, proto.inFrontOfTarget);
+			this.setHealingModel(eventID, proto.healingModel || HealingModel.create());
 			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
 			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});

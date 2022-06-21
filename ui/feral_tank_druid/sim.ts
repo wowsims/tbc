@@ -265,6 +265,8 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
 					OtherInputs.TankAssignment,
+					OtherInputs.IncomingHps,
+					OtherInputs.HealingCadence,
 					OtherInputs.InFrontOfTarget,
 				],
 			},

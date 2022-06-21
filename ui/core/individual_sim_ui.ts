@@ -22,6 +22,7 @@ import { Food } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { HealingModel } from '/tbc/core/proto/common.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -903,6 +904,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
 			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
 			this.player.setInFrontOfTarget(eventID, tankSpec);
+			this.player.setHealingModel(eventID, HealingModel.create());
 
 			if (!this.isWithinRaidSim) {
 				this.sim.encounter.applyDefaults(eventID);

@@ -52,6 +52,8 @@ message Player {
 	Cooldowns cooldowns = 19;
 
 	bool in_front_of_target = 23;
+
+	HealingModel healing_model = 27;
 }
 
 message Party {
@@ -184,6 +186,9 @@ message UnitMetrics {
 
 	// average seconds spent oom per iteration
 	double seconds_oom_avg = 3; 
+
+	// Chance (0-1) representing probability of death. Used for tank sims.
+	double chance_of_death = 12;
 
 	repeated ActionMetrics actions = 5;
 	repeated AuraMetrics auras = 6;
