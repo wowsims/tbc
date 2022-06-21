@@ -48,11 +48,9 @@ var GemDeclarationOverrides = []GemDeclaration{
 	{ID: 38549, Filter: true},
 	{ID: 38550, Filter: true},
 
-	// Other gems to ignore.
-	{ID: 35315, Filter: true},
-	{ID: 35316, Filter: true},
-	{ID: 35318, Filter: true},
-
+	{ID: 35315, Phase: 5},
+	{ID: 35316, Phase: 5},
+	{ID: 35318, Phase: 5},
 	{ID: 35759, Phase: 5},
 	{ID: 35760, Phase: 5},
 }
