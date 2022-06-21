@@ -101,7 +101,7 @@ func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceD
 	return rotations
 }
 
-func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
+func (moonkin *BalanceDruid) GetPresimOptions(_ proto.Player) *core.PresimOptions {
 	// If not adaptive, just use the primary rotation directly.
 	if moonkin.primaryRotation.PrimarySpell != proto.BalanceDruid_Rotation_Adaptive {
 		return nil

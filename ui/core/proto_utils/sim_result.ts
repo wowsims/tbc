@@ -353,7 +353,7 @@ export class UnitMetrics {
 		return index;
 	}
 
-	get inFrontOfTarget() {
+	get inFrontOfTarget(): boolean {
 		if (this.isTarget) {
 			return true;
 		} else if (this.isPlayer) {
@@ -361,6 +361,10 @@ export class UnitMetrics {
 		} else {
 			return false; // TODO pets
 		}
+	}
+
+	get chanceOfDeath(): number {
+		return this.metrics.chanceOfDeath * 100;
 	}
 
 	get maxThreat() {

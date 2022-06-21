@@ -279,6 +279,8 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotImprovedWrathOfAirTotem,
 					OtherInputs.TankAssignment,
+					OtherInputs.IncomingHps,
+					OtherInputs.HealingCadence,
 					OtherInputs.InFrontOfTarget,
 				],
 			},

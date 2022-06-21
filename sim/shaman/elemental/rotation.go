@@ -9,7 +9,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
+func (eleShaman *ElementalShaman) GetPresimOptions(_ proto.Player) *core.PresimOptions {
 	return eleShaman.rotation.GetPresimOptions()
 }
 

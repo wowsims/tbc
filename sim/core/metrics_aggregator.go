@@ -64,14 +64,16 @@ type UnitMetrics struct {
 	CharacterIterationMetrics
 
 	// Aggregate values. These are updated after each iteration.
-	oomTimeSum float64
-	actions    map[ActionID]*ActionMetrics
-	resources  []*ResourceMetrics
+	numItersDead int32
+	oomTimeSum   float64
+	actions      map[ActionID]*ActionMetrics
+	resources    []*ResourceMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
+	Died    bool // Whether this unit died in the current iteration.
 	WentOOM bool // Whether the agent has hit OOM at least once in this iteration.
 
 	ManaSpent       float64
@@ -278,6 +280,9 @@ func (unitMetrics *UnitMetrics) doneIteration(encounterDurationSeconds float64) 
 	unitMetrics.threat.doneIteration(encounterDurationSeconds)
 	unitMetrics.dtps.doneIteration(encounterDurationSeconds)
 	unitMetrics.oomTimeSum += float64(unitMetrics.OOMTime.Seconds())
+	if unitMetrics.Died {
+		unitMetrics.numItersDead++
+	}
 }
 
 func (unitMetrics *UnitMetrics) ToProto(numIterations int32) *proto.UnitMetrics {
@@ -286,6 +291,7 @@ func (unitMetrics *UnitMetrics) ToProto(numIterations int32) *proto.UnitMetrics 
 		Threat:        unitMetrics.threat.ToProto(numIterations),
 		Dtps:          unitMetrics.dtps.ToProto(numIterations),
 		SecondsOomAvg: unitMetrics.oomTimeSum / float64(numIterations),
+		ChanceOfDeath: float64(unitMetrics.numItersDead) / float64(numIterations),
 	}
 
 	for actionID, action := range unitMetrics.actions {

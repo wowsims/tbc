@@ -401,3 +401,51 @@ export const TankAssignment = {
 		},
 	},
 };
+
+export const IncomingHps = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'incoming-hps-picker',
+		],
+		label: 'Incoming HPS',
+		labelTooltip: `
+			<p>Average amount of healing received per second. Used for calculating chance of death.</p>
+			<p>If set to 0, defaults to 125% of DTPS.</p>
+		`,
+		changedEvent: (player: Player<any>) => player.getRaid()!.changeEmitter,
+		getValue: (player: Player<any>) => player.getHealingModel().cadenceSeconds,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const healingModel = player.getHealingModel();
+			healingModel.hps = newValue;
+			player.setHealingModel(eventID, healingModel);
+		},
+		enableWhen: (player: Player<any>) => player.getRaid()!.getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
+	},
+};
+
+export const HealingCadence = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		float: true,
+		extraCssClasses: [
+			'healing-cadence-picker',
+		],
+		label: 'Healing Cadence',
+		labelTooltip: `
+			<p>How often the incoming heal 'ticks', in seconds. Generally, longer durations favor Effective Hit Points (EHP) for minimizing Chance of Death, while shorter durations favor avoidance.</p>
+			<p>Example: if Incoming HPS is set to 1000 and this is set to 1s, then every 1s a heal will be received for 1000. If this is instead set to 2s, then every 2s a heal will be recieved for 2000.</p>
+			<p>If set to 0, defaults to 2.5 seconds.</p>
+		`,
+		changedEvent: (player: Player<any>) => player.getRaid()!.changeEmitter,
+		getValue: (player: Player<any>) => player.getHealingModel().cadenceSeconds,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const healingModel = player.getHealingModel();
+			healingModel.cadenceSeconds = newValue;
+			player.setHealingModel(eventID, healingModel);
+		},
+		enableWhen: (player: Player<any>) => player.getRaid()!.getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
+	},
+};

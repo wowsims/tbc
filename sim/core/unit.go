@@ -71,6 +71,7 @@ type Unit struct {
 	JowManaMetrics        *ResourceMetrics
 	VtManaMetrics         *ResourceMetrics
 
+	CurrentHealth float64
 	rageBar
 	energyBar
 
@@ -354,6 +355,7 @@ func (unit *Unit) reset(sim *Simulation, agent Agent) {
 		spell.reset(sim)
 	}
 
+	unit.CurrentHealth = unit.GetStat(stats.Health)
 	unit.UpdateManaRegenRates()
 
 	unit.energyBar.reset(sim)

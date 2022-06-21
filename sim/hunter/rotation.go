@@ -379,7 +379,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 	hunter.HardcastWaitUntil(sim, doneWeavingAt, hunter.hardcastOnComplete)
 }
 
-func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {
+func (hunter *Hunter) GetPresimOptions(_ proto.Player) *core.PresimOptions {
 	// If not adaptive, don't need to run a presim.
 	if hunter.Rotation.LazyRotation {
 		return nil
