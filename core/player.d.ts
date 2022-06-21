@@ -4,6 +4,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
+import { HealingModel } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -40,6 +41,7 @@ export declare class Player<SpecType extends Spec> {
     private specOptions;
     private cooldowns;
     private inFrontOfTarget;
+    private healingModel;
     private itemEPCache;
     private gemEPCache;
     private enchantEPCache;
@@ -58,6 +60,7 @@ export declare class Player<SpecType extends Spec> {
     readonly specOptionsChangeEmitter: TypedEvent<void>;
     readonly cooldownsChangeEmitter: TypedEvent<void>;
     readonly inFrontOfTargetChangeEmitter: TypedEvent<void>;
+    readonly healingModelChangeEmitter: TypedEvent<void>;
     readonly epWeightsChangeEmitter: TypedEvent<void>;
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
@@ -110,6 +113,8 @@ export declare class Player<SpecType extends Spec> {
     setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>): void;
     getInFrontOfTarget(): boolean;
     setInFrontOfTarget(eventID: EventID, newInFrontOfTarget: boolean): void;
+    getHealingModel(): HealingModel;
+    setHealingModel(eventID: EventID, newHealingModel: HealingModel): void;
     computeStatsEP(stats?: Stats): number;
     computeGemEP(gem: Gem): number;
     computeEnchantEP(enchant: Enchant): number;

@@ -15,6 +15,7 @@ import { RaidTarget } from "./common";
 import { Debuffs } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
+import { HealingModel } from "./common";
 import { Cooldowns } from "./common";
 import { ProtectionWarrior } from "./warrior";
 import { Warrior } from "./warrior";
@@ -185,6 +186,10 @@ export interface Player {
      * @generated from protobuf field: bool in_front_of_target = 23;
      */
     inFrontOfTarget: boolean;
+    /**
+     * @generated from protobuf field: proto.HealingModel healing_model = 27;
+     */
+    healingModel?: HealingModel;
 }
 /**
  * @generated from protobuf message proto.Party
@@ -459,6 +464,12 @@ export interface UnitMetrics {
      * @generated from protobuf field: double seconds_oom_avg = 3;
      */
     secondsOomAvg: number;
+    /**
+     * Chance (0-1) representing probability of death. Used for tank sims.
+     *
+     * @generated from protobuf field: double chance_of_death = 12;
+     */
+    chanceOfDeath: number;
     /**
      * @generated from protobuf field: repeated proto.ActionMetrics actions = 5;
      */

@@ -12,6 +12,7 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { TypedEvent } from './typed_event.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
+import { HealingModel } from '/tbc/core/proto/common.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -659,6 +660,7 @@ export class IndividualSimUI extends SimUI {
             this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
             this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
             this.player.setInFrontOfTarget(eventID, tankSpec);
+            this.player.setHealingModel(eventID, HealingModel.create());
             if (!this.isWithinRaidSim) {
                 this.sim.encounter.applyDefaults(eventID);
                 this.sim.raid.setDebuffs(eventID, this.individualConfig.defaults.debuffs);

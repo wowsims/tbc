@@ -2046,11 +2046,19 @@ input, select {
 }
 
 .topline-result-avg {
-  font-size: 30px;
+  font-size: 18px;
   font-weight: 700;
 }
 
+.hide-threat-metrics .topline-result-avg {
+  font-size: 30px;
+}
+
 .topline-result-avg:after {
+  font-size: 12px;
+}
+
+.hide-threat-metrics .topline-result-avg:after {
   font-size: 18px;
 }
 
@@ -2066,9 +2074,22 @@ input, select {
   content: " DTPS";
 }
 
+.results-sim-chanceOfDeath .topline-result-avg:after {
+  content: "% Chance of Death";
+  font-size: 9px;
+}
+
+.hide-threat-metrics .results-sim-chanceOfDeath .topline-result-avg:after {
+  font-size: 12px;
+}
+
 .topline-result-stdev {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 700;
+}
+
+.hide-threat-metrics .topline-result-stdev {
+  font-size: 18px;
 }
 
 .topline-result-stdev:before {
@@ -2077,8 +2098,12 @@ input, select {
 }
 
 .topline-result-label {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 700;
+}
+
+.hide-threat-metrics .topline-result-label {
+  font-size: 18px;
 }
 
 .results-sim-reference.has-reference .results-sim-set-reference {

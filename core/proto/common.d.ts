@@ -829,6 +829,23 @@ export interface Cooldowns {
     cooldowns: Cooldown[];
 }
 /**
+ * @generated from protobuf message proto.HealingModel
+ */
+export interface HealingModel {
+    /**
+     * Healing per second to apply.
+     *
+     * @generated from protobuf field: double hps = 1;
+     */
+    hps: number;
+    /**
+     * How often healing is applied.
+     *
+     * @generated from protobuf field: double cadence_seconds = 2;
+     */
+    cadenceSeconds: number;
+}
+/**
  * @generated from protobuf enum proto.Spec
  */
 export declare enum Spec {
@@ -2262,4 +2279,14 @@ declare class Cooldowns$Type extends MessageType<Cooldowns> {
  * @generated MessageType for protobuf message proto.Cooldowns
  */
 export declare const Cooldowns: Cooldowns$Type;
+declare class HealingModel$Type extends MessageType<HealingModel> {
+    constructor();
+    create(value?: PartialMessage<HealingModel>): HealingModel;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: HealingModel): HealingModel;
+    internalBinaryWrite(message: HealingModel, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.HealingModel
+ */
+export declare const HealingModel: HealingModel$Type;
 export {};

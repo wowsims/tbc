@@ -14,6 +14,7 @@ import { RaidTarget } from './common.js';
 import { Debuffs } from './common.js';
 import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
+import { HealingModel } from './common.js';
 import { Cooldowns } from './common.js';
 import { ProtectionWarrior } from './warrior.js';
 import { Warrior } from './warrior.js';
@@ -95,7 +96,8 @@ class Player$Type extends MessageType {
             { no: 21, name: "protection_warrior", kind: "message", oneof: "spec", T: () => ProtectionWarrior },
             { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns },
-            { no: 23, name: "in_front_of_target", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 23, name: "in_front_of_target", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 27, name: "healing_model", kind: "message", T: () => HealingModel }
         ]);
     }
     create(value) {
@@ -237,6 +239,9 @@ class Player$Type extends MessageType {
                 case /* bool in_front_of_target */ 23:
                     message.inFrontOfTarget = reader.bool();
                     break;
+                case /* proto.HealingModel healing_model */ 27:
+                    message.healingModel = HealingModel.internalBinaryRead(reader, reader.uint32(), options, message.healingModel);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -331,6 +336,9 @@ class Player$Type extends MessageType {
         /* bool in_front_of_target = 23; */
         if (message.inFrontOfTarget !== false)
             writer.tag(23, WireType.Varint).bool(message.inFrontOfTarget);
+        /* proto.HealingModel healing_model = 27; */
+        if (message.healingModel)
+            HealingModel.internalBinaryWrite(message.healingModel, writer.tag(27, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -959,6 +967,7 @@ class UnitMetrics$Type extends MessageType {
             { no: 8, name: "threat", kind: "message", T: () => DistributionMetrics },
             { no: 11, name: "dtps", kind: "message", T: () => DistributionMetrics },
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 12, name: "chance_of_death", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
             { no: 10, name: "resources", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ResourceMetrics },
@@ -966,7 +975,7 @@ class UnitMetrics$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { name: "", secondsOomAvg: 0, actions: [], auras: [], resources: [], pets: [] };
+        const message = { name: "", secondsOomAvg: 0, chanceOfDeath: 0, actions: [], auras: [], resources: [], pets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -991,6 +1000,9 @@ class UnitMetrics$Type extends MessageType {
                     break;
                 case /* double seconds_oom_avg */ 3:
                     message.secondsOomAvg = reader.double();
+                    break;
+                case /* double chance_of_death */ 12:
+                    message.chanceOfDeath = reader.double();
                     break;
                 case /* repeated proto.ActionMetrics actions */ 5:
                     message.actions.push(ActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
@@ -1031,6 +1043,9 @@ class UnitMetrics$Type extends MessageType {
         /* double seconds_oom_avg = 3; */
         if (message.secondsOomAvg !== 0)
             writer.tag(3, WireType.Bit64).double(message.secondsOomAvg);
+        /* double chance_of_death = 12; */
+        if (message.chanceOfDeath !== 0)
+            writer.tag(12, WireType.Bit64).double(message.chanceOfDeath);
         /* repeated proto.ActionMetrics actions = 5; */
         for (let i = 0; i < message.actions.length; i++)
             ActionMetrics.internalBinaryWrite(message.actions[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();

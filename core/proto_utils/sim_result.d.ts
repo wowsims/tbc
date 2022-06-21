@@ -104,6 +104,7 @@ export declare class UnitMetrics {
     get isPet(): boolean;
     getTargetIndex(filter?: SimResultFilter): number | null;
     get inFrontOfTarget(): boolean;
+    get chanceOfDeath(): number;
     get maxThreat(): number;
     get secondsOomAvg(): number;
     get totalDamage(): number;

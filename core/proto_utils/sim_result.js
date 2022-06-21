@@ -212,6 +212,9 @@ export class UnitMetrics {
             return false; // TODO pets
         }
     }
+    get chanceOfDeath() {
+        return this.metrics.chanceOfDeath * 100;
+    }
     get maxThreat() {
         return this.threatLogs[this.threatLogs.length - 1]?.threatAfter || 0;
     }

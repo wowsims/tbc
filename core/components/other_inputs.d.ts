@@ -210,3 +210,30 @@ export declare const TankAssignment: {
         setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
     };
 };
+export declare const IncomingHps: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => number;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+        enableWhen: (player: Player<any>) => boolean;
+    };
+};
+export declare const HealingCadence: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        float: boolean;
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => number;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+        enableWhen: (player: Player<any>) => boolean;
+    };
+};
