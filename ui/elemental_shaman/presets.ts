@@ -36,6 +36,11 @@ export const StandardTalents = {
 	data: '55003105100213351051--05105301005',
 };
 
+export const RestoTalents = {
+	name: 'Resto',
+	data: '5003--55035051355310510321',
+};
+
 export const DefaultRotation = ElementalShamanRotation.create({
 	totems: ShamanTotems.create({
 		earth: EarthTotem.TremorTotem,

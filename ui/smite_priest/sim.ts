@@ -237,6 +237,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				// Preset talents that the user can quickly select.
 				talents: [
 					Presets.StandardTalents,
+					Presets.HolyTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

@@ -25,6 +25,11 @@ export const StandardTalents = {
 	data: '5012300130505120501-005551002020052',
 };
 
+export const HolyTalents = {
+	name: 'Holy',
+	data: '50023011305-235050032002150520051',
+};
+
 export const DefaultRotation = Rotation.create({
 	rotationType: SmitePriest_Rotation_RotationType.Basic,
 });

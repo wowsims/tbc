@@ -26,6 +26,16 @@ export const StandardTalents = {
 	data: '510022312503135231351--520033',
 };
 
+export const DreamstateTalents = {
+	name: 'Dreamstate',
+	data: '5003223122031312303--500503400314',
+};
+
+export const RestoTalents = {
+	name: 'Resto',
+	data: '--50353351531522531351',
+};
+
 export const DefaultRotation = BalanceDruidRotation.create({
 	primarySpell: PrimarySpell.Adaptive,
 	faerieFire: true,
