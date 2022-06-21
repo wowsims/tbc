@@ -6,6 +6,10 @@ export declare const StandardTalents: {
     name: string;
     data: string;
 };
+export declare const RestoTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: ElementalShamanRotation;
 export declare const DefaultOptions: ElementalShamanOptions;
 export declare const DefaultConsumes: Consumes;

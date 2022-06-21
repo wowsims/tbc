@@ -6,6 +6,14 @@ export declare const StandardTalents: {
     name: string;
     data: string;
 };
+export declare const DreamstateTalents: {
+    name: string;
+    data: string;
+};
+export declare const RestoTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: BalanceDruidRotation;
 export declare const DefaultOptions: BalanceDruidOptions;
 export declare const DefaultConsumes: Consumes;

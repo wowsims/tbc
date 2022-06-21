@@ -5,6 +5,10 @@ export declare const StandardTalents: {
     name: string;
     data: string;
 };
+export declare const HolyTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: Rotation;
 export declare const DefaultOptions: Options;
 export declare const DefaultConsumes: Consumes;
