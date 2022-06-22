@@ -260,7 +260,7 @@ class RaidWCLImporter extends Importer {
 		const reportDataQuery = `
 				{
 					reportData {
-						report(code: '${reportID}') {
+						report(code: "${reportID}") {
 							guild {
 								name faction {id}
 							}
@@ -268,8 +268,8 @@ class RaidWCLImporter extends Importer {
 							fights(fightIDs: [${fightID}]) {
 								startTime, endTime, id, name
 							}
-							innervates: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: 'Druid', abilityID: 29166),
-							powerInfusion: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: 'Priest', abilityID: 10060)
+							innervates: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Druid", abilityID: 29166),
+							powerInfusion: table(fightIDs: [${fightID}], dataType:Casts, endTime: 99999999, sourceClass: "Priest", abilityID: 10060)
 						}
 					}
 				}
@@ -472,7 +472,7 @@ class RaidWCLImporter extends Importer {
 				let auraBuffQueries = auraIDs.map((auraID) => `
 				{
 					reportData {
-						report(code: '${reportID}') {
+						report(code: "${reportID}") {
 					table(startTime: ${startTime}, endTime: ${endTime}, sourceID: ${player.id}, abilityID: ${auraID}, fightIDs: [${fightID}],dataType:Buffs,viewBy:Target,hostilityType:Friendlies)
 						}
 					}
