@@ -221,6 +221,13 @@ class RaidWCLImporter extends Importer {
 				}
 				`;
         const reportData = await this.queryWCL(reportDataQuery, token);
+        if (reportData.errors != undefined && reportData.errors != null && reportData.errors.length) {
+            const errorData = reportData.errors.reduce((accumulator, error) => {
+                return accumulator + error.message;
+            }, "");
+            alert("Failed to import: " + errorData);
+            return;
+        }
         // Process the report data.
         const wclData = reportData.data.reportData.report; // TODO: Typings?
         const guildData = wclData.guild;
