@@ -473,7 +473,7 @@ export class IndividualSimUI extends SimUI {
             showWhen: (player) => this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34678 || this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34679,
         });
         const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0];
-        new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker, false);
+        new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker, this);
         const savedEncounterManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-encounter-manager')[0], this.sim.encounter, {
             label: 'Encounter',
             storageKey: this.getSavedEncounterStorageKey(),

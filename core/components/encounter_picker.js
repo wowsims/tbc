@@ -7,58 +7,94 @@ import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { ListPicker } from '/tbc/core/components/list_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Component } from './component.js';
 import { Popup } from './popup.js';
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
 export class EncounterPicker extends Component {
-    constructor(parent, modEncounter, config, showHealthPicker) {
+    constructor(parent, modEncounter, config, simUI) {
         super(parent, 'encounter-picker-root');
         addEncounterFieldPickers(this.rootElem, modEncounter, config.showExecuteProportion);
-        new EnumPicker(this.rootElem, modEncounter, {
-            label: 'Target Level',
-            values: [
-                { name: '73', value: 73 },
-                { name: '72', value: 72 },
-                { name: '71', value: 71 },
-                { name: '70', value: 70 },
-            ],
-            changedEvent: (encounter) => encounter.changeEmitter,
-            getValue: (encounter) => encounter.primaryTarget.getLevel(),
-            setValue: (eventID, encounter, newValue) => {
-                encounter.primaryTarget.setLevel(eventID, newValue);
-            },
-        });
-        new EnumPicker(this.rootElem, modEncounter, {
-            label: 'Mob Type',
-            values: mobTypeEnumValues,
-            changedEvent: (encounter) => encounter.changeEmitter,
-            getValue: (encounter) => encounter.primaryTarget.getMobType(),
-            setValue: (eventID, encounter, newValue) => {
-                encounter.primaryTarget.setMobType(eventID, newValue);
-            },
-        });
-        if (config.simpleTargetStats) {
-            config.simpleTargetStats.forEach(stat => {
+        // Need to wait so that the encounter and target presets will be loaded.
+        modEncounter.sim.waitForInit().then(() => {
+            const presetTargets = modEncounter.sim.getAllPresetTargets();
+            new EnumPicker(this.rootElem, modEncounter, {
+                extraCssClasses: ['npc-picker'],
+                label: 'NPC',
+                labelTooltip: 'Selects a preset NPC configuration.',
+                values: [
+                    { name: 'Custom', value: -1 },
+                ].concat(presetTargets.map((pe, i) => {
+                    return {
+                        name: pe.path,
+                        value: i,
+                    };
+                })),
+                changedEvent: (encounter) => encounter.changeEmitter,
+                getValue: (encounter) => presetTargets.findIndex(pe => encounter.primaryTarget.matchesPreset(pe)),
+                setValue: (eventID, encounter, newValue) => {
+                    if (newValue != -1) {
+                        encounter.primaryTarget.applyPreset(eventID, presetTargets[newValue]);
+                    }
+                },
+            });
+            new EnumPicker(this.rootElem, modEncounter, {
+                label: 'Target Level',
+                values: [
+                    { name: '73', value: 73 },
+                    { name: '72', value: 72 },
+                    { name: '71', value: 71 },
+                    { name: '70', value: 70 },
+                ],
+                changedEvent: (encounter) => encounter.changeEmitter,
+                getValue: (encounter) => encounter.primaryTarget.getLevel(),
+                setValue: (eventID, encounter, newValue) => {
+                    encounter.primaryTarget.setLevel(eventID, newValue);
+                },
+            });
+            new EnumPicker(this.rootElem, modEncounter, {
+                label: 'Mob Type',
+                values: mobTypeEnumValues,
+                changedEvent: (encounter) => encounter.changeEmitter,
+                getValue: (encounter) => encounter.primaryTarget.getMobType(),
+                setValue: (eventID, encounter, newValue) => {
+                    encounter.primaryTarget.setMobType(eventID, newValue);
+                },
+            });
+            if (config.simpleTargetStats) {
+                config.simpleTargetStats.forEach(stat => {
+                    new NumberPicker(this.rootElem, modEncounter, {
+                        label: statNames[stat],
+                        changedEvent: (encounter) => encounter.changeEmitter,
+                        getValue: (encounter) => encounter.primaryTarget.getStats().getStat(stat),
+                        setValue: (eventID, encounter, newValue) => {
+                            encounter.primaryTarget.setStats(eventID, encounter.primaryTarget.getStats().withStat(stat, newValue));
+                        },
+                    });
+                });
+            }
+            if (simUI.isIndividualSim() && isTankSpec(simUI.player.spec)) {
                 new NumberPicker(this.rootElem, modEncounter, {
-                    label: statNames[stat],
+                    label: 'Min Base Damage',
+                    labelTooltip: 'Base damage for auto attacks, i.e. lowest roll with 0 AP against a 0-armor Player.',
                     changedEvent: (encounter) => encounter.changeEmitter,
-                    getValue: (encounter) => encounter.primaryTarget.getStats().getStat(stat),
+                    getValue: (encounter) => encounter.primaryTarget.getMinBaseDamage(),
                     setValue: (eventID, encounter, newValue) => {
-                        encounter.primaryTarget.setStats(eventID, encounter.primaryTarget.getStats().withStat(stat, newValue));
+                        encounter.primaryTarget.setMinBaseDamage(eventID, newValue);
                     },
                 });
-            });
-        }
-        const advancedButton = document.createElement('button');
-        advancedButton.classList.add('sim-button', 'advanced-button');
-        advancedButton.textContent = 'ADVANCED';
-        advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter, showHealthPicker));
-        this.rootElem.appendChild(advancedButton);
+            }
+            const advancedButton = document.createElement('button');
+            advancedButton.classList.add('sim-button', 'advanced-button');
+            advancedButton.textContent = 'ADVANCED';
+            advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter, simUI));
+            this.rootElem.appendChild(advancedButton);
+        });
     }
 }
 class AdvancedEncounterPicker extends Popup {
-    constructor(parent, encounter, showHealthPicker) {
+    constructor(parent, encounter, simUI) {
         super(parent);
         this.encounter = encounter;
         this.rootElem.classList.add('advanced-encounter-picker');
@@ -93,7 +129,7 @@ class AdvancedEncounterPicker extends Popup {
         const header = this.rootElem.getElementsByClassName('encounter-header')[0];
         const targetsElem = this.rootElem.getElementsByClassName('encounter-targets')[0];
         addEncounterFieldPickers(header, this.encounter, true);
-        if (showHealthPicker) {
+        if (!simUI.isIndividualSim()) {
             new BooleanPicker(header, encounter, {
                 label: 'Use Health',
                 labelTooltip: 'Uses a damage limit in place of a duration limit. Damage limit is equal to sum of all targets health.',
