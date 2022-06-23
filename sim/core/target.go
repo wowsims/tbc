@@ -82,6 +82,8 @@ func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.Encounte
 // Target is an enemy/boss that can be the target of player attacks/spells.
 type Target struct {
 	Unit
+
+	AI TargetAI
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -123,6 +125,11 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.PseudoStats.InFrontOfTarget = true
 	if target.Level == 73 && options.CanCrush {
 		target.PseudoStats.CanCrush = true
+	}
+
+	preset := GetPresetTargetWithID(options.Id)
+	if preset != nil {
+		target.AI = preset.AI()
 	}
 
 	return target

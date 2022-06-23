@@ -286,10 +286,10 @@ func applyInspiration(character *Character, uptime float64) {
 		Duration: time.Second * 15,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			curBonus = character.ApplyStatDependencies(stats.Stats{stats.Armor: character.GetStat(stats.Armor) * 0.25})
-			character.AddStatsDynamic(sim, curBonus)
+			aura.Unit.AddStatsDynamic(sim, curBonus)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			character.AddStatsDynamic(sim, curBonus.Multiply(-1))
+			aura.Unit.AddStatsDynamic(sim, curBonus.Multiply(-1))
 		},
 	})
 
