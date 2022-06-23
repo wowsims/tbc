@@ -190,6 +190,27 @@ class TargetPicker extends Component {
             },
         });
         new EnumPicker(section1, modTarget, {
+            extraCssClasses: ['ai-picker'],
+            label: 'AI',
+            labelTooltip: `
+				<p>Determines the target\'s ability rotation.</p>
+				<p>Note that most rotations are not yet implemented.</p>
+			`,
+            values: [
+                { name: 'None', value: 0 },
+            ].concat(presetTargets.map(pe => {
+                return {
+                    name: pe.path,
+                    value: pe.target.id,
+                };
+            })),
+            changedEvent: (target) => target.changeEmitter,
+            getValue: (target) => target.getId(),
+            setValue: (eventID, target, newValue) => {
+                target.setId(eventID, newValue);
+            },
+        });
+        new EnumPicker(section1, modTarget, {
             label: 'Level',
             values: [
                 { name: '73', value: 73 },

@@ -86,14 +86,12 @@ export class DtpsMeleeMetricsTable extends MetricsTable {
         }
         const player = players[0];
         const targets = resultData.result.getTargets(resultData.filter);
-        const targetActions = targets.map(target => target.getMeleeActions().map(action => action.forTarget(resultData.filter)));
-        return targetActions;
+        const targetActions = targets.map(target => target.getMeleeActions().map(action => action.forTarget(resultData.filter))).flat();
+        const actionGroups = ActionMetrics.groupById(targetActions);
+        return actionGroups;
     }
     mergeMetrics(metrics) {
         // TODO: Use NPC ID here instead of pet ID.
         return ActionMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
-    }
-    shouldCollapse(metric) {
-        return false;
     }
 }
