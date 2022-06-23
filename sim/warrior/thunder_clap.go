@@ -89,14 +89,6 @@ func (warrior *Warrior) ShouldThunderClap(sim *core.Simulation, filler bool, mai
 		return true
 	}
 
-	activeDebuff := warrior.CurrentTarget.GetActiveAuraWithTag(core.ThunderClapAuraTag)
-	if activeDebuff != nil && activeDebuff.Priority > warrior.ThunderClapAura.Priority {
-		return false
-	}
-
-	if maintainOnly {
-		return activeDebuff == nil || activeDebuff.Priority < warrior.ThunderClapAura.Priority || activeDebuff.RemainingDuration(sim) < time.Second*2
-	}
-
-	return false
+	return maintainOnly &&
+		warrior.CurrentTarget.ShouldRefreshAuraWithTagAtPriority(sim, core.ThunderClapAuraTag, warrior.ThunderClapAura.Priority, time.Second*2)
 }

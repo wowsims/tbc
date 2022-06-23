@@ -621,7 +621,7 @@ func ThunderClapAura(target *Unit, points int32) *Aura {
 		Tag:      ThunderClapAuraTag,
 		ActionID: ActionID{SpellID: 25264},
 		Duration: time.Second * 30,
-		Priority: float64(points),
+		Priority: inverseMult,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.MultiplyAttackSpeed(sim, speedMultiplier)
 		},

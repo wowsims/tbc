@@ -47,7 +47,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	var spell *core.Spell
 
-	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
+	if rotation.FaerieFire && moonkin.ShouldFaerieFire(sim) {
 		spell = moonkin.FaerieFire
 	} else if moonkin.ShouldCastHurricane(sim, rotation) {
 		spell = moonkin.Hurricane

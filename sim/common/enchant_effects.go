@@ -238,6 +238,24 @@ func init() {
 			return
 		}
 
+		const slowMultiplier = 0.85
+		var debuffs []*core.Aura
+		for _, target := range character.Env.Encounter.Targets {
+			debuffs = append(debuffs, target.GetOrRegisterAura(core.Aura{
+				Label:    "Deathfrost",
+				Tag:      core.ThunderClapAuraTag,
+				ActionID: actionID,
+				Duration: time.Second * 8,
+				Priority: 1 / slowMultiplier,
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.MultiplyAttackSpeed(sim, slowMultiplier)
+				},
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.MultiplyAttackSpeed(sim, 1/slowMultiplier)
+				},
+			}))
+		}
+
 		procSpell := character.RegisterSpell(core.SpellConfig{
 			ActionID:    actionID,
 			SpellSchool: core.SpellSchoolFrost,
@@ -248,6 +266,12 @@ func init() {
 
 				BaseDamage:     core.BaseDamageConfigFlat(150),
 				OutcomeApplier: character.OutcomeFuncMagicCrit(character.DefaultSpellCritMultiplier()),
+
+				OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.Landed() {
+						debuffs[spellEffect.Target.Index].Activate(sim)
+					}
+				},
 			}),
 		})
 
