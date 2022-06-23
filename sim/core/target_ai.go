@@ -7,8 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-type TargetAI struct {
-	Target *Target
+type TargetAI interface {
+	Initialize(*Target)
+
+	DoAction(*Simulation)
 }
 
 func (target *Target) initialize(config *proto.Target) {
@@ -36,29 +38,39 @@ func (target *Target) initialize(config *proto.Target) {
 		target.EnableAutoAttacks(target, aaOptions)
 	}
 
-	//target.gcdAction = &PendingAction{
-	//	Priority: ActionPriorityGCD,
-	//	OnAction: func(sim *Simulation) {
-	//	},
-	//}
+	if target.AI != nil {
+		target.AI.Initialize(target)
+
+		target.RegisterResetEffect(func(sim *Simulation) {
+			StartPeriodicAction(sim, PeriodicActionOptions{
+				Period:          time.Millisecond * 1620, // 1.62s ability interval
+				TickImmediately: true,
+				OnAction: func(sim *Simulation) {
+					target.AI.DoAction(sim)
+				},
+			})
+		})
+	}
 }
 
 // Empty Agent interface functions.
-// TODO: Figure out how to get rid of these.
 func (target *Target) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (target *Target) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 func (target *Target) ApplyGearBonuses()                          {}
 func (target *Target) ApplyTalents()                              {}
 func (target *Target) GetCharacter() *Character                   { return nil }
 func (target *Target) Initialize()                                {}
-func (target *Target) OnGCDReady(*Simulation)                     {}
-func (target *Target) OnAutoAttack(sim *Simulation, spell *Spell) {}
+func (target *Target) OnGCDReady(sim *Simulation)                 {}
+
+type AIFactory func() TargetAI
 
 type PresetTarget struct {
 	// String in folder-structure format identifying a category for this unit, e.g. "Black Temple/Bosses".
 	PathPrefix string
 
 	Config proto.Target
+
+	AI AIFactory
 }
 
 func (pt PresetTarget) Path() string {
@@ -90,6 +102,16 @@ func GetPresetTargetWithPath(path string) *PresetTarget {
 	for i, _ := range presetTargets {
 		preset := &presetTargets[i]
 		if preset.Path() == path {
+			return preset
+		}
+	}
+	return nil
+}
+
+func GetPresetTargetWithID(id int32) *PresetTarget {
+	for i, _ := range presetTargets {
+		preset := &presetTargets[i]
+		if preset.Config.Id == id {
 			return preset
 		}
 	}

@@ -243,6 +243,17 @@ func (raid Raid) AddStats(s stats.Stats) {
 	}
 }
 
+func (raid Raid) GetPlayerFromUnit(unit *Unit) Agent {
+	for _, party := range raid.Parties {
+		for _, agent := range party.PlayersAndPets {
+			if &agent.GetCharacter().Unit == unit {
+				return agent
+			}
+		}
+	}
+	return nil
+}
+
 func (raid Raid) GetPlayerFromRaidTarget(raidTarget proto.RaidTarget) Agent {
 	raidIndex := raidTarget.TargetIndex
 
