@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -68,14 +67,9 @@ func (druid *Druid) ShouldFaerieFire(sim *core.Simulation) bool {
 		return false
 	}
 
-	activeDebuff := druid.CurrentTarget.GetActiveAuraWithTag(core.FaerieFireAuraTag)
-	if activeDebuff != nil && activeDebuff.Priority > druid.FaerieFireAura.Priority {
+	if !druid.FaerieFire.IsReady(sim) {
 		return false
 	}
 
-	return druid.FaerieFire.IsReady(sim) && druid.FaerieFireAura.RemainingDuration(sim) <= time.Second*3
-}
-
-func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Unit, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.FaerieFire && !druid.FaerieFireAura.IsActive() && druid.FaerieFire.IsReady(sim)
+	return druid.CurrentTarget.ShouldRefreshAuraWithTagAtPriority(sim, core.FaerieFireAuraTag, druid.FaerieFireAura.Priority, time.Second*3)
 }

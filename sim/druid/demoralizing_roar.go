@@ -64,18 +64,10 @@ func (druid *Druid) ShouldDemoralizingRoar(sim *core.Simulation, filler bool, ma
 		return false
 	}
 
-	activeDebuff := druid.CurrentTarget.GetActiveAuraWithTag(core.APReductionAuraTag)
-	if activeDebuff != nil && activeDebuff.Priority > druid.DemoralizingRoarAura.Priority {
-		return false
-	}
-
 	if filler {
 		return true
 	}
 
-	if maintainOnly {
-		return activeDebuff == nil || activeDebuff.Priority < druid.DemoralizingRoarAura.Priority || activeDebuff.RemainingDuration(sim) < time.Second*2
-	}
-
-	return false
+	return maintainOnly &&
+		druid.CurrentTarget.ShouldRefreshAuraWithTagAtPriority(sim, core.APReductionAuraTag, druid.DemoralizingRoarAura.Priority, time.Second*2)
 }
