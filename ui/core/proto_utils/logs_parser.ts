@@ -554,7 +554,11 @@ export class ResourceChangedLog extends SimLog {
 
 	toString(): string {
 		const signedDiff = (this.valueAfter - this.valueBefore) * (this.isSpend ? -1 : 1);
-		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${resourceNames[this.resourceType]} from ${this.actionId!.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
+
+		const isHealth = this.resourceType == ResourceType.ResourceTypeHealth;
+		const verb = isHealth ? (this.isSpend ? 'Lost' : 'Recovered') : (this.isSpend ? 'Spent' : 'Gained');
+
+		return `${this.toStringPrefix()} ${verb} ${signedDiff.toFixed(1)} ${resourceNames[this.resourceType]} from ${this.actionId!.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
 	}
 
 	resultString(): string {
