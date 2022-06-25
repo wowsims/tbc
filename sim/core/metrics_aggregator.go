@@ -197,6 +197,9 @@ func (unitMetrics *UnitMetrics) NewResourceMetrics(actionID ActionID, resourceTy
 }
 
 // Convenience helpers for NewResourceMetrics.
+func (unit *Unit) NewHealthMetrics(actionID ActionID) *ResourceMetrics {
+	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeHealth)
+}
 func (unit *Unit) NewManaMetrics(actionID ActionID) *ResourceMetrics {
 	return unit.Metrics.NewResourceMetrics(actionID, proto.ResourceType_ResourceTypeMana)
 }

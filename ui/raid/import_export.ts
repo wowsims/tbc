@@ -8,6 +8,7 @@ import { Encounter as EncounterProto, EquipmentSpec, ItemSpec, MobType, Spec, Ta
 import { nameToClass } from '/tbc/core/proto_utils/names.js';
 import { makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec, playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { MAX_NUM_PARTIES } from '/tbc/core/raid.js';
+import { Player } from '/tbc/core/player.js';
 import { Target } from '/tbc/core/target.js';
 
 import { playerPresets, PresetSpecSettings } from './presets.js';
@@ -731,11 +732,6 @@ class WCLSimPlayer implements wclSimPlayer {
 
 		player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
 
-		// Set tanks 'in front of target'
-		if (isTankSpec(this.spec)) {
-			player.inFrontOfTarget = true;
-		}
-
 		player.talentsString = matchingPreset.talents;
 		player.consumes = matchingPreset.consumes;
 
@@ -743,6 +739,8 @@ class WCLSimPlayer implements wclSimPlayer {
 		player.class = nameToClass(this.type);
 		player.equipment = this.getEquipment();
 		player.race = matchingPreset.defaultFactionRaces[this.faction];
+
+		Player.applySharedDefaultsToProto(player);
 
 		return player;
 	}

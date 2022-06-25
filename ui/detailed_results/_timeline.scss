@@ -2,6 +2,7 @@
 
 $dps-color: #ed5653;
 $threat-color: #b56d07;
+$health-color: #22ba00;
 $mana-color: #2E93fA;
 $energy-color: #ffd700;
 $rage-color: #ff0000;
@@ -10,6 +11,9 @@ $combo-points-color: #ffa07a;
 
 .threat .series-color, .threat.series-color {
 	color: $threat-color;
+}
+.health .series-color, .health.series-color {
+	color: $health-color;
 }
 .mana .series-color, .mana.series-color {
 	color: $mana-color;
@@ -104,6 +108,9 @@ $combo-points-color: #ffa07a;
 }
 .timeline-tooltip.threat ul li::before {
 	color: $threat-color;
+}
+.timeline-tooltip.health ul li::before {
+	color: $health-color;
 }
 .timeline-tooltip.mana ul li::before {
 	color: $mana-color;

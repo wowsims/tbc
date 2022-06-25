@@ -71,7 +71,7 @@ type Unit struct {
 	JowManaMetrics        *ResourceMetrics
 	VtManaMetrics         *ResourceMetrics
 
-	currentHealth float64
+	healthBar
 	rageBar
 	energyBar
 
@@ -241,18 +241,6 @@ func (unit *Unit) updateSpellPen() {
 	}
 }
 
-func (unit *Unit) MaxHealth() float64 {
-	return unit.stats[stats.Health]
-}
-
-func (unit *Unit) CurrentHealth() float64 {
-	return unit.currentHealth
-}
-
-func (unit *Unit) CurrentHealthPercent() float64 {
-	return unit.currentHealth / unit.stats[stats.Health]
-}
-
 // Returns whether the indicates stat is currently modified by a temporary bonus.
 func (unit *Unit) HasTemporaryBonusForStat(stat stats.Stat) bool {
 	return unit.initialStats[stat] != unit.stats[stat]
@@ -367,7 +355,7 @@ func (unit *Unit) reset(sim *Simulation, agent Agent) {
 		spell.reset(sim)
 	}
 
-	unit.currentHealth = unit.MaxHealth()
+	unit.healthBar.reset(sim)
 	unit.UpdateManaRegenRates()
 
 	unit.energyBar.reset(sim)

@@ -55,8 +55,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-AdamantineFigurine-27891"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442670112
+  tps: 945.4663375417033
  }
 }
 dps_results: {
@@ -69,8 +69,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-AncientAqirArtifact-33830"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442670112
+  tps: 945.4663375417033
  }
 }
 dps_results: {
@@ -195,8 +195,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BroochoftheImmortalKing-32534"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442671918
+  tps: 945.4663375418298
  }
 }
 dps_results: {
@@ -237,8 +237,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Coren'sLuckyCoin-38289"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442670112
+  tps: 945.4663375417033
  }
 }
 dps_results: {
@@ -258,8 +258,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Dabiri'sEnigma-30300"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442671918
+  tps: 945.4663375418298
  }
 }
 dps_results: {
@@ -419,8 +419,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-GnomereganAuto-Blocker600-29387"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442670112
+  tps: 945.4663375417033
  }
 }
 dps_results: {
@@ -552,8 +552,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Moroes'LuckyPocketWatch-28528"
  value: {
-  dps: 1348.5976442671918
-  tps: 945.4663375418298
+  dps: 1348.5976442671024
+  tps: 945.4663375417672
  }
 }
 dps_results: {
@@ -657,8 +657,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-ShadowmoonInsignia-32501"
  value: {
-  dps: 1348.5976442671024
-  tps: 945.4663375417672
+  dps: 1348.5976442671918
+  tps: 945.4663375418298
  }
 }
 dps_results: {
