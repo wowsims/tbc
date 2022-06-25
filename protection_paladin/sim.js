@@ -210,6 +210,8 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
                 ],
                 conjured: [
                     Conjured.ConjuredDarkRune,
+                    Conjured.ConjuredFlameCap,
+                    Conjured.ConjuredHealthstone,
                 ],
                 flasks: [
                     Flask.FlaskOfFortification,
@@ -260,6 +262,10 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    OtherInputs.TankAssignment,
+                    OtherInputs.IncomingHps,
+                    OtherInputs.HealingCadence,
+                    OtherInputs.HpPercentForDefensives,
                     ProtectionPaladinInputs.AuraSelection,
                     ProtectionPaladinInputs.UseAvengingWrath,
                     OtherInputs.ExposeWeaknessUptime,
@@ -267,9 +273,6 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
                     OtherInputs.InspirationUptime,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.SnapshotImprovedWrathOfAirTotem,
-                    OtherInputs.TankAssignment,
-                    OtherInputs.IncomingHps,
-                    OtherInputs.HealingCadence,
                     OtherInputs.InFrontOfTarget,
                 ],
             },

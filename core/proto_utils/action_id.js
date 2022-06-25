@@ -67,6 +67,10 @@ export class ActionId {
                 baseName = 'Damage Taken';
                 iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_sword_04.jpg';
                 break;
+            case OtherAction.OtherActionHealingModel:
+                baseName = 'Incoming HPS';
+                iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_renew.jpg';
+                break;
         }
         this.baseName = baseName;
         this.name = name || baseName;
@@ -388,9 +392,10 @@ const petNameToIcon = {
 };
 export const resourceTypeToIcon = {
     [ResourceType.ResourceTypeNone]: '',
-    [ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-    [ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-    [ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-    [ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
-    [ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+    [ResourceType.ResourceTypeHealth]: 'https://wow.zamimg.com/images/wow/icons/medium/inv_elemental_mote_life01.jpg',
+    [ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/medium/inv_elemental_mote_mana.jpg',
+    [ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_shadowworddominate.jpg',
+    [ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/medium/spell_misc_emotionangry.jpg',
+    [ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/medium/inv_mace_2h_pvp410_c_01.jpg',
+    [ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_focusfire.jpg',
 };

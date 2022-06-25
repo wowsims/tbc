@@ -184,6 +184,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 ],
                 conjured: [
                     Conjured.ConjuredFlameCap,
+                    Conjured.ConjuredHealthstone,
                 ],
                 flasks: [
                     Flask.FlaskOfRelentlessAssault,
@@ -223,6 +224,10 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    OtherInputs.TankAssignment,
+                    OtherInputs.IncomingHps,
+                    OtherInputs.HealingCadence,
+                    OtherInputs.HpPercentForDefensives,
                     DruidInputs.StartingRage,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
@@ -232,9 +237,6 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.SnapshotBsSolarianSapphire,
                     OtherInputs.SnapshotBsT2,
-                    OtherInputs.TankAssignment,
-                    OtherInputs.IncomingHps,
-                    OtherInputs.HealingCadence,
                     OtherInputs.InFrontOfTarget,
                 ],
             },

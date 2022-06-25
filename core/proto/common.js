@@ -891,6 +891,10 @@ export var Conjured;
      */
     Conjured[Conjured["ConjuredFlameCap"] = 2] = "ConjuredFlameCap";
     /**
+     * @generated from protobuf enum value: ConjuredHealthstone = 5;
+     */
+    Conjured[Conjured["ConjuredHealthstone"] = 5] = "ConjuredHealthstone";
+    /**
      * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
      */
     Conjured[Conjured["ConjuredMageManaEmerald"] = 3] = "ConjuredMageManaEmerald";
@@ -1307,6 +1311,12 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionDamageTaken = 9;
      */
     OtherAction[OtherAction["OtherActionDamageTaken"] = 9] = "OtherActionDamageTaken";
+    /**
+     * Indicates healing received from healing model.
+     *
+     * @generated from protobuf enum value: OtherActionHealingModel = 12;
+     */
+    OtherAction[OtherAction["OtherActionHealingModel"] = 12] = "OtherActionHealingModel";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {
@@ -3170,11 +3180,12 @@ export const Cooldown = new Cooldown$Type();
 class Cooldowns$Type extends MessageType {
     constructor() {
         super("proto.Cooldowns", [
-            { no: 1, name: "cooldowns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Cooldown }
+            { no: 1, name: "cooldowns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Cooldown },
+            { no: 2, name: "hp_percent_for_defensives", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { cooldowns: [] };
+        const message = { cooldowns: [], hpPercentForDefensives: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -3187,6 +3198,9 @@ class Cooldowns$Type extends MessageType {
             switch (fieldNo) {
                 case /* repeated proto.Cooldown cooldowns */ 1:
                     message.cooldowns.push(Cooldown.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* double hp_percent_for_defensives */ 2:
+                    message.hpPercentForDefensives = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -3203,6 +3217,9 @@ class Cooldowns$Type extends MessageType {
         /* repeated proto.Cooldown cooldowns = 1; */
         for (let i = 0; i < message.cooldowns.length; i++)
             Cooldown.internalBinaryWrite(message.cooldowns[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* double hp_percent_for_defensives = 2; */
+        if (message.hpPercentForDefensives !== 0)
+            writer.tag(2, WireType.Bit64).double(message.hpPercentForDefensives);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

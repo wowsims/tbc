@@ -124,4 +124,6 @@ export declare class Player<SpecType extends Spec> {
     toProto(forExport?: boolean): PlayerProto;
     fromProto(eventID: EventID, proto: PlayerProto): void;
     clone(eventID: EventID): Player<SpecType>;
+    applySharedDefaults(eventID: EventID): void;
+    static applySharedDefaultsToProto(proto: PlayerProto): void;
 }

@@ -66,6 +66,10 @@ export var ResourceType;
      * @generated from protobuf enum value: ResourceTypeFocus = 5;
      */
     ResourceType[ResourceType["ResourceTypeFocus"] = 5] = "ResourceTypeFocus";
+    /**
+     * @generated from protobuf enum value: ResourceTypeHealth = 6;
+     */
+    ResourceType[ResourceType["ResourceTypeHealth"] = 6] = "ResourceTypeHealth";
 })(ResourceType || (ResourceType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Player$Type extends MessageType {

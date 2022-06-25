@@ -556,6 +556,7 @@ class NewPlayerPicker extends Component {
                         newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
                         newPlayer.setConsumes(eventID, matchingPreset.consumes);
                         newPlayer.setName(eventID, matchingPreset.defaultName);
+                        newPlayer.applySharedDefaults(eventID);
                         // Need to wait because the gear might not be loaded yet.
                         this.raidPicker.raid.sim.waitForInit().then(() => {
                             newPlayer.setGear(eventID, this.raidPicker.raid.sim.lookupEquipmentSpec(matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));

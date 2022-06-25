@@ -2,6 +2,7 @@ import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { HealingModel } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -14,7 +15,7 @@ import { talentStringToProto } from '/tbc/core/talents/factory.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipEnchant, canEquipItem, classColors, emptyRaidTarget, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, newRaidTarget, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipEnchant, canEquipItem, classColors, emptyRaidTarget, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, isTankSpec, newRaidTarget, playerToSpec, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -516,5 +517,26 @@ export class Player {
         const newPlayer = new Player(this.spec, this.sim);
         newPlayer.fromProto(eventID, this.toProto());
         return newPlayer;
+    }
+    applySharedDefaults(eventID) {
+        TypedEvent.freezeAllAndDo(() => {
+            this.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
+            this.setInFrontOfTarget(eventID, isTankSpec(this.spec));
+            this.setHealingModel(eventID, HealingModel.create());
+            this.setCooldowns(eventID, Cooldowns.create({
+                hpPercentForDefensives: isTankSpec(this.spec) ? 0.35 : 0,
+            }));
+            this.setBonusStats(eventID, new Stats());
+        });
+    }
+    static applySharedDefaultsToProto(proto) {
+        const spec = playerToSpec(proto);
+        proto.shattFaction = ShattrathFaction.ShattrathFactionAldor;
+        proto.inFrontOfTarget = isTankSpec(spec);
+        proto.healingModel = HealingModel.create();
+        proto.cooldowns = Cooldowns.create({
+            hpPercentForDefensives: isTankSpec(spec) ? 0.35 : 0,
+        });
+        proto.bonusStats = new Stats().asArray();
     }
 }

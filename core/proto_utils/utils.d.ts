@@ -1,4 +1,5 @@
 import { Player } from '/tbc/core/proto/api.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -99,3 +100,4 @@ export declare function makeBlessingsAssignments(numPaladins: number, data: Arra
     blessings: Array<Blessings>;
 }>): BlessingsAssignments;
 export declare function makeDefaultBlessings(numPaladins: number): BlessingsAssignments;
+export declare const orderedResourceTypes: Array<ResourceType>;

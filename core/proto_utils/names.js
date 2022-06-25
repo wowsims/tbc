@@ -162,6 +162,7 @@ export const slotNames = {
 };
 export const resourceNames = {
     [ResourceType.ResourceTypeNone]: 'None',
+    [ResourceType.ResourceTypeHealth]: 'Health',
     [ResourceType.ResourceTypeMana]: 'Mana',
     [ResourceType.ResourceTypeEnergy]: 'Energy',
     [ResourceType.ResourceTypeRage]: 'Rage',
@@ -170,6 +171,7 @@ export const resourceNames = {
 };
 export const resourceColors = {
     [ResourceType.ResourceTypeNone]: '#ffffff',
+    [ResourceType.ResourceTypeHealth]: '#22ba00',
     [ResourceType.ResourceTypeMana]: '#2e93fa',
     [ResourceType.ResourceTypeEnergy]: '#ffd700',
     [ResourceType.ResourceTypeRage]: '#ff0000',

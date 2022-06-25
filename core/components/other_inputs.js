@@ -419,3 +419,26 @@ export const HealingCadence = {
         enableWhen: (player) => player.getRaid().getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
     },
 };
+export const HpPercentForDefensives = {
+    type: 'number',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        float: true,
+        extraCssClasses: [
+            'hp-percent-for-defensives-picker',
+        ],
+        label: 'HP % for Defensive CDs',
+        labelTooltip: `
+			<p>% of Maximum Health, below which defensive cooldowns are allowed to be used.</p>
+			<p>If set to 0, this restriction is disabled.</p>
+		`,
+        changedEvent: (player) => player.getRaid().changeEmitter,
+        getValue: (player) => player.getCooldowns().hpPercentForDefensives * 100,
+        setValue: (eventID, player, newValue) => {
+            const cooldowns = player.getCooldowns();
+            cooldowns.hpPercentForDefensives = newValue / 100;
+            player.setCooldowns(eventID, cooldowns);
+        },
+        enableWhen: (player) => player.getRaid().getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
+    },
+};

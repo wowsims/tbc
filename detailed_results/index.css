@@ -1155,6 +1155,10 @@ input, select {
   color: #b56d07;
 }
 
+.health .series-color, .health.series-color {
+  color: #22ba00;
+}
+
 .mana .series-color, .mana.series-color {
   color: #2E93fA;
 }
@@ -1247,6 +1251,10 @@ input, select {
 
 .timeline-tooltip.threat ul li::before {
   color: #b56d07;
+}
+
+.timeline-tooltip.health ul li::before {
+  color: #22ba00;
 }
 
 .timeline-tooltip.mana ul li::before {

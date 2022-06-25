@@ -12,7 +12,6 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { TypedEvent } from './typed_event.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
-import { HealingModel } from '/tbc/core/proto/common.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -647,20 +646,16 @@ export class IndividualSimUI extends SimUI {
         TypedEvent.freezeAllAndDo(() => {
             const tankSpec = isTankSpec(this.player.spec);
             this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
-            this.player.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
             this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
-            this.player.setBonusStats(eventID, new Stats());
             this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
             this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
             this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
             this.player.setSpecOptions(eventID, this.individualConfig.defaults.specOptions);
             this.player.setBuffs(eventID, this.individualConfig.defaults.individualBuffs);
-            this.player.setCooldowns(eventID, Cooldowns.create());
             this.player.getParty().setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
             this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
             this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
-            this.player.setInFrontOfTarget(eventID, tankSpec);
-            this.player.setHealingModel(eventID, HealingModel.create());
+            this.player.applySharedDefaults(eventID);
             if (!this.isWithinRaidSim) {
                 this.sim.encounter.applyDefaults(eventID);
                 this.sim.raid.setDebuffs(eventID, this.individualConfig.defaults.debuffs);

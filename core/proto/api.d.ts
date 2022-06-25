@@ -878,7 +878,11 @@ export declare enum ResourceType {
     /**
      * @generated from protobuf enum value: ResourceTypeFocus = 5;
      */
-    ResourceTypeFocus = 5
+    ResourceTypeFocus = 5,
+    /**
+     * @generated from protobuf enum value: ResourceTypeHealth = 6;
+     */
+    ResourceTypeHealth = 6
 }
 declare class Player$Type extends MessageType<Player> {
     constructor();

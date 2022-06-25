@@ -189,6 +189,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 ],
                 conjured: [
                     Conjured.ConjuredFlameCap,
+                    Conjured.ConjuredHealthstone,
                 ],
                 flasks: [
                     Flask.FlaskOfRelentlessAssault,
@@ -232,6 +233,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    OtherInputs.TankAssignment,
+                    OtherInputs.IncomingHps,
+                    OtherInputs.HealingCadence,
+                    OtherInputs.HpPercentForDefensives,
                     ProtectionWarriorInputs.StartingRage,
                     ProtectionWarriorInputs.ShoutPicker,
                     ProtectionWarriorInputs.PrecastShout,
@@ -241,9 +246,6 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.InspirationUptime,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
-                    OtherInputs.TankAssignment,
-                    OtherInputs.IncomingHps,
-                    OtherInputs.HealingCadence,
                     OtherInputs.InFrontOfTarget,
                 ],
             },

@@ -5,6 +5,7 @@ import { intersection } from '/tbc/core/utils.js';
 import { maxIndex } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 import { Player } from '/tbc/core/proto/api.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -1237,3 +1238,11 @@ export function makeDefaultBlessings(numPaladins) {
     ]);
 }
 ;
+export const orderedResourceTypes = [
+    ResourceType.ResourceTypeHealth,
+    ResourceType.ResourceTypeMana,
+    ResourceType.ResourceTypeEnergy,
+    ResourceType.ResourceTypeRage,
+    ResourceType.ResourceTypeComboPoints,
+    ResourceType.ResourceTypeFocus,
+];

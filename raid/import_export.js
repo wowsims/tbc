@@ -8,6 +8,7 @@ import { Encounter as EncounterProto, EquipmentSpec, ItemSpec, Spec, RaidTarget,
 import { nameToClass } from '/tbc/core/proto_utils/names.js';
 import { makeDefaultBlessings, specTypeFunctions, withSpecProto, isTankSpec, playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { MAX_NUM_PARTIES } from '/tbc/core/raid.js';
+import { Player } from '/tbc/core/player.js';
 import { Target } from '/tbc/core/target.js';
 import { playerPresets } from './presets.js';
 export function newRaidImporters(simUI) {
@@ -571,16 +572,13 @@ class WCLSimPlayer {
             return;
         }
         player = withSpecProto(this.spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
-        // Set tanks 'in front of target'
-        if (isTankSpec(this.spec)) {
-            player.inFrontOfTarget = true;
-        }
         player.talentsString = matchingPreset.talents;
         player.consumes = matchingPreset.consumes;
         player.name = this.name;
         player.class = nameToClass(this.type);
         player.equipment = this.getEquipment();
         player.race = matchingPreset.defaultFactionRaces[this.faction];
+        Player.applySharedDefaultsToProto(player);
         return player;
     }
     getBuffBot() {

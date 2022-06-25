@@ -409,7 +409,9 @@ export class ResourceChangedLog extends SimLog {
     }
     toString() {
         const signedDiff = (this.valueAfter - this.valueBefore) * (this.isSpend ? -1 : 1);
-        return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${resourceNames[this.resourceType]} from ${this.actionId.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
+        const isHealth = this.resourceType == ResourceType.ResourceTypeHealth;
+        const verb = isHealth ? (this.isSpend ? 'Lost' : 'Recovered') : (this.isSpend ? 'Spent' : 'Gained');
+        return `${this.toStringPrefix()} ${verb} ${signedDiff.toFixed(1)} ${resourceNames[this.resourceType]} from ${this.actionId.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
     }
     resultString() {
         const delta = this.valueAfter - this.valueBefore;
@@ -421,12 +423,12 @@ export class ResourceChangedLog extends SimLog {
         }
     }
     static parse(params) {
-        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((mana)|(energy)|(focus)|(rage)|(combo points)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
+        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((health)|(mana)|(energy)|(focus)|(rage)|(combo points)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
         if (match) {
             const resourceType = stringToResourceType(match[4]);
-            return ActionId.fromLogString(match[10]).fill(params.source?.index).then(cause => {
+            return ActionId.fromLogString(match[11]).fill(params.source?.index).then(cause => {
                 params.actionId = cause;
-                return new ResourceChangedLog(params, resourceType, parseFloat(match[11]), parseFloat(match[12]), match[1] == 'Spent');
+                return new ResourceChangedLog(params, resourceType, parseFloat(match[12]), parseFloat(match[13]), match[1] == 'Spent');
             });
         }
         else {

@@ -831,6 +831,12 @@ export interface Cooldowns {
      * @generated from protobuf field: repeated proto.Cooldown cooldowns = 1;
      */
     cooldowns: Cooldown[];
+    /**
+     * % HP threshold, below which defensive cooldowns can be used.
+     *
+     * @generated from protobuf field: double hp_percent_for_defensives = 2;
+     */
+    hpPercentForDefensives: number;
 }
 /**
  * @generated from protobuf message proto.HealingModel
@@ -1717,6 +1723,10 @@ export declare enum Conjured {
      */
     ConjuredFlameCap = 2,
     /**
+     * @generated from protobuf enum value: ConjuredHealthstone = 5;
+     */
+    ConjuredHealthstone = 5,
+    /**
      * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
      */
     ConjuredMageManaEmerald = 3,
@@ -2121,7 +2131,13 @@ export declare enum OtherAction {
      *
      * @generated from protobuf enum value: OtherActionDamageTaken = 9;
      */
-    OtherActionDamageTaken = 9
+    OtherActionDamageTaken = 9,
+    /**
+     * Indicates healing received from healing model.
+     *
+     * @generated from protobuf enum value: OtherActionHealingModel = 12;
+     */
+    OtherActionHealingModel = 12
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
