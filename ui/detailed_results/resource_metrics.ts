@@ -2,6 +2,7 @@ import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { ResourceMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 import { resourceNames } from '/tbc/core/proto_utils/names.js';
+import { orderedResourceTypes } from '/tbc/core/proto_utils/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { ColumnSortType, MetricsTable } from './metrics_table.js';
@@ -15,8 +16,7 @@ export class ResourceMetricsTable extends ResultComponent {
 		config.rootCssClass = 'resource-metrics-root';
 		super(config);
 
-		const resourceTypes = (getEnumValues(ResourceType) as Array<ResourceType>).filter(val => val != ResourceType.ResourceTypeNone);
-		resourceTypes.forEach(resourceType => {
+		orderedResourceTypes.forEach(resourceType => {
 			const containerElem = document.createElement('div');
 			containerElem.classList.add('resource-metrics-table-container', 'hide');
 			containerElem.innerHTML = `<span class="resource-metrics-table-title">${resourceNames[resourceType]}</span>`;

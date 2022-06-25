@@ -227,8 +227,9 @@ func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) *proto.RaidStats 
 			}
 
 			char := player.GetCharacter()
-			partyStats.Players[char.PartyIndex] = char.applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
+			char.EnableHealthBar()
 			char.trackChanceOfDeath(playerConfig.HealingModel)
+			partyStats.Players[char.PartyIndex] = char.applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
 		}
 
 		raidStats.Parties = append(raidStats.Parties, partyStats)

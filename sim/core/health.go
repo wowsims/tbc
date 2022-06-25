@@ -7,6 +7,78 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+type healthBar struct {
+	unit *Unit
+
+	currentHealth  float64
+
+	DamageTakenHealthMetrics *ResourceMetrics
+}
+
+func (unit *Unit) EnableHealthBar() {
+	unit.healthBar = healthBar{
+		unit: unit,
+
+		DamageTakenHealthMetrics: unit.NewHealthMetrics(ActionID{OtherID: proto.OtherAction_OtherActionDamageTaken}),
+	}
+}
+
+func (unit *Unit) HasHealthBar() bool {
+	return unit.healthBar.unit != nil
+}
+
+func (hb *healthBar) reset(_ *Simulation) {
+	if hb.unit == nil {
+		return
+	}
+	hb.currentHealth = hb.MaxHealth()
+}
+
+func (hb *healthBar) MaxHealth() float64 {
+	return hb.unit.stats[stats.Health]
+}
+
+func (hb *healthBar) CurrentHealth() float64 {
+	return hb.currentHealth
+}
+
+func (hb *healthBar) CurrentHealthPercent() float64 {
+	return hb.currentHealth / hb.unit.stats[stats.Health]
+}
+
+func (hb *healthBar) GainHealth(sim *Simulation, amount float64, metrics *ResourceMetrics) {
+	if amount < 0 {
+		panic("Trying to gain negative health!")
+	}
+
+	oldHealth := hb.currentHealth
+	newHealth := MinFloat(oldHealth+amount, hb.unit.MaxHealth())
+	metrics.AddEvent(amount, newHealth-oldHealth)
+
+	if sim.Log != nil {
+		hb.unit.Log(sim, "Gained %0.3f health from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, oldHealth, newHealth)
+	}
+
+	hb.currentHealth = newHealth
+}
+
+func (hb *healthBar) RemoveHealth(sim *Simulation, amount float64) {
+	if amount < 0 {
+		panic("Trying to remove negative health!")
+	}
+
+	oldHealth := hb.currentHealth
+	newHealth := MaxFloat(oldHealth-amount, 0)
+	metrics := hb.DamageTakenHealthMetrics
+	metrics.AddEvent(-amount, newHealth-oldHealth)
+
+	if sim.Log != nil {
+		hb.unit.Log(sim, "Spent %0.3f health from %s (%0.3f --> %0.3f).", amount, metrics.ActionID, oldHealth, newHealth)
+	}
+
+	hb.currentHealth = newHealth
+}
+
 var ChanceOfDeathAuraLabel = "Chance of Death"
 
 func (character *Character) trackChanceOfDeath(healingModel *proto.HealingModel) {
@@ -32,10 +104,8 @@ func (character *Character) trackChanceOfDeath(healingModel *proto.HealingModel)
 		},
 		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Damage > 0 {
-				aura.Unit.currentHealth -= spellEffect.Damage
-				if sim.Log != nil {
-					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth())
-				}
+				aura.Unit.RemoveHealth(sim, spellEffect.Damage)
+
 				if aura.Unit.CurrentHealth() <= 0 && !aura.Unit.Metrics.Died {
 					aura.Unit.Metrics.Died = true
 					if sim.Log != nil {
@@ -46,10 +116,8 @@ func (character *Character) trackChanceOfDeath(healingModel *proto.HealingModel)
 		},
 		OnPeriodicDamageTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Damage > 0 {
-				aura.Unit.currentHealth -= spellEffect.Damage
-				if sim.Log != nil {
-					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth())
-				}
+				aura.Unit.RemoveHealth(sim, spellEffect.Damage)
+
 				if aura.Unit.CurrentHealth() <= 0 && !aura.Unit.Metrics.Died {
 					aura.Unit.Metrics.Died = true
 					if sim.Log != nil {
@@ -72,6 +140,8 @@ func (character *Character) applyHealingModel(healingModel proto.HealingModel) {
 	}
 	healPerTick := healingModel.Hps * (float64(cadence) / float64(time.Second))
 
+	healthMetrics := character.NewHealthMetrics(ActionID{OtherID: proto.OtherAction_OtherActionHealingModel})
+
 	character.RegisterResetEffect(func(sim *Simulation) {
 		// Hack since we don't have OnHealingReceived aura handlers yet.
 		ardentDefenderAura := character.GetAura("Ardent Defender")
@@ -79,10 +149,7 @@ func (character *Character) applyHealingModel(healingModel proto.HealingModel) {
 		StartPeriodicAction(sim, PeriodicActionOptions{
 			Period: cadence,
 			OnAction: func(sim *Simulation) {
-				character.currentHealth = MinFloat(character.currentHealth+healPerTick, character.GetStat(stats.Health))
-				if sim.Log != nil {
-					character.Log(sim, "Heal for %0.02f, current health: %0.01f", healPerTick, character.CurrentHealth())
-				}
+				character.GainHealth(sim, healPerTick, healthMetrics)
 
 				if ardentDefenderAura != nil && character.CurrentHealthPercent() >= 0.35 {
 					ardentDefenderAura.Deactivate(sim)

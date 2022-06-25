@@ -209,15 +209,15 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 713.66019212549
-  tps: 605.3779549373378
+  dps: 703.7352183523898
+  tps: 597.1819557097106
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 708.1888345684737
-  tps: 601.1729527794253
+  dps: 713.0950799772297
+  tps: 605.1730954692977
  }
 }
 dps_results: {
