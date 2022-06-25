@@ -235,6 +235,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtection-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 421.795388268385
+  tps: 790.70182862891
+ }
+}
+dps_results: {
  key: "TestProtection-AllItems-Coren'sLuckyCoin-38289"
  value: {
   dps: 421.795388268385

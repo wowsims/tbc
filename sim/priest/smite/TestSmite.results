@@ -228,6 +228,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestSmite-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 1082.5535511472544
+  tps: 1053.5836825311221
+ }
+}
+dps_results: {
  key: "TestSmite-AllItems-Coren'sLuckyCoin-38289"
  value: {
   dps: 1082.5535511472544

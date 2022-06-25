@@ -83,6 +83,7 @@ func (paladin *Paladin) ApplyTalents() {
 
 	paladin.applyRedoubt()
 	paladin.applyReckoning()
+	paladin.applyArdentDefender()
 	paladin.applyCrusade()
 	paladin.applyWeaponSpecialization()
 	paladin.applyVengeance()
@@ -173,6 +174,40 @@ func (paladin *Paladin) applyReckoning() {
 			if sim.RandomFloat("Redoubt") < procChance {
 				procAura.Activate(sim)
 				procAura.SetStacks(sim, 4)
+			}
+		},
+	})
+}
+
+func (paladin *Paladin) applyArdentDefender() {
+	if paladin.Talents.ArdentDefender == 0 {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 31854}
+	damageReduction := 1.0 - 0.06*float64(paladin.Talents.ArdentDefender)
+
+	procAura := paladin.RegisterAura(core.Aura{
+		Label:    "Ardent Defender",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageTakenMultiplier *= damageReduction
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageTakenMultiplier /= damageReduction
+		},
+	})
+
+	paladin.RegisterAura(core.Aura{
+		Label:    "Ardent Defender Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if aura.Unit.CurrentHealthPercent() < 0.35 {
+				procAura.Activate(sim)
 			}
 		},
 	})
