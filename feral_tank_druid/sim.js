@@ -169,6 +169,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 IconInputs.GiftOfArthas,
                 IconInputs.DemoralizingRoar,
                 IconInputs.DemoralizingShout,
+                IconInputs.Screech,
                 IconInputs.ThunderClap,
                 IconInputs.ShadowEmbrace,
                 IconInputs.InsectSwarm,

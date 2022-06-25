@@ -2021,11 +2021,12 @@ class Debuffs$Type extends MessageType {
             { no: 21, name: "thunder_clap", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 22, name: "insect_swarm", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "scorpid_sting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 24, name: "shadow_embrace", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 24, name: "shadow_embrace", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 26, name: "screech", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, judgementOfLight: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false };
+        const message = { judgementOfWisdom: false, judgementOfLight: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false, screech: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2110,6 +2111,9 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* bool shadow_embrace */ 24:
                     message.shadowEmbrace = reader.bool();
+                    break;
+                case /* bool screech */ 26:
+                    message.screech = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2198,6 +2202,9 @@ class Debuffs$Type extends MessageType {
         /* bool shadow_embrace = 24; */
         if (message.shadowEmbrace !== false)
             writer.tag(24, WireType.Varint).bool(message.shadowEmbrace);
+        /* bool screech = 26; */
+        if (message.screech !== false)
+            writer.tag(26, WireType.Varint).bool(message.screech);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

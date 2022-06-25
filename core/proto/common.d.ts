@@ -448,6 +448,10 @@ export interface Debuffs {
      * @generated from protobuf field: bool shadow_embrace = 24;
      */
     shadowEmbrace: boolean;
+    /**
+     * @generated from protobuf field: bool screech = 26;
+     */
+    screech: boolean;
 }
 /**
  * @generated from protobuf message proto.Target

@@ -73,6 +73,7 @@ export declare const WintersChill: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const GiftOfArthas: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const DemoralizingRoar: IndividualSimIconPickerConfig<Raid, number>;
 export declare const DemoralizingShout: IndividualSimIconPickerConfig<Raid, number>;
+export declare const Screech: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const ThunderClap: IndividualSimIconPickerConfig<Raid, number>;
 export declare const InsectSwarm: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const ScorpidSting: IndividualSimIconPickerConfig<Raid, boolean>;
