@@ -133,20 +133,20 @@ func (unit *Unit) GetStat(stat stats.Stat) float64 {
 
 func (unit *Unit) AddStats(stat stats.Stats) {
 	if unit.Env != nil && unit.Env.IsFinalized() {
-		panic("Already finalized, used AddStatsDynamic instead!")
+		panic("Already finalized, use AddStatsDynamic instead!")
 	}
 	unit.stats = unit.stats.Add(stat)
 }
 func (unit *Unit) AddStat(stat stats.Stat, amount float64) {
 	if unit.Env != nil && unit.Env.IsFinalized() {
-		panic("Already finalized, used AddStatDynamic instead!")
+		panic("Already finalized, use AddStatDynamic instead!")
 	}
 	unit.stats[stat] += amount
 }
 
 func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	if unit.Env == nil || !unit.Env.IsFinalized() {
-		panic("Not finalized, used AddStats instead!")
+		panic("Not finalized, use AddStats instead!")
 	}
 
 	stat[stats.Mana] = 0 // TODO: Mana needs special treatment
@@ -179,7 +179,7 @@ func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 }
 func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
 	if unit.Env == nil || !unit.Env.IsFinalized() {
-		panic("Not finalized, used AddStats instead!")
+		panic("Not finalized, use AddStats instead!")
 	}
 
 	if stat == stats.MeleeHaste {

@@ -150,6 +150,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
+				ProtectionWarriorInputs.ShoutPicker,
+				ProtectionWarriorInputs.ShieldWall,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -264,7 +266,6 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 					OtherInputs.HealingCadence,
 					OtherInputs.HpPercentForDefensives,
 					ProtectionWarriorInputs.StartingRage,
-					ProtectionWarriorInputs.ShoutPicker,
 					ProtectionWarriorInputs.PrecastShout,
 					ProtectionWarriorInputs.PrecastShoutWithSapphire,
 					ProtectionWarriorInputs.PrecastShoutWithT2,

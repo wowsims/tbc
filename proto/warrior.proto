@@ -51,9 +51,11 @@ message WarriorTalents {
 	int32 anticipation = 47;
 	int32 shield_specialization = 48;
 	int32 toughness = 49;
+	bool last_stand = 53;
 	bool improved_shield_block = 50;
 	int32 defiance = 38;
 	int32 improved_sunder_armor = 39;
+	int32 improved_shield_wall = 54;
 	int32 shield_mastery = 51;
 	int32 one_handed_weapon_specialization = 40;
 	int32 improved_defensive_stance = 52;
@@ -161,6 +163,7 @@ message ProtectionWarrior {
 	
 	message Options {
 		double starting_rage = 1;
+		bool use_shield_wall = 6;
 
 		WarriorShout shout = 4;
 		bool precast_shout = 5;
