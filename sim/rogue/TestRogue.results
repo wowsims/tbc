@@ -228,6 +228,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 1348.714920330571
+  tps: 945.5496035468294
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-Coren'sLuckyCoin-38289"
  value: {
   dps: 1348.5976442671024

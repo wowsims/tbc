@@ -990,6 +990,41 @@ func init() {
 		}
 	})
 
+	core.NewItemEffect(34473, func(agent core.Agent) {
+		character := agent.GetCharacter()
+
+		procAura := character.NewTemporaryStatsAura("Commendation of Kael'Thas Proc", core.ActionID{ItemID: 34473}, stats.Stats{stats.Dodge: 152}, time.Second*10)
+
+		icd := core.Cooldown{
+			Timer:    character.NewTimer(),
+			Duration: time.Second * 30,
+		}
+
+		character.GetOrRegisterAura(core.Aura{
+			Label:    "Commendation of Kael'Thas",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+					return
+				}
+
+				if aura.Unit.CurrentHealthPercent() >= 0.35 {
+					return
+				}
+
+				if !icd.IsReady(sim) {
+					return
+				}
+
+				icd.Use(sim)
+				procAura.Activate(sim)
+			},
+		})
+	})
+
 	core.NewItemEffect(34679, func(agent core.Agent) {
 		character := agent.GetCharacter()
 		const proc = 0.15

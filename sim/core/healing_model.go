@@ -32,11 +32,11 @@ func (character *Character) trackChanceOfDeath(healingModel *proto.HealingModel)
 		},
 		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Damage > 0 {
-				aura.Unit.CurrentHealth -= spellEffect.Damage
+				aura.Unit.currentHealth -= spellEffect.Damage
 				if sim.Log != nil {
-					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth)
+					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth())
 				}
-				if aura.Unit.CurrentHealth <= 0 && !aura.Unit.Metrics.Died {
+				if aura.Unit.CurrentHealth() <= 0 && !aura.Unit.Metrics.Died {
 					aura.Unit.Metrics.Died = true
 					if sim.Log != nil {
 						character.Log(sim, "Dead")
@@ -46,11 +46,11 @@ func (character *Character) trackChanceOfDeath(healingModel *proto.HealingModel)
 		},
 		OnPeriodicDamageTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Damage > 0 {
-				aura.Unit.CurrentHealth -= spellEffect.Damage
+				aura.Unit.currentHealth -= spellEffect.Damage
 				if sim.Log != nil {
-					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth)
+					character.Log(sim, "Damage received for %0.02f, current health: %0.01f", spellEffect.Damage, character.CurrentHealth())
 				}
-				if aura.Unit.CurrentHealth <= 0 && !aura.Unit.Metrics.Died {
+				if aura.Unit.CurrentHealth() <= 0 && !aura.Unit.Metrics.Died {
 					aura.Unit.Metrics.Died = true
 					if sim.Log != nil {
 						character.Log(sim, "Dead")
@@ -73,12 +73,19 @@ func (character *Character) applyHealingModel(healingModel proto.HealingModel) {
 	healPerTick := healingModel.Hps * (float64(cadence) / float64(time.Second))
 
 	character.RegisterResetEffect(func(sim *Simulation) {
+		// Hack since we don't have OnHealingReceived aura handlers yet.
+		ardentDefenderAura := character.GetAura("Ardent Defender")
+
 		StartPeriodicAction(sim, PeriodicActionOptions{
 			Period: cadence,
 			OnAction: func(sim *Simulation) {
-				character.CurrentHealth = MinFloat(character.CurrentHealth+healPerTick, character.GetStat(stats.Health))
+				character.currentHealth = MinFloat(character.currentHealth+healPerTick, character.GetStat(stats.Health))
 				if sim.Log != nil {
-					character.Log(sim, "Heal for %0.02f, current health: %0.01f", healPerTick, character.CurrentHealth)
+					character.Log(sim, "Heal for %0.02f, current health: %0.01f", healPerTick, character.CurrentHealth())
+				}
+
+				if ardentDefenderAura != nil && character.CurrentHealthPercent() >= 0.35 {
+					ardentDefenderAura.Deactivate(sim)
 				}
 			},
 		})
