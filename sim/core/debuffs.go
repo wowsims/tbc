@@ -114,6 +114,9 @@ func applyDebuffEffects(target *Unit, debuffs proto.Debuffs) {
 	if debuffs.ShadowEmbrace {
 		MakePermanent(ShadowEmbraceAura(target, 5))
 	}
+	if debuffs.Screech {
+		MakePermanent(ScreechAura(target))
+	}
 }
 
 func MiseryAura(target *Unit, numPoints int32) *Aura {
@@ -594,6 +597,22 @@ func DemoralizingShoutAura(target *Unit, boomingVoicePts int32, impDemoShoutPts 
 		ActionID: ActionID{SpellID: 25203},
 		Duration: duration,
 		Priority: apReduction,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, -apReduction)
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, apReduction)
+		},
+	})
+}
+
+func ScreechAura(target *Unit) *Aura {
+	const apReduction = 210.0
+
+	return target.GetOrRegisterAura(Aura{
+		Label:    "Screech",
+		ActionID: ActionID{SpellID: 27051},
+		Duration: time.Second * 4,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.AddStatDynamic(sim, stats.AttackPower, -apReduction)
 		},

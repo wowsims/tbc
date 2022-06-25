@@ -488,6 +488,7 @@ message Debuffs {
 	bool insect_swarm = 22;
 	bool scorpid_sting = 23;
 	bool shadow_embrace = 24;
+	bool screech = 26;
 }
 
 enum MobType {
