@@ -128,7 +128,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	}
 
 	preset := GetPresetTargetWithID(options.Id)
-	if preset != nil {
+	if preset != nil && preset.AI != nil {
 		target.AI = preset.AI()
 	}
 
