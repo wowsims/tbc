@@ -349,6 +349,7 @@ export const TankAssignment = {
         extraCssClasses: [
             'tank-selector',
             'threat-metrics',
+            'within-raid-sim-hide',
         ],
         label: 'Tank Assignment',
         labelTooltip: 'Determines which mobs will be tanked. Most mobs default to targeting the Main Tank, but in preset multi-target encounters this is not always true.',
@@ -432,13 +433,12 @@ export const HpPercentForDefensives = {
 			<p>% of Maximum Health, below which defensive cooldowns are allowed to be used.</p>
 			<p>If set to 0, this restriction is disabled.</p>
 		`,
-        changedEvent: (player) => player.getRaid().changeEmitter,
+        changedEvent: (player) => player.cooldownsChangeEmitter,
         getValue: (player) => player.getCooldowns().hpPercentForDefensives * 100,
         setValue: (eventID, player, newValue) => {
             const cooldowns = player.getCooldowns();
             cooldowns.hpPercentForDefensives = newValue / 100;
             player.setCooldowns(eventID, cooldowns);
         },
-        enableWhen: (player) => player.getRaid().getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
     },
 };

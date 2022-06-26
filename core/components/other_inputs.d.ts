@@ -248,6 +248,5 @@ export declare const HpPercentForDefensives: {
         changedEvent: (player: Player<any>) => TypedEvent<void>;
         getValue: (player: Player<any>) => number;
         setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
-        enableWhen: (player: Player<any>) => boolean;
     };
 };
