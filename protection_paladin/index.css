@@ -2446,6 +2446,7 @@ input, select {
 .ep-weights-actions {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   width: 50%;
 }
 
@@ -2456,6 +2457,7 @@ input, select {
 .ep-weights-results {
   position: relative;
   width: 50%;
+  min-height: 150px;
 }
 
 .ep-weights-results .results-viewer {
@@ -2464,6 +2466,12 @@ input, select {
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
+}
+
+.stats-controls-row {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px;
 }
 
 .show-all-stats-container .boolean-picker-input {

@@ -76,7 +76,7 @@ export declare class Player<SpecType extends Spec> {
     getOtherPartyMembers(): Array<Player<any>>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
-    getGems(socketColor: GemColor | undefined): Array<Gem>;
+    getGems(socketColor?: GemColor): Array<Gem>;
     getEpWeights(): Stats;
     setEpWeights(eventID: EventID, newEpWeights: Stats): void;
     computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;

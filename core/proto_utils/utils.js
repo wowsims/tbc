@@ -1043,14 +1043,14 @@ export function isBluntWeaponType(weaponType) {
 // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 const metaGemEffectEPs = {
     [Spec.SpecBalanceDruid]: (gem, playerStats) => {
-        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND.id) {
             // TODO: Fix this
             return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
         }
         return 0;
     },
     [Spec.SpecElementalShaman]: (gem, playerStats) => {
-        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND.id) {
             return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
         }
         return 0;

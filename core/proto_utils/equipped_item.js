@@ -96,8 +96,8 @@ export class EquippedItem {
     }
     /**
      * Returns a new EquippedItem with the given gem socketed.
-       *
-       * Also ensures validity of the item on its own. Currently this just means enforcing unique gems.
+     *
+     * Also ensures validity of the item on its own. Currently this just means enforcing unique gems.
      */
     withGem(gem, socketIdx) {
         let curItem = this;

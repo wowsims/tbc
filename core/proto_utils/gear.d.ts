@@ -22,6 +22,7 @@ export declare class Gear {
     getEquippedItem(slot: ItemSlot): EquippedItem | null;
     getTrinkets(): Array<EquippedItem | null>;
     hasTrinket(itemId: number): boolean;
+    asMap(): InternalGear;
     asArray(): Array<EquippedItem | null>;
     asSpec(): EquipmentSpec;
     getAllGems(): Array<Gem>;
