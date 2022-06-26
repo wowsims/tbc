@@ -434,10 +434,6 @@ func (warrior *Warrior) registerLastStandCD() {
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.Cast{
-				GCD: core.GCDDefault,
-			},
-			IgnoreHaste: true,
 			CD: core.Cooldown{
 				Timer:    warrior.NewTimer(),
 				Duration: time.Minute * 8,
