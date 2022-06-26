@@ -42,10 +42,7 @@ export class Gear {
 	 */
 	withEquippedItem(newSlot: ItemSlot, newItem: EquippedItem | null): Gear {
 		// Create a new identical set of gear
-		const newInternalGear: Partial<InternalGear> = {};
-		getEnumValues(ItemSlot).map(slot => Number(slot) as ItemSlot).forEach(slot => {
-			newInternalGear[slot] = this.getEquippedItem(slot);
-		});
+		const newInternalGear = this.asMap();
 
 		if (newItem) {
 			// If the new item has unique gems, remove matching.
@@ -95,6 +92,14 @@ export class Gear {
 
 	hasTrinket(itemId: number): boolean {
 		return this.getTrinkets().map(t => t?.item.id).includes(itemId);
+	}
+
+	asMap(): InternalGear {
+		const newInternalGear: Partial<InternalGear> = {};
+		getEnumValues(ItemSlot).map(slot => Number(slot) as ItemSlot).forEach(slot => {
+			newInternalGear[slot] = this.getEquippedItem(slot);
+		});
+		return newInternalGear as InternalGear;
 	}
 
 	asArray(): Array<EquippedItem | null> {
