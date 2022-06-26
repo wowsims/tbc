@@ -487,7 +487,7 @@ export const warriorTalentsConfig = newTalentsConfig([
                 maxPoints: 5,
             },
             {
-                //fieldName: 'lastStand',
+                fieldName: 'lastStand',
                 location: {
                     rowIdx: 2,
                     colIdx: 0,
@@ -554,7 +554,7 @@ export const warriorTalentsConfig = newTalentsConfig([
                 maxPoints: 2,
             },
             {
-                //fieldName: 'improvedShieldWall',
+                fieldName: 'improvedShieldWall',
                 location: {
                     rowIdx: 4,
                     colIdx: 0,

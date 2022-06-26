@@ -183,6 +183,10 @@ export interface WarriorTalents {
      */
     toughness: number;
     /**
+     * @generated from protobuf field: bool last_stand = 53;
+     */
+    lastStand: boolean;
+    /**
      * @generated from protobuf field: bool improved_shield_block = 50;
      */
     improvedShieldBlock: boolean;
@@ -194,6 +198,10 @@ export interface WarriorTalents {
      * @generated from protobuf field: int32 improved_sunder_armor = 39;
      */
     improvedSunderArmor: number;
+    /**
+     * @generated from protobuf field: int32 improved_shield_wall = 54;
+     */
+    improvedShieldWall: number;
     /**
      * @generated from protobuf field: int32 shield_mastery = 51;
      */
@@ -486,6 +494,10 @@ export interface ProtectionWarrior_Options {
      * @generated from protobuf field: double starting_rage = 1;
      */
     startingRage: number;
+    /**
+     * @generated from protobuf field: bool use_shield_wall = 6;
+     */
+    useShieldWall: boolean;
     /**
      * @generated from protobuf field: proto.WarriorShout shout = 4;
      */

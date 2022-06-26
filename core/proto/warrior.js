@@ -139,9 +139,11 @@ class WarriorTalents$Type extends MessageType {
             { no: 47, name: "anticipation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 48, name: "shield_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 49, name: "toughness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 53, name: "last_stand", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 50, name: "improved_shield_block", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 38, name: "defiance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 39, name: "improved_sunder_armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 54, name: "improved_shield_wall", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 51, name: "shield_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 40, name: "one_handed_weapon_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 52, name: "improved_defensive_stance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -152,7 +154,7 @@ class WarriorTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedHeroicStrike: 0, deflection: 0, improvedRend: 0, improvedCharge: 0, improvedThunderClap: 0, improvedOverpower: 0, angerManagement: false, deepWounds: 0, twoHandedWeaponSpecialization: 0, impale: 0, poleaxeSpecialization: 0, deathWish: false, maceSpecialization: 0, swordSpecialization: 0, improvedDisciplines: 0, bloodFrenzy: 0, mortalStrike: false, improvedMortalStrike: 0, endlessRage: false, boomingVoice: 0, cruelty: 0, improvedDemoralizingShout: 0, unbridledWrath: 0, improvedCleave: 0, commandingPresence: 0, dualWieldSpecialization: 0, improvedExecute: 0, improvedSlam: 0, sweepingStrikes: false, weaponMastery: 0, improvedBerserkerRage: 0, flurry: 0, precision: 0, bloodthirst: false, improvedWhirlwind: 0, improvedBerserkerStance: 0, rampage: false, improvedBloodrage: 0, tacticalMastery: 0, anticipation: 0, shieldSpecialization: 0, toughness: 0, improvedShieldBlock: false, defiance: 0, improvedSunderArmor: 0, shieldMastery: 0, oneHandedWeaponSpecialization: 0, improvedDefensiveStance: 0, shieldSlam: false, focusedRage: 0, vitality: 0, devastate: false };
+        const message = { improvedHeroicStrike: 0, deflection: 0, improvedRend: 0, improvedCharge: 0, improvedThunderClap: 0, improvedOverpower: 0, angerManagement: false, deepWounds: 0, twoHandedWeaponSpecialization: 0, impale: 0, poleaxeSpecialization: 0, deathWish: false, maceSpecialization: 0, swordSpecialization: 0, improvedDisciplines: 0, bloodFrenzy: 0, mortalStrike: false, improvedMortalStrike: 0, endlessRage: false, boomingVoice: 0, cruelty: 0, improvedDemoralizingShout: 0, unbridledWrath: 0, improvedCleave: 0, commandingPresence: 0, dualWieldSpecialization: 0, improvedExecute: 0, improvedSlam: 0, sweepingStrikes: false, weaponMastery: 0, improvedBerserkerRage: 0, flurry: 0, precision: 0, bloodthirst: false, improvedWhirlwind: 0, improvedBerserkerStance: 0, rampage: false, improvedBloodrage: 0, tacticalMastery: 0, anticipation: 0, shieldSpecialization: 0, toughness: 0, lastStand: false, improvedShieldBlock: false, defiance: 0, improvedSunderArmor: 0, improvedShieldWall: 0, shieldMastery: 0, oneHandedWeaponSpecialization: 0, improvedDefensiveStance: 0, shieldSlam: false, focusedRage: 0, vitality: 0, devastate: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -289,6 +291,9 @@ class WarriorTalents$Type extends MessageType {
                 case /* int32 toughness */ 49:
                     message.toughness = reader.int32();
                     break;
+                case /* bool last_stand */ 53:
+                    message.lastStand = reader.bool();
+                    break;
                 case /* bool improved_shield_block */ 50:
                     message.improvedShieldBlock = reader.bool();
                     break;
@@ -297,6 +302,9 @@ class WarriorTalents$Type extends MessageType {
                     break;
                 case /* int32 improved_sunder_armor */ 39:
                     message.improvedSunderArmor = reader.int32();
+                    break;
+                case /* int32 improved_shield_wall */ 54:
+                    message.improvedShieldWall = reader.int32();
                     break;
                 case /* int32 shield_mastery */ 51:
                     message.shieldMastery = reader.int32();
@@ -457,6 +465,9 @@ class WarriorTalents$Type extends MessageType {
         /* int32 toughness = 49; */
         if (message.toughness !== 0)
             writer.tag(49, WireType.Varint).int32(message.toughness);
+        /* bool last_stand = 53; */
+        if (message.lastStand !== false)
+            writer.tag(53, WireType.Varint).bool(message.lastStand);
         /* bool improved_shield_block = 50; */
         if (message.improvedShieldBlock !== false)
             writer.tag(50, WireType.Varint).bool(message.improvedShieldBlock);
@@ -466,6 +477,9 @@ class WarriorTalents$Type extends MessageType {
         /* int32 improved_sunder_armor = 39; */
         if (message.improvedSunderArmor !== 0)
             writer.tag(39, WireType.Varint).int32(message.improvedSunderArmor);
+        /* int32 improved_shield_wall = 54; */
+        if (message.improvedShieldWall !== 0)
+            writer.tag(54, WireType.Varint).int32(message.improvedShieldWall);
         /* int32 shield_mastery = 51; */
         if (message.shieldMastery !== 0)
             writer.tag(51, WireType.Varint).int32(message.shieldMastery);
@@ -961,6 +975,7 @@ class ProtectionWarrior_Options$Type extends MessageType {
     constructor() {
         super("proto.ProtectionWarrior.Options", [
             { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "use_shield_wall", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "shout", kind: "enum", T: () => ["proto.WarriorShout", WarriorShout] },
             { no: 5, name: "precast_shout", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "precast_shout_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -968,7 +983,7 @@ class ProtectionWarrior_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
+        const message = { startingRage: 0, useShieldWall: false, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -981,6 +996,9 @@ class ProtectionWarrior_Options$Type extends MessageType {
             switch (fieldNo) {
                 case /* double starting_rage */ 1:
                     message.startingRage = reader.double();
+                    break;
+                case /* bool use_shield_wall */ 6:
+                    message.useShieldWall = reader.bool();
                     break;
                 case /* proto.WarriorShout shout */ 4:
                     message.shout = reader.int32();
@@ -1009,6 +1027,9 @@ class ProtectionWarrior_Options$Type extends MessageType {
         /* double starting_rage = 1; */
         if (message.startingRage !== 0)
             writer.tag(1, WireType.Bit64).double(message.startingRage);
+        /* bool use_shield_wall = 6; */
+        if (message.useShieldWall !== false)
+            writer.tag(6, WireType.Varint).bool(message.useShieldWall);
         /* proto.WarriorShout shout = 4; */
         if (message.shout !== 0)
             writer.tag(4, WireType.Varint).int32(message.shout);

@@ -1,8 +1,17 @@
 import { Spec } from '/tbc/core/proto/common.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { WarriorShout, ProtectionWarrior_Rotation_DemoShout as DemoShout, ProtectionWarrior_Rotation_ShieldBlock as ShieldBlock, ProtectionWarrior_Rotation_ThunderClap as ThunderClap } from '/tbc/core/proto/warrior.js';
+export declare const ShieldWall: {
+    id: ActionId;
+    states: number;
+    extraCssClasses: string[];
+    changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
+    getValue: (player: Player<Spec.SpecProtectionWarrior>) => boolean;
+    setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: boolean) => void;
+};
 export declare const StartingRage: {
     type: "number";
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
@@ -16,20 +25,22 @@ export declare const StartingRage: {
     };
 };
 export declare const ShoutPicker: {
-    type: "enum";
-    cssClass: string;
-    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
-    config: {
-        label: string;
-        labelTooltip: string;
-        values: {
-            name: string;
-            value: WarriorShout;
-        }[];
-        changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
-        getValue: (player: Player<Spec.SpecProtectionWarrior>) => WarriorShout;
-        setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => void;
-    };
+    extraCssClasses: string[];
+    numColumns: number;
+    values: ({
+        color: string;
+        value: WarriorShout;
+        actionId?: undefined;
+    } | {
+        actionId: ActionId;
+        value: WarriorShout;
+        color?: undefined;
+    })[];
+    equals: (a: WarriorShout, b: WarriorShout) => boolean;
+    zeroValue: WarriorShout;
+    changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
+    getValue: (player: Player<Spec.SpecProtectionWarrior>) => WarriorShout;
+    setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => void;
 };
 export declare const PrecastShout: {
     type: "boolean";
