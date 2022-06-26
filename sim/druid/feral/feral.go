@@ -94,7 +94,6 @@ type FeralDruid struct {
 
 	Rotation FeralDruidRotation
 
-	// currently unused
 	readyToShift   bool
 	waitingForTick bool
 	latency        time.Duration

@@ -82,7 +82,9 @@ func (druid *Druid) registerInnervateCD() {
 			if character.CurrentMana() < baseCost {
 				return false
 			}
-			if druid.InForm(Bear) || druid.InForm(Cat) {
+			// Technically this shouldn't be allowed in bear form either, but bear
+			// doesn't have shifting implemented in its rotation.
+			if druid.InForm(Cat) {
 				return false
 			}
 			// If target already has another innervate, don't cast.
