@@ -209,7 +209,7 @@ export class Player<SpecType extends Spec> {
 	}
 
 	// Returns all gems that this player can wear of the given color.
-	getGems(socketColor: GemColor | undefined): Array<Gem> {
+	getGems(socketColor?: GemColor): Array<Gem> {
 		return this.sim.getGems(socketColor);
 	}
 

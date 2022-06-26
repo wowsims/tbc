@@ -1,6 +1,11 @@
 import { StatWeightsRequest, StatWeightsResult, StatWeightValues, ProgressMetrics } from '/tbc/core/proto/api.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { gemMatchesSocket, getMetaGemCondition } from '/tbc/core/proto_utils/gems.js';
 import { statNames, statOrder } from '/tbc/core/proto_utils/names.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -9,7 +14,7 @@ import { stDevToConf90 } from '/tbc/core/utils.js';
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
-import { getEnumValues } from '/tbc/core/utils.js';
+import { getEnumValues, maxIndex, sum } from '/tbc/core/utils.js';
 
 import { Popup } from './popup.js';
 
@@ -44,17 +49,20 @@ class EpWeightsMenu extends Popup {
 			<div class="ep-weights-header">
 				<div class="ep-weights-actions">
 					<button class="sim-button calc-weights">CALCULATE</button>
-					<div class="ep-weights-options">
-						<select class="ep-type-select">
-							<option value="ep">EP</option>
-							<option value="weight">Weights</option>
-						</select>
-					</div>
-					<div class="show-all-stats-container">
-					</div>
 				</div>
 				<div class="ep-weights-results">
 				</div>
+			</div>
+			<div class="stats-controls-row">
+				<div class="ep-weights-options">
+					<select class="ep-type-select">
+						<option value="ep">EP</option>
+						<option value="weight">Weights</option>
+					</select>
+				</div>
+				<div class="show-all-stats-container">
+				</div>
+				<button class="sim-button optimize-gems">OPTIMIZE GEMS</button>
 			</div>
 			<div class="ep-weights-table">
 				<table class="results-ep-table">
@@ -151,6 +159,16 @@ class EpWeightsMenu extends Popup {
 		});
 
 		this.updateTable(this.simUI.prevEpIterations || 1, this.getPrevSimResult());
+
+		const optimizeGemsButton = this.rootElem.getElementsByClassName('optimize-gems')[0] as HTMLElement;
+		tippy(optimizeGemsButton, {
+			'content': `
+				<p>Optimizes equipped gems to maximize EP, based on the values in <b>Current EP</b>.</p>
+				<p>WARNING: Ignores unique gems and does not pick the meta gem or ensure its condition is met.</p>
+			`,
+			'allowHTML': true,
+		});
+		optimizeGemsButton.addEventListener('click', event => this.optimizeGems(TypedEvent.nextEventID()));
 
 		this.addCloseButton();
 	}
@@ -264,5 +282,89 @@ class EpWeightsMenu extends Popup {
 				epValuesStdev: new Stats().asArray(),
 			},
 		});
+	}
+
+	private optimizeGems(eventID: EventID) {
+		let epWeights = this.simUI.player.getEpWeights();
+
+		// Replace 0 weights with a very tiny value, so we always prefer to take free stats even if the user gave a 0 weight.
+		epWeights = new Stats(epWeights.asArray().map(w => w == 0 ? 1e-8 : w));
+
+		const gemColors = getEnumValues(GemColor) as Array<GemColor>;
+		const allGems = this.simUI.player.getGems().filter(gem => !gem.unique && gem.phase <= this.simUI.sim.getPhase());
+
+		// Best gem when we need a gem of a specific color.
+		const bestGemForColor: Array<Gem> = gemColors.map(color => null as unknown as Gem);
+		const bestGemForColorEP: Array<number> = gemColors.map(color => 0);
+		// Best gem when we need to match a socket to activate a bonus.
+		const bestGemForSocket: Array<Gem> = bestGemForColor.slice();
+		const bestGemForSocketEP: Array<number> = bestGemForColorEP.slice();
+		// The single best gem, when color doesn't matter.
+		let bestGem = allGems[0];
+		let bestGemEP = 0;
+		allGems.forEach(gem => {
+			const gemEP = new Stats(gem.stats).computeEP(epWeights);
+			if (gemEP > bestGemForColorEP[gem.color]) {
+				bestGemForColorEP[gem.color] = gemEP;
+				bestGemForColor[gem.color] = gem;
+
+				if (gem.color != GemColor.GemColorMeta && gemEP > bestGemEP) {
+					bestGemEP = gemEP;
+					bestGem = gem;
+				}
+			}
+
+			gemColors.forEach(socketColor => {
+				if (gemMatchesSocket(gem, socketColor) && gemEP > bestGemForSocketEP[socketColor]) {
+					bestGemForSocketEP[socketColor] = gemEP;
+					bestGemForSocket[socketColor] = gem;
+				}
+			});
+		});
+
+
+		let gear = this.simUI.player.getGear();
+		const items = gear.asMap();
+		const socketBonusEPs = Object.values(items).map(item => item != null ? new Stats(item.item.socketBonus).computeEP(epWeights) : 0);
+
+		// Start by optimally filling all items, ignoring meta condition.
+		Object.entries(items).forEach(([itemSlot, equippedItem], i) => {
+			if (equippedItem == null) {
+				return;
+			}
+			const item = equippedItem.item;
+
+			// Compare whether its better to match sockets + get socket bonus, or just use best gems.
+			const bestGemEPNotMatchingSockets = sum(item.gemSockets.map(socketColor => socketColor == GemColor.GemColorMeta ? 0 : bestGemEP));
+			const bestGemEPMatchingSockets = socketBonusEPs[i] + sum(item.gemSockets.map(socketColor => socketColor == GemColor.GemColorMeta ? 0 : bestGemForSocketEP[socketColor]));
+
+			if (bestGemEPNotMatchingSockets > bestGemEPMatchingSockets) {
+				item.gemSockets.forEach((socketColor, i) => {
+					if (socketColor != GemColor.GemColorMeta) {
+						equippedItem = equippedItem!.withGem(bestGem, i);
+					}
+				});
+			} else {
+				item.gemSockets.forEach((socketColor, i) => {
+					if (socketColor != GemColor.GemColorMeta) {
+						equippedItem = equippedItem!.withGem(bestGemForSocket[socketColor], i);
+					}
+				});
+			}
+
+			items[Number(itemSlot) as ItemSlot] = equippedItem;
+		});
+		gear = new Gear(items);
+
+		// Now make adjustments to satisfy meta condition.
+		const metaGem = gear.getMetaGem();
+		if (metaGem != null) {
+			const condition = getMetaGemCondition(metaGem.id);
+			// TODO: Satisfy condition. Not implementing this since we're about to move
+			// to wrath which doesn't have meta conditions.
+		}
+
+		// Apply the new gear.
+		this.simUI.player.setGear(eventID, gear);
 	}
 }
