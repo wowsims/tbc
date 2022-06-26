@@ -29,6 +29,16 @@ export class FeralDruidSimUI extends IndividualSimUI {
             cssClass: 'feral-druid-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
+            warnings: [
+                // Warning that a frontal rotation is not implemented.
+                (simUI) => {
+                    return {
+                        updateOn: simUI.player.inFrontOfTargetChangeEmitter,
+                        shouldDisplay: () => simUI.player.getInFrontOfTarget(),
+                        getContent: () => 'Frontal rotation (without Shred) is not implemented.',
+                    };
+                },
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatStrength,
