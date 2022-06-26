@@ -26,6 +26,21 @@ import { SimUI } from '../core/sim_ui.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
+export const ShieldWall = {
+	id: ActionId.fromSpellId(871),
+	states: 2,
+	extraCssClasses: [
+		'shield-wall-picker',
+	],
+	changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.specOptionsChangeEmitter,
+	getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getSpecOptions().useShieldWall,
+	setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: boolean) => {
+		const newOptions = player.getSpecOptions();
+		newOptions.useShieldWall = newValue
+		player.setSpecOptions(eventID, newOptions);
+	},
+};
+
 export const StartingRage = {
 	type: 'number' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
@@ -46,23 +61,23 @@ export const StartingRage = {
 };
 
 export const ShoutPicker = {
-	type: 'enum' as const, cssClass: 'shout-picker',
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-	config: {
-		label: 'Shout',
-		labelTooltip: 'Shout buff to maintain.',
-		values: [
-			{ name: 'None', value: WarriorShout.WarriorShoutNone },
-			{ name: 'Battle Shout', value: WarriorShout.WarriorShoutBattle },
-			{ name: 'Commanding Shout', value: WarriorShout.WarriorShoutCommanding },
-		],
-		changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
-		getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getSpecOptions().shout,
-		setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
-			const newOptions = player.getSpecOptions();
-			newOptions.shout = newValue;
-			player.setSpecOptions(eventID, newOptions);
-		},
+	extraCssClasses: [
+		'shout-picker',
+	],
+	numColumns: 1,
+	values: [
+		{ color: 'c79c6e', value: WarriorShout.WarriorShoutNone },
+		{ actionId: ActionId.fromSpellId(2048), value: WarriorShout.WarriorShoutBattle },
+		{ actionId: ActionId.fromSpellId(469), value: WarriorShout.WarriorShoutCommanding },
+	],
+	equals: (a: WarriorShout, b: WarriorShout) => a == b,
+	zeroValue: WarriorShout.WarriorShoutNone,
+	changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.specOptionsChangeEmitter,
+	getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getSpecOptions().shout,
+	setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+		const newOptions = player.getSpecOptions();
+		newOptions.shout = newValue;
+		player.setSpecOptions(eventID, newOptions);
 	},
 };
 
