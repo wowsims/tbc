@@ -96,6 +96,16 @@ func init() {
 		})
 	})
 
+	core.NewItemEffect(35501, func(agent core.Agent) {
+		agent.GetCharacter().AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.BlockValue,
+			ModifiedStat: stats.BlockValue,
+			Modifier: func(bv float64, _ float64) float64 {
+				return bv * 1.1
+			},
+		})
+	})
+
 	core.NewItemEffect(35503, func(agent core.Agent) {
 		agent.GetCharacter().AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,

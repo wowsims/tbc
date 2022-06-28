@@ -473,8 +473,8 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 484.4527692984964
-  tps: 848.5032094857544
+  dps: 487.6652300764703
+  tps: 853.4018909260865
  }
 }
 dps_results: {
