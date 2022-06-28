@@ -23,6 +23,7 @@ export declare const BRUTAL_EARTHSTORM_DIAMOND: MetaGemCondition;
 export declare const CHAOTIC_SKYFIRE_DIAMOND: MetaGemCondition;
 export declare const DESTRUCTIVE_SKYFIRE_DIAMOND: MetaGemCondition;
 export declare const EMBER_SKYFIRE_DIAMOND: MetaGemCondition;
+export declare const ETERNAL_EARTHSTORM_DIAMOND: MetaGemCondition;
 export declare const IMBUED_UNSTABLE_DIAMOND: MetaGemCondition;
 export declare const INSIGHTFUL_EARTHSTORM_DIAMOND: MetaGemCondition;
 export declare const POWERFUL_EARTHSTORM_DIAMOND: MetaGemCondition;

@@ -74,6 +74,7 @@ export const BRUTAL_EARTHSTORM_DIAMOND = MetaGemCondition.fromMinColors(25899, '
 export const CHAOTIC_SKYFIRE_DIAMOND = MetaGemCondition.fromMinColors(34220, 'Requires at least 2 Blue Gems.', 0, 0, 2);
 export const DESTRUCTIVE_SKYFIRE_DIAMOND = MetaGemCondition.fromMinColors(25890, 'Requires at least 2 Red Gems, at least 2 Yellow Gems, and at least 2 Blue Gems.', 2, 2, 2);
 export const EMBER_SKYFIRE_DIAMOND = MetaGemCondition.fromMinColors(35503, 'Requires at least 3 Red Gems.', 3, 0, 0);
+export const ETERNAL_EARTHSTORM_DIAMOND = MetaGemCondition.fromMinColors(35501, 'Requires at least 2 Blue Gems and at least 1 Yellow Gem.', 0, 1, 2);
 export const IMBUED_UNSTABLE_DIAMOND = MetaGemCondition.fromMinColors(32641, 'Requires at least 3 Yellow Gems.', 0, 3, 0);
 export const INSIGHTFUL_EARTHSTORM_DIAMOND = MetaGemCondition.fromMinColors(25901, 'Requires at least 2 Red Gems, at least 2 Yellow Gems, and at least 2 Blue Gems.', 2, 2, 2);
 export const POWERFUL_EARTHSTORM_DIAMOND = MetaGemCondition.fromMinColors(25896, 'Requires at least 3 Blue Gems.', 0, 0, 3);
