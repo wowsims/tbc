@@ -62,6 +62,8 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			epStats: [
 				Stat.StatStrength,
 				Stat.StatAgility,
+				Stat.StatIntellect,
+				Stat.StatSpirit,
 				Stat.StatAttackPower,
 				Stat.StatFeralAttackPower,
 				Stat.StatMeleeHit,

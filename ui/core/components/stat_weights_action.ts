@@ -360,8 +360,7 @@ class EpWeightsMenu extends Popup {
 		const metaGem = gear.getMetaGem();
 		if (metaGem != null) {
 			const condition = getMetaGemCondition(metaGem.id);
-			// TODO: Satisfy condition. Not implementing this since we're about to move
-			// to wrath which doesn't have meta conditions.
+			// TODO: Satisfy condition.
 		}
 
 		// Apply the new gear.
