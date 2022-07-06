@@ -47,6 +47,7 @@ var Enchants = []Enchant{
 	{ID: 35500, EffectID: 1950, Name: "Chest - Defense", Phase: 5, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Defense: 15}, ItemType: proto.ItemType_ItemTypeChest},
 
 	// Wrist
+	{ID: 22530, EffectID: 2648, Name: "Major Defense", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Defense: 12}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 22533, EffectID: 2649, Name: "Bracer - Fortitude", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Stamina: 12}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 22534, EffectID: 2650, Name: "Bracer - Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 15}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 34001, EffectID: 369, Name: "Bracer - Major Intellect", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Intellect: 12}, ItemType: proto.ItemType_ItemTypeWrist},
@@ -66,6 +67,7 @@ var Enchants = []Enchant{
 	{ID: 24274, EffectID: 2748, Name: "Runic Spellthread", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.SpellPower: 35, stats.Stamina: 20}, ItemType: proto.ItemType_ItemTypeLegs},
 	{ID: 24273, EffectID: 2747, Name: "Mystic Spellthread", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 25, stats.Stamina: 15}, ItemType: proto.ItemType_ItemTypeLegs},
 	{ID: 29533, EffectID: 3010, Name: "Cobrahide Leg Armor", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 40, stats.RangedAttackPower: 40, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeLegs},
+	{ID: 29534, EffectID: 3011, Name: "Clefthide Leg Armor", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Stamina: 30, stats.Agility: 10}, ItemType: proto.ItemType_ItemTypeLegs},
 	{ID: 29535, EffectID: 3012, Name: "Nethercobra Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 50, stats.RangedAttackPower: 50, stats.MeleeCrit: 12}, ItemType: proto.ItemType_ItemTypeLegs},
 	{ID: 29536, EffectID: 3013, Name: "Nethercleft Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.Stamina: 40, stats.Agility: 12}, ItemType: proto.ItemType_ItemTypeLegs},
 
