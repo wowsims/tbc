@@ -41,7 +41,7 @@ func (priest *Priest) registerSmiteSpell() {
 
 			BaseDamage: core.BaseDamageConfigMagic(549, 616, 0.7143),
 			OutcomeApplier: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, attackTable *core.AttackTable) {
-				if priest.SurgeOfLightProcAura.IsActive() {
+				if priest.SurgeOfLightProcAura != nil && priest.SurgeOfLightProcAura.IsActive() {
 					surgeOfLightOutcome(sim, spell, spellEffect, attackTable)
 				} else {
 					normalOutcome(sim, spell, spellEffect, attackTable)
