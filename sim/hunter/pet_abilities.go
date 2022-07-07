@@ -190,6 +190,11 @@ func (hp *HunterPet) newLightningBreath(isPrimary bool) PetAbility {
 }
 
 func (hp *HunterPet) newScreech(isPrimary bool) PetAbility {
+	var debuffs []*core.Aura
+	for _, target := range hp.Env.Encounter.Targets {
+		debuffs = append(debuffs, core.ScreechAura(&target.Unit))
+	}
+
 	return PetAbility{
 		Type: Screech,
 		Cost: 20,
@@ -212,6 +217,14 @@ func (hp *HunterPet) newScreech(isPrimary bool) PetAbility {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigRoll(33, 61),
 				OutcomeApplier:   hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
+
+				OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.Landed() {
+						for _, debuff := range debuffs {
+							debuff.Activate(sim)
+						}
+					}
+				},
 			}),
 		}),
 	}

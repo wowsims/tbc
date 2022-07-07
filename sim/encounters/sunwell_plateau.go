@@ -91,6 +91,9 @@ func registerSunwellPlateau() {
 			DualWield:        true,
 			DualWieldPenalty: false,
 		},
+		AI: NewDefaultAI([]TargetAbility{
+			BrutallusStomp,
+		}),
 	})
 
 	AddSingleTargetBossEncounter(core.PresetTarget{

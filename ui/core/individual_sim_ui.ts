@@ -891,20 +891,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const tankSpec = isTankSpec(this.player.spec);
 
 			this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
-			this.player.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
 			this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
-			this.player.setBonusStats(eventID, new Stats());
 			this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
 			this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
 			this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
 			this.player.setSpecOptions(eventID, this.individualConfig.defaults.specOptions);
 			this.player.setBuffs(eventID, this.individualConfig.defaults.individualBuffs);
-			this.player.setCooldowns(eventID, Cooldowns.create());
 			this.player.getParty()!.setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
 			this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
 			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
-			this.player.setInFrontOfTarget(eventID, tankSpec);
-			this.player.setHealingModel(eventID, HealingModel.create());
+			this.player.applySharedDefaults(eventID);
 
 			if (!this.isWithinRaidSim) {
 				this.sim.encounter.applyDefaults(eventID);

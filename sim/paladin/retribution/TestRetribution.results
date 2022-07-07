@@ -195,15 +195,15 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 2081.701245331741
-  tps: 1509.753643046014
+  dps: 2075.919446195575
+  tps: 1505.69647967352
  }
 }
 dps_results: {
  key: "TestRetribution-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 2088.925965473441
-  tps: 1514.8209842062681
+  dps: 2083.1394468654103
+  tps: 1510.7604463168627
  }
 }
 dps_results: {
@@ -225,6 +225,13 @@ dps_results: {
  value: {
   dps: 2100.23512839829
   tps: 1522.5905192566706
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 2043.0018377732981
+  tps: 1481.6248208166144
  }
 }
 dps_results: {

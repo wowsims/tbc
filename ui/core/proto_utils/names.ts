@@ -173,6 +173,7 @@ export const slotNames: Record<ItemSlot, string> = {
 
 export const resourceNames: Record<ResourceType, string> = {
 	[ResourceType.ResourceTypeNone]: 'None',
+	[ResourceType.ResourceTypeHealth]: 'Health',
 	[ResourceType.ResourceTypeMana]: 'Mana',
 	[ResourceType.ResourceTypeEnergy]: 'Energy',
 	[ResourceType.ResourceTypeRage]: 'Rage',
@@ -182,6 +183,7 @@ export const resourceNames: Record<ResourceType, string> = {
 
 export const resourceColors: Record<ResourceType, string> = {
 	[ResourceType.ResourceTypeNone]: '#ffffff',
+	[ResourceType.ResourceTypeHealth]: '#22ba00',
 	[ResourceType.ResourceTypeMana]: '#2e93fa',
 	[ResourceType.ResourceTypeEnergy]: '#ffd700',
 	[ResourceType.ResourceTypeRage]: '#ff0000',

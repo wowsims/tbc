@@ -332,6 +332,19 @@ func (at *auraTracker) HasActiveAuraWithTag(tag string) bool {
 	return false
 }
 
+// Returns if an aura should be refreshed at a specific priority, i.e. the aura
+// is about to expire AND the replacement aura has at least as high priority.
+//
+// This is used to decide whether to refresh effects with multiple strengths,
+// like Thunder Clap/Deathfrost or Faerie Fire ranks.
+func (at *auraTracker) ShouldRefreshAuraWithTagAtPriority(sim *Simulation, tag string, priority float64, refreshWindow time.Duration) bool {
+	activeAura := at.GetActiveAuraWithTag(tag)
+
+	return activeAura == nil ||
+		priority > activeAura.Priority ||
+		(priority == activeAura.Priority && activeAura.RemainingDuration(sim) <= refreshWindow)
+}
+
 // Registers a callback to this Character which will be invoked on
 // every Sim reset.
 func (at *auraTracker) RegisterResetEffect(resetEffect ResetEffect) {

@@ -150,6 +150,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
+				ProtectionWarriorInputs.ShoutPicker,
+				ProtectionWarriorInputs.ShieldWall,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -198,6 +200,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				IconInputs.GiftOfArthas,
 				IconInputs.DemoralizingRoar,
 				IconInputs.DemoralizingShout,
+				IconInputs.Screech,
 				IconInputs.ThunderClap,
 				IconInputs.ShadowEmbrace,
 				IconInputs.InsectSwarm,
@@ -213,6 +216,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				],
 				conjured: [
 					Conjured.ConjuredFlameCap,
+					Conjured.ConjuredHealthstone,
 				],
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
@@ -257,8 +261,11 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					OtherInputs.TankAssignment,
+					OtherInputs.IncomingHps,
+					OtherInputs.HealingCadence,
+					OtherInputs.HpPercentForDefensives,
 					ProtectionWarriorInputs.StartingRage,
-					ProtectionWarriorInputs.ShoutPicker,
 					ProtectionWarriorInputs.PrecastShout,
 					ProtectionWarriorInputs.PrecastShoutWithSapphire,
 					ProtectionWarriorInputs.PrecastShoutWithT2,
@@ -266,9 +273,6 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.InspirationUptime,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
-					OtherInputs.TankAssignment,
-					OtherInputs.IncomingHps,
-					OtherInputs.HealingCadence,
 					OtherInputs.InFrontOfTarget,
 				],
 			},

@@ -6,6 +6,7 @@ import { maxIndex } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -1292,7 +1293,7 @@ export function isBluntWeaponType(weaponType: WeaponType): boolean {
 // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 const metaGemEffectEPs: Partial<Record<Spec, (gem: Gem, playerStats: Stats) => number>> = {
 	[Spec.SpecBalanceDruid]: (gem, playerStats) => {
-		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND.id) {
 			// TODO: Fix this
 			return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
 		}
@@ -1300,7 +1301,7 @@ const metaGemEffectEPs: Partial<Record<Spec, (gem: Gem, playerStats: Stats) => n
 		return 0;
 	},
 	[Spec.SpecElementalShaman]: (gem, playerStats) => {
-		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND.id) {
 			return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
 		}
 
@@ -1515,3 +1516,12 @@ export function makeDefaultBlessings(numPaladins: number): BlessingsAssignments 
 		{ spec: Spec.SpecProtectionWarrior, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSanctuary] },
 	]);
 };
+
+export const orderedResourceTypes: Array<ResourceType> = [
+	ResourceType.ResourceTypeHealth,
+	ResourceType.ResourceTypeMana,
+	ResourceType.ResourceTypeEnergy,
+	ResourceType.ResourceTypeRage,
+	ResourceType.ResourceTypeComboPoints,
+	ResourceType.ResourceTypeFocus,
+];

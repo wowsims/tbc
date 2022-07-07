@@ -152,6 +152,7 @@ enum ResourceType {
 	ResourceTypeRage = 3;
 	ResourceTypeComboPoints = 4;
 	ResourceTypeFocus = 5;
+	ResourceTypeHealth = 6;
 }
 
 message ResourceMetrics {

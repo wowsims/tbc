@@ -21,6 +21,7 @@ const (
 	CooldownTypeUnknown CooldownType = 0
 	CooldownTypeMana    CooldownType = 1 << iota
 	CooldownTypeDPS
+	CooldownTypeSurvival
 	CooldownTypeUsableShapeShifted
 )
 
@@ -266,6 +267,17 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 		}
 	}
 
+	if mcd.Type.Matches(CooldownTypeSurvival) && mcdm.cooldownConfigs.HpPercentForDefensives != 0 {
+		origCanActivate := mcd.CanActivate
+		mcd.CanActivate = func(sim *Simulation, character *Character) bool {
+			if character.CurrentHealthPercent() > mcdm.cooldownConfigs.HpPercentForDefensives {
+				return false
+			}
+
+			return origCanActivate == nil || origCanActivate(sim, character)
+		}
+	}
+
 	if mcd.CanActivate == nil {
 		mcd.CanActivate = func(sim *Simulation, character *Character) bool {
 			return true
@@ -440,6 +452,13 @@ func (mcdm *majorCooldownManager) sort() {
 func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempStats stats.Stats, duration time.Duration, config SpellConfig) {
 	aura := character.NewTemporaryStatsAura(auraLabel, config.ActionID, tempStats, duration)
 
+	cdType := CooldownTypeUsableShapeShifted
+	if tempStats.DotProduct(stats.Stats{stats.Armor: 1, stats.Block: 1, stats.BlockValue: 1, stats.Dodge: 1, stats.Parry: 1, stats.Health: 1}).Equals(stats.Stats{}) {
+		cdType |= CooldownTypeDPS
+	} else {
+		cdType |= CooldownTypeSurvival
+	}
+
 	config.Flags |= SpellFlagNoOnCastComplete
 	config.ApplyEffects = func(sim *Simulation, _ *Unit, _ *Spell) {
 		aura.Activate(sim)
@@ -448,7 +467,7 @@ func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempS
 
 	character.AddMajorCooldown(MajorCooldown{
 		Spell: spell,
-		Type:  CooldownTypeDPS | CooldownTypeUsableShapeShifted,
+		Type:  cdType,
 	})
 }
 

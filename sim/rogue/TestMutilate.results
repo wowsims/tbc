@@ -207,6 +207,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 1167.7913807439427
+  tps: 817.0972392746764
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-Coren'sLuckyCoin-38289"
  value: {
   dps: 1167.7913807439427

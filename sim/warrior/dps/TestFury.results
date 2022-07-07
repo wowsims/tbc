@@ -55,8 +55,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-AdamantineFigurine-27891"
  value: {
-  dps: 890.1507300364815
-  tps: 677.801122776048
+  dps: 890.1609636364816
+  tps: 677.808286296048
  }
 }
 dps_results: {
@@ -69,8 +69,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-AncientAqirArtifact-33830"
  value: {
-  dps: 890.1507300364815
-  tps: 677.801122776048
+  dps: 890.1609636364816
+  tps: 677.808286296048
  }
 }
 dps_results: {
@@ -209,15 +209,15 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 933.0071900052835
-  tps: 712.0803207539695
+  dps: 931.1007921368561
+  tps: 710.8286408635034
  }
 }
 dps_results: {
  key: "TestFury-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 937.6852092752167
-  tps: 715.527576098603
+  dps: 934.5516071815596
+  tps: 712.4311903553204
  }
 }
 dps_results: {
@@ -242,10 +242,17 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestFury-AllItems-Coren'sLuckyCoin-38289"
+ key: "TestFury-AllItems-CommendationofKael'thas-34473"
  value: {
   dps: 890.1507300364815
   tps: 677.801122776048
+ }
+}
+dps_results: {
+ key: "TestFury-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 890.1609636364816
+  tps: 677.808286296048
  }
 }
 dps_results: {
@@ -454,8 +461,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-GnomereganAuto-Blocker600-29387"
  value: {
-  dps: 890.1507300364815
-  tps: 677.801122776048
+  dps: 890.1609636364816
+  tps: 677.808286296048
  }
 }
 dps_results: {
@@ -587,8 +594,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Moroes'LuckyPocketWatch-28528"
  value: {
-  dps: 890.1507300364815
-  tps: 677.801122776048
+  dps: 890.1609636364816
+  tps: 677.808286296048
  }
 }
 dps_results: {

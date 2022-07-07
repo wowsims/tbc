@@ -114,6 +114,9 @@ func applyDebuffEffects(target *Unit, debuffs proto.Debuffs) {
 	if debuffs.ShadowEmbrace {
 		MakePermanent(ShadowEmbraceAura(target, 5))
 	}
+	if debuffs.Screech {
+		MakePermanent(ScreechAura(target))
+	}
 }
 
 func MiseryAura(target *Unit, numPoints int32) *Aura {
@@ -603,6 +606,22 @@ func DemoralizingShoutAura(target *Unit, boomingVoicePts int32, impDemoShoutPts 
 	})
 }
 
+func ScreechAura(target *Unit) *Aura {
+	const apReduction = 210.0
+
+	return target.GetOrRegisterAura(Aura{
+		Label:    "Screech",
+		ActionID: ActionID{SpellID: 27051},
+		Duration: time.Second * 4,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, -apReduction)
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, apReduction)
+		},
+	})
+}
+
 const ThunderClapAuraTag = "ThunderClap"
 
 func ThunderClapAura(target *Unit, points int32) *Aura {
@@ -621,7 +640,7 @@ func ThunderClapAura(target *Unit, points int32) *Aura {
 		Tag:      ThunderClapAuraTag,
 		ActionID: ActionID{SpellID: 25264},
 		Duration: time.Second * 30,
-		Priority: float64(points),
+		Priority: inverseMult,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.MultiplyAttackSpeed(sim, speedMultiplier)
 		},

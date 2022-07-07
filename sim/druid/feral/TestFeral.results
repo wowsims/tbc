@@ -186,6 +186,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFeral-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 2193.202234282249
+  tps: 1592.854754527817
+ }
+}
+dps_results: {
  key: "TestFeral-AllItems-Coren'sLuckyCoin-38289"
  value: {
   dps: 2193.202234282249

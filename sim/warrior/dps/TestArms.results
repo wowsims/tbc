@@ -83,8 +83,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Assassin'sAlchemistStone-35751"
  value: {
-  dps: 696.0705682742539
-  tps: 590.675016903055
+  dps: 695.7323646819149
+  tps: 590.3700033075431
  }
 }
 dps_results: {
@@ -209,15 +209,15 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 713.66019212549
-  tps: 605.3779549373378
+  dps: 703.7352183523898
+  tps: 597.1819557097106
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 708.1888345684737
-  tps: 601.1729527794253
+  dps: 713.0950799772297
+  tps: 605.1730954692977
  }
 }
 dps_results: {
@@ -239,6 +239,13 @@ dps_results: {
  value: {
   dps: 700.0445861006817
   tps: 593.6987746750797
+ }
+}
+dps_results: {
+ key: "TestArms-AllItems-CommendationofKael'thas-34473"
+ value: {
+  dps: 668.3025855845932
+  tps: 567.4761142322157
  }
 }
 dps_results: {
@@ -314,8 +321,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-DestroyerArmor"
  value: {
-  dps: 549.2621683955265
-  tps: 466.73278354146197
+  dps: 550.3750087894055
+  tps: 467.4180025020394
  }
 }
 dps_results: {
@@ -447,8 +454,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-FlameGuard"
  value: {
-  dps: 539.9584009106112
-  tps: 458.9809939588727
+  dps: 539.4568749546926
+  tps: 458.6497661180107
  }
 }
 dps_results: {
@@ -545,8 +552,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 843.6221291733516
-  tps: 707.7931339594339
+  dps: 844.0563524275844
+  tps: 708.1685389084929
  }
 }
 dps_results: {
@@ -566,8 +573,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-ManualCrowdPummeler-9449"
  value: {
-  dps: 491.57216494744125
-  tps: 422.5618600190561
+  dps: 491.75086612490907
+  tps: 422.59953034578945
  }
 }
 dps_results: {
@@ -692,8 +699,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 667.8965023853929
-  tps: 567.9400018741385
+  dps: 667.8952243265268
+  tps: 567.9397659328085
  }
 }
 dps_results: {
@@ -748,8 +755,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 673.2941590747905
-  tps: 572.3000634536373
+  dps: 673.2237845276115
+  tps: 572.2582466277087
  }
 }
 dps_results: {
@@ -979,8 +986,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-Average-Default"
  value: {
-  dps: 705.6126998780089
-  tps: 598.7723049394249
+  dps: 705.9053919159314
+  tps: 599.0051810908657
  }
 }
 dps_results: {
@@ -1070,7 +1077,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 598.2997050512454
-  tps: 508.71620190459186
+  dps: 600.8077436777196
+  tps: 510.9572000130285
  }
 }

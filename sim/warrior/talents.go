@@ -74,6 +74,7 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.applyShieldSpecialization()
 	warrior.registerDeathWishCD()
 	warrior.registerSweepingStrikesCD()
+	warrior.registerLastStandCD()
 }
 
 func (warrior *Warrior) applyAngerManagement() {
@@ -403,5 +404,49 @@ func (warrior *Warrior) registerDeathWishCD() {
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
+	})
+}
+
+func (warrior *Warrior) registerLastStandCD() {
+	if !warrior.Talents.LastStand {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 12975}
+	healthMetrics := warrior.NewHealthMetrics(actionID)
+
+	var bonusHealth float64
+	lastStandAura := warrior.RegisterAura(core.Aura{
+		Label:    "Last Stand",
+		ActionID: actionID,
+		Duration: time.Second * 20,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			bonusHealth = warrior.MaxHealth() * 0.3
+			warrior.AddStatsDynamic(sim, stats.Stats{stats.Health: bonusHealth})
+			warrior.GainHealth(sim, bonusHealth, healthMetrics)
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			warrior.AddStatsDynamic(sim, stats.Stats{stats.Health: -bonusHealth})
+		},
+	})
+
+	lastStandSpell := warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Minute * 8,
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			lastStandAura.Activate(sim)
+		},
+	})
+
+	warrior.AddMajorCooldown(core.MajorCooldown{
+		Spell: lastStandSpell,
+		Type:  core.CooldownTypeSurvival,
 	})
 }

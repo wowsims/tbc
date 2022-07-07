@@ -494,7 +494,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = newTalentsC
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'lastStand',
+				fieldName: 'lastStand',
 				location: {
 					rowIdx: 2,
 					colIdx: 0,
@@ -561,7 +561,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = newTalentsC
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'improvedShieldWall',
+				fieldName: 'improvedShieldWall',
 				location: {
 					rowIdx: 4,
 					colIdx: 0,

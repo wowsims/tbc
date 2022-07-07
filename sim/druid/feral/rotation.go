@@ -48,88 +48,86 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 
 	rotation := &cat.Rotation
 
-	if cat.Rotation.maintain_faerie_fire && cat.ShouldFaerieFire(sim) {
+	if cat.Rotation.MaintainFaerieFire && cat.ShouldFaerieFire(sim) {
 		return cat.FaerieFire.Cast(sim, cat.CurrentTarget)
 	}
 
 	energy := cat.CurrentEnergy()
 	cp := cat.ComboPoints()
-	rip_debuff := cat.RipDot.IsActive()
-	rip_end := cat.RipDot.ExpiresAt()
-	mangle_debuff := cat.MangleAura.IsActive()
-	mangle_end := cat.MangleAura.ExpiresAt()
-	rake_debuff := cat.RakeDot.IsActive()
-	next_tick := cat.NextEnergyTickAt()
-	shift_cost := cat.CatForm.DefaultCast.Cost
-	omen_proc := cat.ClearcastingActive()
+	ripDebuff := cat.RipDot.IsActive()
+	ripEnd := cat.RipDot.ExpiresAt()
+	mangleDebuff := cat.MangleAura.IsActive()
+	mangleEnd := cat.MangleAura.ExpiresAt()
+	rakeDebuff := cat.RakeDot.IsActive()
+	nextTick := cat.NextEnergyTickAt()
+	shiftCost := cat.CatForm.DefaultCast.Cost
+	omenProc := cat.ClearcastingActive()
 
 	// 10/6/21 - Added logic to not cast Rip if we're near the end of the
 	// fight.
 
-	rip_now := cp >= rotation.rip_cp && !rip_debuff
-	ripweave_now := (rotation.use_rip_trick &&
-		cp >= rotation.rip_trick_cp &&
-		!rip_debuff &&
-		energy >= rip_trick_min &&
-		!cat.PseudoStats.NoCost)
+	ripNow := cp >= rotation.RipCP && !ripDebuff
+	ripweaveNow := rotation.UseRipTrick &&
+		cp >= rotation.RipTrickCP &&
+		!ripDebuff &&
+		energy >= RipTrickMin &&
+		!cat.PseudoStats.NoCost
 
 	remainingDuration := sim.GetRemainingDuration()
-	rip_now = (rip_now || ripweave_now) && (remainingDuration >= rip_end_thresh)
+	ripNow = (ripNow || ripweaveNow) && remainingDuration >= RipEndThresh
 
 	// TODO: Can we use fight % completion as an estimate for this instead of exact time calculation?
-	bite_at_end := (cp >= rotation.bite_cp &&
-		((remainingDuration < rip_end_thresh) ||
-			(rip_debuff && (sim.Duration-rip_end < rip_end_thresh))))
+	biteAtEnd := (cp >= rotation.BiteCP &&
+		(remainingDuration < RipEndThresh ||
+			(ripDebuff && sim.Duration-ripEnd < RipEndThresh)))
 
-	mangle_now := !rip_now && !mangle_debuff
-	mangle_cost := cat.Mangle.DefaultCast.Cost
+	mangleNow := !ripNow && !mangleDebuff
+	mangleCost := cat.Mangle.DefaultCast.Cost
 
-	bite_before_rip := (rip_debuff && rotation.use_bite &&
-		(rip_end-sim.CurrentTime >= bite_time))
+	biteBeforeRip := ripDebuff && rotation.UseBite &&
+		ripEnd-sim.CurrentTime >= BiteTime
 
-	bite_now := ((bite_before_rip || rotation.bite_over_rip) &&
-		cp >= rotation.bite_cp)
+	biteNow := (biteBeforeRip || rotation.BiteOverRip) &&
+		cp >= rotation.BiteCP
 
 	// TODO: Can we use fight % completion as an estimate for this instead of exact time calculation?
-	rip_next := ((rip_now || ((cp >= rotation.rip_cp) && (rip_end <= next_tick))) &&
-		(sim.Duration-next_tick >= rip_end_thresh))
+	ripNext := (ripNow || (cp >= rotation.RipCP && ripEnd <= nextTick)) &&
+		sim.Duration-nextTick >= RipEndThresh
 
-	mangle_next := (!rip_next && (mangle_now || mangle_end <= next_tick))
+	mangleNext := !ripNext && (mangleNow || mangleEnd <= nextTick)
 
-	// 12/2/21 - Added wait_to_mangle parameter that tells us whether we
+	// 12/2/21 - Added waitToMangle parameter that tells us whether we
 	// should wait for the next Energy tick and cast Mangle, assuming we
 	// are less than a tick's worth of Energy from being able to cast it. In
-	// a standard Wolfshead rotation, wait_for_mangle is identical to
-	// mangle_next, i.e. we only wait for the tick if Mangle will have
+	// a standard Wolfshead rotation, waitForMangle is identical to
+	// mangleNext, i.e. we only wait for the tick if Mangle will have
 	// fallen off before the next tick. In a no-Wolfshead rotation, however,
 	// it is preferable to Mangle rather than Shred as the second special in
 	// a standard cycle, provided a bonus like 2pT6 is present to bring the
 	// Mangle Energy cost down to 38 or below so that it can be fit in
 	// alongside a Shred.
-	wait_to_mangle := (mangle_next || ((!rotation.wolfshead) && (mangle_cost <= 38)))
+	waitToMangle := mangleNext || (!rotation.Wolfshead && mangleCost <= 38)
 
-	bite_before_rip_next := (bite_before_rip &&
-		(rip_end-next_tick >= bite_time))
+	biteBeforeRipNext := biteBeforeRip && ripEnd-nextTick >= BiteTime
 
-	prio_bite_over_mangle := (rotation.bite_over_rip || (!mangle_now))
+	prioBiteOverMangle := rotation.BiteOverRip || !mangleNow
 
-	time_to_next_tick := next_tick - sim.CurrentTime
+	timeToNextTick := nextTick - sim.CurrentTime
 	cat.waitingForTick = true
 	markOOM := false
 
-	if cat.CurrentMana() < shift_cost {
+	if cat.CurrentMana() < shiftCost {
 		// No-shift rotation
-		if rip_now && ((energy >= 30) || omen_proc) {
+		if ripNow && (energy >= 30 || omenProc) {
 			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.Rip.Cast(sim, cat.CurrentTarget)
-		} else if mangle_now &&
-			((energy >= mangle_cost) || omen_proc) {
+		} else if mangleNow && (energy >= mangleCost || omenProc) {
 			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
-		} else if bite_now && ((energy >= 35) || omen_proc) {
+		} else if biteNow && (energy >= 35 || omenProc) {
 			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.FerociousBite.Cast(sim, cat.CurrentTarget)
-		} else if (energy >= 42) || omen_proc {
+		} else if energy >= 42 || omenProc {
 			cat.Metrics.MarkOOM(&cat.Unit, time.Second)
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		} else {
@@ -137,26 +135,25 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		}
 	} else if energy < 10 {
 		cat.shift(sim)
-	} else if rip_now {
-		if (energy >= 30) || omen_proc {
+	} else if ripNow {
+		if energy >= 30 || omenProc {
 			cat.Rip.Cast(sim, cat.CurrentTarget)
 			cat.waitingForTick = false
-		} else if time_to_next_tick > max_wait_time {
+		} else if timeToNextTick > MaxWaitTime {
 			cat.shift(sim)
 		}
-	} else if (bite_now || bite_at_end) && prio_bite_over_mangle {
+	} else if (biteNow || biteAtEnd) && prioBiteOverMangle {
 		// Decision tree for Bite usage is more complicated, so there is
 		// some duplicated logic with the main tree.
 
 		// Shred versus Bite decision is the same as vanilla criteria.
 
 		// Bite immediately if we'd have to wait for the following cast.
-		cutoff_mod := 20.0
-		if time_to_next_tick <= time.Second {
-			cutoff_mod = 0.0
+		cutoffMod := 20.0
+		if timeToNextTick <= time.Second {
+			cutoffMod = 0.0
 		}
-		if (energy >= 57.0+cutoff_mod) ||
-			((energy >= 15+cutoff_mod) && omen_proc) {
+		if energy >= 57.0+cutoffMod || (energy >= 15+cutoffMod && omenProc) {
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		}
 		if energy >= 35 {
@@ -172,44 +169,41 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		// desired to match the rest of the rotation code, where waiting for
 		// tick is handled implicitly instead.
 		wait := false
-		if (energy >= 22) && bite_before_rip &&
-			(!bite_before_rip_next) {
+		if energy >= 22 && biteBeforeRip && !biteBeforeRipNext {
 			wait = true
-		} else if (energy >= 15) &&
-			((!bite_before_rip) ||
-				bite_before_rip_next || bite_at_end) {
+		} else if energy >= 15 && (!biteBeforeRip || biteBeforeRipNext || biteAtEnd) {
 			wait = true
-		} else if (!rip_next) && ((energy < 20) || (!mangle_next)) {
+		} else if !ripNext && (energy < 20 || !mangleNext) {
 			wait = false
 			cat.shift(sim)
 		} else {
 			wait = true
 		}
-		if wait && (time_to_next_tick > max_wait_time) {
+		if wait && timeToNextTick > MaxWaitTime {
 			cat.shift(sim)
 		}
-	} else if energy >= 35 && energy <= bite_trick_max &&
-		rotation.use_rake_trick &&
-		(time_to_next_tick > cat.latency) &&
-		!omen_proc &&
-		cp >= bite_trick_cp {
+	} else if energy >= 35 && energy <= BiteTrickMax &&
+		rotation.UseRakeTrick &&
+		timeToNextTick > cat.latency &&
+		!omenProc &&
+		cp >= BiteTrickCP {
 		return cat.FerociousBite.Cast(sim, cat.CurrentTarget)
-	} else if energy >= 35 && energy < mangle_cost &&
-		rotation.use_rake_trick &&
-		(time_to_next_tick > 1*time.Second+cat.latency) &&
-		!rake_debuff &&
-		!omen_proc {
+	} else if energy >= 35 && energy < mangleCost &&
+		rotation.UseRakeTrick &&
+		timeToNextTick > time.Second+cat.latency &&
+		!rakeDebuff &&
+		!omenProc {
 		return cat.Rake.Cast(sim, cat.CurrentTarget)
-	} else if mangle_now {
-		if (energy < mangle_cost-20) && (!rip_next) {
+	} else if mangleNow {
+		if energy < mangleCost-20 && !ripNext {
 			cat.shift(sim)
-		} else if (energy >= mangle_cost) || omen_proc {
+		} else if energy >= mangleCost || omenProc {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
-		} else if time_to_next_tick > max_wait_time {
+		} else if timeToNextTick > MaxWaitTime {
 			cat.shift(sim)
 		}
 	} else if energy >= 22 {
-		if omen_proc {
+		if omenProc {
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		}
 		// If our energy value is between 50-56 with 2pT6, or 60-61 without,
@@ -218,25 +212,24 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 		// Mangles instead for higher cpm. This scenario is most relevant
 		// when using a no-Wolfshead rotation with 2pT6, and it will
 		// occur whenever the initial Shred on a cycle misses.
-		if (energy >= 2*mangle_cost-20) && (energy < 22+mangle_cost) &&
-			(time_to_next_tick <= 1.0*time.Second) &&
-			rotation.use_mangle_trick &&
-			(!rotation.use_rake_trick || mangle_cost == 35) {
+		if energy >= 2*mangleCost-20 && energy < 22+mangleCost &&
+			timeToNextTick <= 1.0*time.Second &&
+			rotation.UseMangleTrick &&
+			(!rotation.UseRakeTrick || mangleCost == 35) {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		}
 		if energy >= 42 {
 			return cat.Shred.Cast(sim, cat.CurrentTarget)
 		}
-		if (energy >= mangle_cost) &&
-			(time_to_next_tick > time.Second+cat.latency) {
+		if energy >= mangleCost && timeToNextTick > time.Second+cat.latency {
 			return cat.Mangle.Cast(sim, cat.CurrentTarget)
 		}
-		if time_to_next_tick > max_wait_time {
+		if timeToNextTick > MaxWaitTime {
 			cat.shift(sim)
 		}
-	} else if (!rip_next) && ((energy < mangle_cost-20) || (!wait_to_mangle)) {
+	} else if !ripNext && (energy < mangleCost-20 || !waitToMangle) {
 		cat.shift(sim)
-	} else if time_to_next_tick > max_wait_time {
+	} else if timeToNextTick > MaxWaitTime {
 		cat.shift(sim)
 	}
 	// Model two types of input latency: (1) When waiting for an energy tick
@@ -248,58 +241,58 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) bool {
 	if cat.readyToShift {
 		cat.SetGCDTimer(sim, sim.CurrentTime+cat.latency)
 	} else if cat.waitingForTick {
-		cat.SetGCDTimer(sim, sim.CurrentTime+time_to_next_tick+cat.latency)
+		cat.SetGCDTimer(sim, sim.CurrentTime+timeToNextTick+cat.latency)
 		if markOOM {
-			cat.Metrics.MarkOOM(&cat.Unit, time_to_next_tick+cat.latency)
+			cat.Metrics.MarkOOM(&cat.Unit, timeToNextTick+cat.latency)
 		}
 	}
 
 	return false
 }
 
-const bite_trick_cp = int32(2)
-const bite_trick_max = 39.0
-const bite_time = time.Second * 0.0
-const rip_trick_min = 52.0
-const rip_end_thresh = time.Second * 10
-const max_wait_time = time.Second * 1.0
+const BiteTrickCP = int32(2)
+const BiteTrickMax = 39.0
+const BiteTime = time.Second * 0.0
+const RipTrickMin = 52.0
+const RipEndThresh = time.Second * 10
+const MaxWaitTime = time.Second * 1.0
 
 type FeralDruidRotation struct {
-	rip_cp           int32
-	bite_cp          int32
-	rip_trick_cp     int32
-	use_bite         bool
-	bite_over_rip    bool
-	use_mangle_trick bool
-	use_rip_trick    bool
-	use_rake_trick   bool
-	wolfshead        bool
+	RipCP          int32
+	BiteCP         int32
+	RipTrickCP     int32
+	UseBite        bool
+	BiteOverRip    bool
+	UseMangleTrick bool
+	UseRipTrick    bool
+	UseRakeTrick   bool
+	Wolfshead      bool
 
-	maintain_faerie_fire bool
+	MaintainFaerieFire bool
 }
 
 func (cat *FeralDruid) setupRotation(rotation *proto.FeralDruid_Rotation) {
 
-	use_bite := (rotation.Biteweave && rotation.FinishingMove == proto.FeralDruid_Rotation_Rip) ||
+	UseBite := (rotation.Biteweave && rotation.FinishingMove == proto.FeralDruid_Rotation_Rip) ||
 		rotation.FinishingMove == proto.FeralDruid_Rotation_Bite
-	rip_cp := rotation.RipMinComboPoints
+	RipCP := rotation.RipMinComboPoints
 
 	if rotation.FinishingMove != proto.FeralDruid_Rotation_Rip {
-		rip_cp = 6
+		RipCP = 6
 	}
 
 	cat.Rotation = FeralDruidRotation{
-		rip_cp:           rip_cp,
-		bite_cp:          rotation.BiteMinComboPoints,
-		rip_trick_cp:     rotation.RipMinComboPoints,
-		use_bite:         use_bite,
-		bite_over_rip:    use_bite && rotation.FinishingMove != proto.FeralDruid_Rotation_Rip,
-		use_mangle_trick: rotation.MangleTrick,
-		use_rip_trick:    rotation.Ripweave,
-		use_rake_trick:   rotation.RakeTrick && !druid.ItemSetThunderheartHarness.CharacterHasSetBonus(&cat.Character, 2),
-		wolfshead:        cat.Equip[items.ItemSlotHead].ID == 8345,
+		RipCP:          RipCP,
+		BiteCP:         rotation.BiteMinComboPoints,
+		RipTrickCP:     rotation.RipMinComboPoints,
+		UseBite:        UseBite,
+		BiteOverRip:    UseBite && rotation.FinishingMove != proto.FeralDruid_Rotation_Rip,
+		UseMangleTrick: rotation.MangleTrick,
+		UseRipTrick:    rotation.Ripweave,
+		UseRakeTrick:   rotation.RakeTrick && !druid.ItemSetThunderheartHarness.CharacterHasSetBonus(&cat.Character, 2),
+		Wolfshead:      cat.Equip[items.ItemSlotHead].ID == 8345,
 
-		maintain_faerie_fire: rotation.MaintainFaerieFire,
+		MaintainFaerieFire: rotation.MaintainFaerieFire,
 	}
 
 }

@@ -67,18 +67,10 @@ func (warrior *Warrior) ShouldDemoralizingShout(sim *core.Simulation, filler boo
 		return false
 	}
 
-	activeDebuff := warrior.CurrentTarget.GetActiveAuraWithTag(core.APReductionAuraTag)
-	if activeDebuff != nil && activeDebuff.Priority > warrior.DemoralizingShoutAura.Priority {
-		return false
-	}
-
 	if filler {
 		return true
 	}
 
-	if maintainOnly {
-		return activeDebuff == nil || activeDebuff.Priority < warrior.DemoralizingShoutAura.Priority || activeDebuff.RemainingDuration(sim) < time.Second*2
-	}
-
-	return false
+	return maintainOnly &&
+		warrior.CurrentTarget.ShouldRefreshAuraWithTagAtPriority(sim, core.APReductionAuraTag, warrior.DemoralizingShoutAura.Priority, time.Second*2)
 }

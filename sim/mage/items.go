@@ -71,7 +71,7 @@ func init() {
 
 	core.NewItemEffect(32488, func(agent core.Agent) {
 		mage := agent.(MageAgent).GetMage()
-		procAura := mage.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
+		procAura := mage.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{ItemID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
 		mage.RegisterAura(core.Aura{
 			Label:    "Ashtongue Talisman",
@@ -80,7 +80,7 @@ func init() {
 				aura.Activate(sim)
 			},
 			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
 					return
 				}
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {

@@ -43,7 +43,9 @@ import {
 	getTalentTree,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
+	isTankSpec,
 	newRaidTarget,
+	playerToSpec,
 	raceToFaction,
 	specToClass,
 	specToEligibleRaces,
@@ -207,7 +209,7 @@ export class Player<SpecType extends Spec> {
 	}
 
 	// Returns all gems that this player can wear of the given color.
-	getGems(socketColor: GemColor | undefined): Array<Gem> {
+	getGems(socketColor?: GemColor): Array<Gem> {
 		return this.sim.getGems(socketColor);
 	}
 
@@ -662,5 +664,28 @@ export class Player<SpecType extends Spec> {
 		const newPlayer = new Player<SpecType>(this.spec, this.sim);
 		newPlayer.fromProto(eventID, this.toProto());
 		return newPlayer;
+	}
+
+	applySharedDefaults(eventID: EventID) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
+			this.setInFrontOfTarget(eventID, isTankSpec(this.spec));
+			this.setHealingModel(eventID, HealingModel.create());
+			this.setCooldowns(eventID, Cooldowns.create({
+				hpPercentForDefensives: isTankSpec(this.spec) ? 0.35 : 0,
+			}));
+			this.setBonusStats(eventID, new Stats());
+		});
+	}
+
+	static applySharedDefaultsToProto(proto : PlayerProto) {
+		const spec = playerToSpec(proto);
+		proto.shattFaction = ShattrathFaction.ShattrathFactionAldor;
+		proto.inFrontOfTarget = isTankSpec(spec);
+		proto.healingModel = HealingModel.create();
+		proto.cooldowns = Cooldowns.create({
+			hpPercentForDefensives: isTankSpec(spec) ? 0.35 : 0,
+		});
+		proto.bonusStats = new Stats().asArray();
 	}
 }

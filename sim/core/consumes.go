@@ -1069,6 +1069,31 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					flameCapAura.Activate(sim)
 				},
 			})
+	} else if conjuredType == proto.Conjured_ConjuredHealthstone {
+		actionID := ActionID{ItemID: 22105}
+		healthMetrics := character.NewHealthMetrics(actionID)
+		return MajorCooldown{
+				Type: CooldownTypeSurvival,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			character.RegisterSpell(SpellConfig{
+				ActionID: actionID,
+				Flags:    SpellFlagNoOnCastComplete,
+				Cast: CastConfig{
+					CD: Cooldown{
+						Timer:    character.GetConjuredCD(),
+						Duration: time.Minute * 2,
+					},
+				},
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
+					character.GainHealth(sim, 2496, healthMetrics)
+				},
+			})
 	} else {
 		return MajorCooldown{}, nil
 	}

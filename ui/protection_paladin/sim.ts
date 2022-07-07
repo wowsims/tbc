@@ -206,6 +206,7 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 				IconInputs.GiftOfArthas,
 				IconInputs.DemoralizingRoar,
 				IconInputs.DemoralizingShout,
+				IconInputs.Screech,
 				IconInputs.ThunderClap,
 				IconInputs.ShadowEmbrace,
 				IconInputs.InsectSwarm,
@@ -221,6 +222,8 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 				],
 				conjured: [
 					Conjured.ConjuredDarkRune,
+					Conjured.ConjuredFlameCap,
+					Conjured.ConjuredHealthstone,
 				],
 				flasks: [
 					Flask.FlaskOfFortification,
@@ -271,6 +274,10 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					OtherInputs.TankAssignment,
+					OtherInputs.IncomingHps,
+					OtherInputs.HealingCadence,
+					OtherInputs.HpPercentForDefensives,
 					ProtectionPaladinInputs.AuraSelection,
 					ProtectionPaladinInputs.UseAvengingWrath,
 					OtherInputs.ExposeWeaknessUptime,
@@ -278,9 +285,6 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					OtherInputs.InspirationUptime,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotImprovedWrathOfAirTotem,
-					OtherInputs.TankAssignment,
-					OtherInputs.IncomingHps,
-					OtherInputs.HealingCadence,
 					OtherInputs.InFrontOfTarget,
 				],
 			},

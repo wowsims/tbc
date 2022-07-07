@@ -377,6 +377,7 @@ export const TankAssignment = {
 		extraCssClasses: [
 			'tank-selector',
 			'threat-metrics',
+			'within-raid-sim-hide',
 		],
 		label: 'Tank Assignment',
 		labelTooltip: 'Determines which mobs will be tanked. Most mobs default to targeting the Main Tank, but in preset multi-target encounters this is not always true.',
@@ -447,5 +448,28 @@ export const HealingCadence = {
 			player.setHealingModel(eventID, healingModel);
 		},
 		enableWhen: (player: Player<any>) => player.getRaid()!.getTanks().find(tank => RaidTarget.equals(tank, player.makeRaidTarget())) != null,
+	},
+};
+
+export const HpPercentForDefensives = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		float: true,
+		extraCssClasses: [
+			'hp-percent-for-defensives-picker',
+		],
+		label: 'HP % for Defensive CDs',
+		labelTooltip: `
+			<p>% of Maximum Health, below which defensive cooldowns are allowed to be used.</p>
+			<p>If set to 0, this restriction is disabled.</p>
+		`,
+		changedEvent: (player: Player<any>) => player.cooldownsChangeEmitter,
+		getValue: (player: Player<any>) => player.getCooldowns().hpPercentForDefensives * 100,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const cooldowns = player.getCooldowns();
+			cooldowns.hpPercentForDefensives = newValue / 100;
+			player.setCooldowns(eventID, cooldowns);
+		},
 	},
 };

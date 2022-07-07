@@ -3,6 +3,7 @@ import { OtherAction } from '/tbc/core/proto/common.js';
 import { UnitMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId, resourceTypeToIcon } from '/tbc/core/proto_utils/action_id.js';
 import { resourceColors, resourceNames } from '/tbc/core/proto_utils/names.js';
+import { orderedResourceTypes } from '/tbc/core/proto_utils/utils.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { bucket, distinct, getEnumValues, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
@@ -465,8 +466,7 @@ export class Timeline extends ResultComponent {
 		this.clearRotationChart();
 		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
-		const resourceTypes = (getEnumValues(ResourceType) as Array<ResourceType>).filter(val => val != ResourceType.ResourceTypeNone);
-		resourceTypes.forEach(resourceType => this.addResourceRow(resourceType, player.groupedResourceLogs[resourceType], duration));
+		orderedResourceTypes.forEach(resourceType => this.addResourceRow(resourceType, player.groupedResourceLogs[resourceType], duration));
 
 		const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.actionId!.toString()));
 		buffsById.sort((a, b) => stringComparator(a[0].actionId!.name, b[0].actionId!.name));
@@ -629,7 +629,7 @@ export class Timeline extends ResultComponent {
 			resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
 			resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
 			resourceElem.style.width = this.timeToPx((resourceLogs[i + 1]?.timestamp || duration) - resourceLogGroup.timestamp);
-			if (resourceType == ResourceType.ResourceTypeMana) {
+			if (percentageResources.includes(resourceType)) {
 				resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
 			} else {
 				resourceElem.textContent = Math.floor(resourceLogGroup.valueAfter).toFixed(0);
@@ -847,7 +847,7 @@ export class Timeline extends ResultComponent {
 	}
 
 	private resourceTooltip(log: ResourceChangedLogGroup, maxValue: number, includeAuras: boolean): string {
-		const valToDisplayString = log.resourceType == ResourceType.ResourceTypeMana
+		const valToDisplayString = percentageResources.includes(log.resourceType)
 			? (val: number) => `${val.toFixed(1)} (${(val / maxValue * 100).toFixed(0)}%)`
 			: (val: number) => `${val.toFixed(1)}`;
 
@@ -1006,4 +1006,9 @@ const idsToGroupForRotation: Array<number> = [
 	26866, // Expose Armor
 	26865, // Eviscerate
 	26867, // Rupture
+];
+
+const percentageResources: Array<ResourceType> = [
+	ResourceType.ResourceTypeHealth,
+	ResourceType.ResourceTypeMana,
 ];

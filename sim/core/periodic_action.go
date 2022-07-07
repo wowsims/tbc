@@ -12,6 +12,10 @@ type PeriodicActionOptions struct {
 	// 0 indicates a permanent periodic action.
 	NumTicks int
 
+	// Whether the first tick should happen immediately. If false, first tick will
+	// wait for Period.
+	TickImmediately bool
+
 	Priority ActionPriority
 
 	OnAction func(*Simulation)
@@ -41,6 +45,18 @@ func NewPeriodicAction(sim *Simulation, options PeriodicActionOptions) *PendingA
 	pa.CleanUp = func(sim *Simulation) {
 		if options.CleanUp != nil {
 			options.CleanUp(sim)
+		}
+	}
+
+	if options.TickImmediately {
+		if sim.CurrentTime == 0 {
+			StartPeriodicAction(sim, PeriodicActionOptions{
+				Period:   0,
+				NumTicks: 1,
+				OnAction: options.OnAction,
+			})
+		} else {
+			options.OnAction(sim)
 		}
 	}
 

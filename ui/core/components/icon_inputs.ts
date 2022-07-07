@@ -101,6 +101,7 @@ export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 
 export const GiftOfArthas = makeBooleanDebuffInput(ActionId.fromSpellId(11374), 'giftOfArthas');
 export const DemoralizingRoar = makeTristateDebuffInput(ActionId.fromSpellId(26998), ActionId.fromSpellId(16862), 'demoralizingRoar');
 export const DemoralizingShout = makeTristateDebuffInput(ActionId.fromSpellId(25203), ActionId.fromSpellId(12879), 'demoralizingShout');
+export const Screech = makeBooleanDebuffInput(ActionId.fromSpellId(27051), 'screech');
 export const ThunderClap = makeTristateDebuffInput(ActionId.fromSpellId(25264), ActionId.fromSpellId(12666), 'thunderClap');
 export const InsectSwarm = makeBooleanDebuffInput(ActionId.fromSpellId(27013), 'insectSwarm');
 export const ScorpidSting = makeBooleanDebuffInput(ActionId.fromSpellId(3043), 'scorpidSting');
@@ -428,6 +429,7 @@ export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
 export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
 	{ actionId: ActionId.fromItemId(12662), value: Conjured.ConjuredDarkRune },
 	{ actionId: ActionId.fromItemId(22788), value: Conjured.ConjuredFlameCap },
+	{ actionId: ActionId.fromItemId(22105), value: Conjured.ConjuredHealthstone },
 	{ actionId: ActionId.fromItemId(22044), value: Conjured.ConjuredMageManaEmerald },
 	{ actionId: ActionId.fromItemId(7676), value: Conjured.ConjuredRogueThistleTea },
 ] as Array<IconEnumValueConfig<Player<any>, Conjured>>);

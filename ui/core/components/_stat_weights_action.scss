@@ -7,6 +7,7 @@
 .ep-weights-actions {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
 	width: 50%;
 }
 .ep-weights-actions > * {
@@ -16,9 +17,16 @@
 .ep-weights-results {
 	position: relative;
 	width: 50%;
+	min-height: 150px;
 }
 .ep-weights-results .results-viewer {
 	@include vertical-horizontal-center;
+}
+
+.stats-controls-row {
+	display: flex;
+	justify-content: space-around;
+	margin: 10px;
 }
 
 .show-all-stats-container .boolean-picker-input {

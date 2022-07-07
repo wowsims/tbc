@@ -227,8 +227,9 @@ func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) *proto.RaidStats 
 			}
 
 			char := player.GetCharacter()
-			partyStats.Players[char.PartyIndex] = char.applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
+			char.EnableHealthBar()
 			char.trackChanceOfDeath(playerConfig.HealingModel)
+			partyStats.Players[char.PartyIndex] = char.applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
 		}
 
 		raidStats.Parties = append(raidStats.Parties, partyStats)
@@ -241,6 +242,17 @@ func (raid Raid) AddStats(s stats.Stats) {
 	for _, party := range raid.Parties {
 		party.AddStats(s)
 	}
+}
+
+func (raid Raid) GetPlayerFromUnit(unit *Unit) Agent {
+	for _, party := range raid.Parties {
+		for _, agent := range party.PlayersAndPets {
+			if &agent.GetCharacter().Unit == unit {
+				return agent
+			}
+		}
+	}
+	return nil
 }
 
 func (raid Raid) GetPlayerFromRaidTarget(raidTarget proto.RaidTarget) Agent {
