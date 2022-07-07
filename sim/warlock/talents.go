@@ -30,7 +30,7 @@ func (warlock *Warlock) ApplyTalents() {
 	}
 
 	// Add 1% crit per level of backlash.
-	warlock.PseudoStats.BonusCritRating += float64(warlock.Talents.Backlash) * 1 * core.SpellCritRatingPerCritChance
+	warlock.AddStat(stats.SpellCrit, float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance)
 
 	// fel intellect
 	if warlock.Talents.FelIntellect > 0 {
