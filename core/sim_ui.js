@@ -85,16 +85,17 @@ export class SimUI extends Component {
                 sim.setIterations(eventID, newValue);
             },
         });
-        const reportBug = document.createElement('span');
-        reportBug.classList.add('report-bug', 'fa', 'fa-bug');
-        tippy(reportBug, {
-            'content': 'Report a bug / request a feature',
-            'allowHTML': true,
-        });
-        reportBug.addEventListener('click', event => {
-            window.open('https://github.com/wowsims/tbc/issues/new/choose', '_blank');
-        });
-        this.addToolbarItem(reportBug);
+        // Commented out because TBC repo isn't actively supported anymore.
+        //const reportBug = document.createElement('span');
+        //reportBug.classList.add('report-bug', 'fa', 'fa-bug');
+        //tippy(reportBug, {
+        //	'content': 'Report a bug / request a feature',
+        //	'allowHTML': true,
+        //});
+        //reportBug.addEventListener('click', event => {
+        //	window.open('https://github.com/wowsims/tbc/issues/new/choose', '_blank');
+        //});
+        //this.addToolbarItem(reportBug);
         if (!this.isWithinRaidSim) {
             window.addEventListener('message', async (event) => {
                 if (event.data == 'runOnce') {
