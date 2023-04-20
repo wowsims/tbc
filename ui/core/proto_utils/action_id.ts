@@ -359,7 +359,7 @@ export class ActionId {
 	private static async getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
 		if (!cache.has(id)) {
 			cache.set(id,
-				fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+				fetch(`https://nether.wowhead.com/tbc/tooltip/${tooltipPostfix}/${id}`)
 					.then(response => response.json()));
 		}
 
