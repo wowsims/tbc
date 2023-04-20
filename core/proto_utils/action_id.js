@@ -334,7 +334,7 @@ export class ActionId {
     }
     static async getTooltipDataHelper(id, tooltipPostfix, cache) {
         if (!cache.has(id)) {
-            cache.set(id, fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+            cache.set(id, fetch(`https://nether.wowhead.com/tbc/tooltip/${tooltipPostfix}/${id}`)
                 .then(response => response.json()));
         }
         return cache.get(id);
