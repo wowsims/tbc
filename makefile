@@ -115,7 +115,7 @@ $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
 
-$(OUT_DIR)/assets/%: assets/%
+$(OUT_DIR)/assets/: assets/
 	mkdir -p $(@D)
 	cp $< $@
 	rm -rf $(OUT_DIR)/assets/item_data
