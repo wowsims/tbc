@@ -18,7 +18,7 @@ jobs:
           version: 3.x
 
       - name: Install Protoc Go plugin
-        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.2
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
       - name: Install Node
         uses: actions/setup-node@v2
