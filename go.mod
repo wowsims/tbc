@@ -1,6 +1,6 @@
 module github.com/wowsims/tbc
 
-go 1.16
+go 1.18
 
 require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8

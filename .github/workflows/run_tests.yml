@@ -10,7 +10,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.x
+          go-version: 1.18.x
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -18,7 +18,7 @@ jobs:
           version: 3.x
 
       - name: Install Protoc Go plugin
-        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.2
 
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
