@@ -117,6 +117,7 @@ $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 
 $(OUT_DIR)/assets: assets/*
 	cp -r assets $(OUT_DIR)
+	rm -rf $(OUT_DIR)/assets/item_data
 
 binary_dist/dist.go: sim/web/dist.go.tmpl
 	mkdir -p binary_dist/tbc
