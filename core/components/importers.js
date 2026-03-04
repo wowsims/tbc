@@ -227,6 +227,7 @@ class IndividualAddonImporter extends Importer {
         const talentsStr = importJson['talents'] || '';
         const gearJson = importJson['gear'];
         gearJson.items = gearJson.items.filter(item => item != null);
+		delete gearJson.version;
         const equipmentSpec = EquipmentSpec.fromJson(gearJson);
         this.finishIndividualImport(this.simUI, charClass, race, equipmentSpec, talentsStr);
     }
