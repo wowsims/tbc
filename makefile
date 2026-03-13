@@ -146,10 +146,22 @@ devserver: sim/web/main.go binary_dist/dist.go
 rundevserver: devserver
 	./wowsimtbc --usefs=true --launch=false
 
-release: wowsimtbc
-	GOOS=windows GOARCH=amd64 go build -o wowsimtbc-windows.exe -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
-	GOOS=darwin GOARCH=amd64 go build -o wowsimtbc-amd64-darwin -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
-	GOOS=linux GOARCH=amd64 go build -o wowsimtbc-amd64-linux   -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
+wowsimtbc-windows.exe: wowsimtbc
+# go build only considers syso files when invoked without specifying .go files: https://github.com/golang/go/issues/16090
+	cp ./assets/favicon_io/icon-windows_amd64.syso ./sim/web/icon-windows_amd64.syso
+	cd ./sim/web/ && GOOS=windows GOARCH=amd64 GOAMD64=v2 go build -o wowsimtbc-windows.exe -ldflags="-X 'main.Version=$(VERSION)' -s -w"
+	rm ./sim/web/icon-windows_amd64.syso
+	mv ./sim/web/wowsimtbc-windows.exe ./wowsimtbc-windows.exe
+
+release: wowsimtbc wowsimtbc-windows.exe
+	GOOS=darwin GOARCH=amd64 GOAMD64=v2 go build -o wowsimtbc-amd64-darwin -ldflags="-X 'main.Version=$(VERSION)' -s -w" ./sim/web/main.go
+	GOOS=darwin GOARCH=arm64 go build -o wowsimtbc-arm64-darwin -ldflags="-X 'main.Version=$(VERSION)' -s -w" ./sim/web/main.go
+	GOOS=linux GOARCH=amd64 GOAMD64=v2 go build -o wowsimtbc-amd64-linux   -ldflags="-X 'main.Version=$(VERSION)' -s -w" ./sim/web/main.go
+# Now compress into a zip because the files are getting large.
+	zip wowsimtbc-windows.exe.zip wowsimtbc-windows.exe
+	zip wowsimtbc-amd64-darwin.zip wowsimtbc-amd64-darwin
+	zip wowsimtbc-arm64-darwin.zip wowsimtbc-arm64-darwin
+	zip wowsimtbc-amd64-linux.zip wowsimtbc-amd64-linux
 
 sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto
