@@ -2,13 +2,23 @@
 node_modules
 
 # IDE folders
-.vscode
 .idea
+.history
+.vscode
 
 # binaries
 dist
 binary_dist
+sim/web/__debug_bin
+/wowsimcli*
+/wowsimtbc*
 
 # temporary files
 *.results.tmp
 .dockerignore
+
+# lib
+wowsimtbc*.so
+wowsimtbc*.dll
+wowsimtbc*.h
+wowsims.db
