@@ -1,4 +1,4 @@
-# This is the old TBC Sim, released in 2019. This version is not maintained nor monitored. TBC Anniversary is being supported at [https://github.com/wowsims/tbc-new](https://github.com/wowsims/tbc-new)
+# This is the old TBC Sim, released in 2021. This version is not maintained nor monitored. TBC Anniversary is being supported at [https://github.com/wowsims/tbc-new](https://github.com/wowsims/tbc-new)
 
 Welcome to the WoW TBC Classic simulator! If you have questions or are thinking about contributing, [join our discord](https://discord.gg/jJMPr9JWwx "https://discord.gg/jJMPr9JWwx") to chat!
 
