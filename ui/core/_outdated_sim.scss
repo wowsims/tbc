@@ -85,11 +85,6 @@ body.has-outdated-sim-bar .sim-root {
 			color: $outdated-sim-link-color;
 		}
 
-		.outdated-sim-modal-countdown {
-			font-weight: bold;
-			color: $outdated-sim-warning-color;
-		}
-
 		.outdated-sim-modal-buttons {
 			display: flex;
 			flex-direction: column;
