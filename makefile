@@ -56,6 +56,17 @@ host: $(OUT_DIR)
 	# directory just like github pages.
 	npx http-server $(OUT_DIR)/..
 
+# Docker helpers, for building/hosting without installing the old Go/node
+# toolchains locally. Run docker_image once, then use docker_build/docker_host.
+docker_image:
+	docker build --tag wowsims-tbc .
+
+docker_build: docker_image
+	docker run --rm -v $(CURDIR):/tbc wowsims-tbc sh -c "npm install && make"
+
+docker_host: docker_build
+	docker run --rm -it -p 8080:8080 -v $(CURDIR):/tbc wowsims-tbc npx http-server dist -p 8080
+
 ui/core/proto/api.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts

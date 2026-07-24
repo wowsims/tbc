@@ -1,0 +1,117 @@
+$outdated-sim-bar-height: 40px;
+$outdated-sim-warning-color: #ffb3b3;
+$outdated-sim-border-color: #e03535;
+$outdated-sim-link-color: #ffd100;
+
+.outdated-sim-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 9999;
+	height: $outdated-sim-bar-height;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 0 10px;
+	box-sizing: border-box;
+	background: #6b0f0f;
+	border-bottom: 2px solid $outdated-sim-border-color;
+	color: $outdated-sim-warning-color;
+	font-weight: bold;
+
+	a {
+		color: $outdated-sim-link-color;
+		margin: 0 4px;
+	}
+}
+
+// Push the sim below the fixed bar.
+body.has-outdated-sim-bar .sim-root {
+	height: calc(100% - #{$outdated-sim-bar-height});
+	margin-top: $outdated-sim-bar-height;
+}
+
+.outdated-sim-sidebar-warning {
+	margin: 15px 10px 0 10px;
+	padding: 10px;
+	border: 2px solid $outdated-sim-border-color;
+	background: rgba(224, 53, 53, 0.15);
+	color: $outdated-sim-warning-color;
+	text-align: left;
+	font-size: 14px;
+
+	a {
+		color: $outdated-sim-link-color;
+	}
+
+	ol {
+		margin: 5px 0 0;
+		padding-left: 25px;
+
+		li {
+			margin-top: 5px;
+		}
+	}
+}
+
+.outdated-sim-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.8);
+
+	.outdated-sim-modal {
+		max-width: 500px;
+		margin: 20px;
+		padding: 20px 30px;
+		background: #1e2633;
+		border: 2px solid $outdated-sim-border-color;
+		color: var(--main-text-color);
+		text-align: center;
+
+		h2 {
+			color: $outdated-sim-warning-color;
+		}
+
+		a {
+			color: $outdated-sim-link-color;
+		}
+
+		.outdated-sim-modal-countdown {
+			font-weight: bold;
+			color: $outdated-sim-warning-color;
+		}
+
+		.outdated-sim-modal-buttons {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			margin-top: 15px;
+
+			button {
+				padding: 10px;
+				cursor: pointer;
+				border: none;
+				font-weight: bold;
+			}
+
+			.outdated-sim-modal-go {
+				background: $outdated-sim-link-color;
+				color: black;
+			}
+
+			.outdated-sim-modal-dismiss {
+				background: #373e58;
+				color: var(--main-text-color);
+			}
+		}
+	}
+}

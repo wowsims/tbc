@@ -6,6 +6,8 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
+import { addOutdatedSimBar, makeOutdatedSimSidebarWarning, showOutdatedSimModal } from '/tbc/core/outdated_sim.js';
+
 import { Sim } from './sim.js';
 import { Target } from './target.js';
 import { EventID, TypedEvent } from './typed_event.js';
@@ -127,6 +129,12 @@ export abstract class SimUI extends Component {
 				sim.setIterations(eventID, newValue);
 			},
 		});
+
+		if (!this.isWithinRaidSim) {
+			makeOutdatedSimSidebarWarning(simActionsContainer);
+			addOutdatedSimBar();
+			showOutdatedSimModal();
+		}
 
 		// Commented out because TBC repo isn't actively supported anymore.
 		//const reportBug = document.createElement('span');

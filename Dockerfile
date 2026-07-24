@@ -6,8 +6,7 @@ WORKDIR /tbc
 
 RUN apt-get update
 RUN apt-get install -y protobuf-compiler
-RUN go get -u google.golang.org/protobuf
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.2
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 

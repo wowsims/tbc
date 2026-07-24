@@ -40,29 +40,25 @@ npm install
 ## Windows
 If you want to develop on Windows, we recommend setting up a Ubuntu virtual machine (VM) or running Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Ubuntu or Docker instructions, respectively.
 
-## Docker
-Alternatively, install Docker and your workflow will look something like this:
+## Docker (recommended)
+This project requires old versions of Go (1.18) and node (14), which you probably don't want
+installed on your machine. The Docker image provides both, so this is the recommended way to
+build and run the sim today:
 ```sh
 git clone https://github.com/wowsims/tbc.git
 cd tbc
 
-# Build the docker image and install npm dependencies (only need to run these once).
-docker build --tag wowsims-tbc .
-docker run --rm -v $(pwd):/tbc wowsims-tbc npm install
+# Build the docker image (only needed once, or after changing the Dockerfile).
+make docker_image
 
-# Now you can run the commands as shown in the Commands sections, preceding everything with, "docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc".
-# For convenience, set this as an environment variable:
-TBC_CMD="docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc"
+# Install npm dependencies and build the whole sim (dist/tbc) inside the container.
+make docker_build
 
-# ... do some coding on the sim ...
+# Build and host a local site at http://localhost:8080/tbc.
+make docker_host
 
-# Run tests
-$TBC_CMD make test
-
-# ... do some coding on the UI ...
-
-# Host a local site
-$TBC_CMD make host
+# Or run any other command from the Commands section inside the container:
+docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc make test
 ```
 
 # Commands
