@@ -11,191 +11,191 @@ export interface HunterTalents {
     /**
      * Beast Mastery
      *
-     * @generated from protobuf field: int32 improved_aspect_of_the_hawk = 1;
+     * @generated from protobuf field: int32 improved_aspect_of_the_hawk = 1
      */
     improvedAspectOfTheHawk: number;
     /**
-     * @generated from protobuf field: int32 endurance_training = 2;
+     * @generated from protobuf field: int32 endurance_training = 2
      */
     enduranceTraining: number;
     /**
-     * @generated from protobuf field: int32 focused_fire = 3;
+     * @generated from protobuf field: int32 focused_fire = 3
      */
     focusedFire: number;
     /**
-     * @generated from protobuf field: int32 unleashed_fury = 4;
+     * @generated from protobuf field: int32 unleashed_fury = 4
      */
     unleashedFury: number;
     /**
-     * @generated from protobuf field: int32 ferocity = 5;
+     * @generated from protobuf field: int32 ferocity = 5
      */
     ferocity: number;
     /**
-     * @generated from protobuf field: int32 bestial_discipline = 6;
+     * @generated from protobuf field: int32 bestial_discipline = 6
      */
     bestialDiscipline: number;
     /**
-     * @generated from protobuf field: int32 animal_handler = 45;
+     * @generated from protobuf field: int32 animal_handler = 45
      */
     animalHandler: number;
     /**
-     * @generated from protobuf field: int32 frenzy = 7;
+     * @generated from protobuf field: int32 frenzy = 7
      */
     frenzy: number;
     /**
-     * @generated from protobuf field: int32 ferocious_inspiration = 8;
+     * @generated from protobuf field: int32 ferocious_inspiration = 8
      */
     ferociousInspiration: number;
     /**
-     * @generated from protobuf field: bool bestial_wrath = 9;
+     * @generated from protobuf field: bool bestial_wrath = 9
      */
     bestialWrath: boolean;
     /**
-     * @generated from protobuf field: int32 serpents_swiftness = 10;
+     * @generated from protobuf field: int32 serpents_swiftness = 10
      */
     serpentsSwiftness: number;
     /**
-     * @generated from protobuf field: bool the_beast_within = 11;
+     * @generated from protobuf field: bool the_beast_within = 11
      */
     theBeastWithin: boolean;
     /**
      * Marksmanship
      *
-     * @generated from protobuf field: int32 lethal_shots = 12;
+     * @generated from protobuf field: int32 lethal_shots = 12
      */
     lethalShots: number;
     /**
-     * @generated from protobuf field: int32 improved_hunters_mark = 13;
+     * @generated from protobuf field: int32 improved_hunters_mark = 13
      */
     improvedHuntersMark: number;
     /**
-     * @generated from protobuf field: int32 efficiency = 14;
+     * @generated from protobuf field: int32 efficiency = 14
      */
     efficiency: number;
     /**
-     * @generated from protobuf field: int32 go_for_the_throat = 15;
+     * @generated from protobuf field: int32 go_for_the_throat = 15
      */
     goForTheThroat: number;
     /**
-     * @generated from protobuf field: int32 improved_arcane_shot = 16;
+     * @generated from protobuf field: int32 improved_arcane_shot = 16
      */
     improvedArcaneShot: number;
     /**
-     * @generated from protobuf field: bool aimed_shot = 17;
+     * @generated from protobuf field: bool aimed_shot = 17
      */
     aimedShot: boolean;
     /**
-     * @generated from protobuf field: int32 rapid_killing = 18;
+     * @generated from protobuf field: int32 rapid_killing = 18
      */
     rapidKilling: number;
     /**
-     * @generated from protobuf field: int32 improved_stings = 19;
+     * @generated from protobuf field: int32 improved_stings = 19
      */
     improvedStings: number;
     /**
-     * @generated from protobuf field: int32 mortal_shots = 20;
+     * @generated from protobuf field: int32 mortal_shots = 20
      */
     mortalShots: number;
     /**
-     * @generated from protobuf field: bool scatter_shot = 21;
+     * @generated from protobuf field: bool scatter_shot = 21
      */
     scatterShot: boolean;
     /**
-     * @generated from protobuf field: int32 barrage = 22;
+     * @generated from protobuf field: int32 barrage = 22
      */
     barrage: number;
     /**
-     * @generated from protobuf field: int32 combat_experience = 23;
+     * @generated from protobuf field: int32 combat_experience = 23
      */
     combatExperience: number;
     /**
-     * @generated from protobuf field: int32 ranged_weapon_specialization = 24;
+     * @generated from protobuf field: int32 ranged_weapon_specialization = 24
      */
     rangedWeaponSpecialization: number;
     /**
-     * @generated from protobuf field: int32 careful_aim = 25;
+     * @generated from protobuf field: int32 careful_aim = 25
      */
     carefulAim: number;
     /**
-     * @generated from protobuf field: bool trueshot_aura = 26;
+     * @generated from protobuf field: bool trueshot_aura = 26
      */
     trueshotAura: boolean;
     /**
-     * @generated from protobuf field: int32 improved_barrage = 27;
+     * @generated from protobuf field: int32 improved_barrage = 27
      */
     improvedBarrage: number;
     /**
-     * @generated from protobuf field: int32 master_marksman = 28;
+     * @generated from protobuf field: int32 master_marksman = 28
      */
     masterMarksman: number;
     /**
-     * @generated from protobuf field: bool silencing_shot = 29;
+     * @generated from protobuf field: bool silencing_shot = 29
      */
     silencingShot: boolean;
     /**
      * Survival
      *
-     * @generated from protobuf field: int32 monster_slaying = 30;
+     * @generated from protobuf field: int32 monster_slaying = 30
      */
     monsterSlaying: number;
     /**
-     * @generated from protobuf field: int32 humanoid_slaying = 31;
+     * @generated from protobuf field: int32 humanoid_slaying = 31
      */
     humanoidSlaying: number;
     /**
-     * @generated from protobuf field: int32 savage_strikes = 32;
+     * @generated from protobuf field: int32 savage_strikes = 32
      */
     savageStrikes: number;
     /**
-     * @generated from protobuf field: int32 deflection = 46;
+     * @generated from protobuf field: int32 deflection = 46
      */
     deflection: number;
     /**
-     * @generated from protobuf field: int32 clever_traps = 33;
+     * @generated from protobuf field: int32 clever_traps = 33
      */
     cleverTraps: number;
     /**
-     * @generated from protobuf field: int32 survivalist = 34;
+     * @generated from protobuf field: int32 survivalist = 34
      */
     survivalist: number;
     /**
-     * @generated from protobuf field: int32 trap_mastery = 35;
+     * @generated from protobuf field: int32 trap_mastery = 35
      */
     trapMastery: number;
     /**
-     * @generated from protobuf field: int32 surefooted = 36;
+     * @generated from protobuf field: int32 surefooted = 36
      */
     surefooted: number;
     /**
-     * @generated from protobuf field: int32 survival_instincts = 37;
+     * @generated from protobuf field: int32 survival_instincts = 37
      */
     survivalInstincts: number;
     /**
-     * @generated from protobuf field: int32 killer_instinct = 38;
+     * @generated from protobuf field: int32 killer_instinct = 38
      */
     killerInstinct: number;
     /**
-     * @generated from protobuf field: int32 resourcefulness = 39;
+     * @generated from protobuf field: int32 resourcefulness = 39
      */
     resourcefulness: number;
     /**
-     * @generated from protobuf field: int32 lightning_reflexes = 40;
+     * @generated from protobuf field: int32 lightning_reflexes = 40
      */
     lightningReflexes: number;
     /**
-     * @generated from protobuf field: int32 thrill_of_the_hunt = 41;
+     * @generated from protobuf field: int32 thrill_of_the_hunt = 41
      */
     thrillOfTheHunt: number;
     /**
-     * @generated from protobuf field: int32 expose_weakness = 42;
+     * @generated from protobuf field: int32 expose_weakness = 42
      */
     exposeWeakness: number;
     /**
-     * @generated from protobuf field: int32 master_tactician = 43;
+     * @generated from protobuf field: int32 master_tactician = 43
      */
     masterTactician: number;
     /**
-     * @generated from protobuf field: bool readiness = 44;
+     * @generated from protobuf field: bool readiness = 44
      */
     readiness: boolean;
 }
@@ -204,15 +204,15 @@ export interface HunterTalents {
  */
 export interface Hunter {
     /**
-     * @generated from protobuf field: proto.Hunter.Rotation rotation = 1;
+     * @generated from protobuf field: proto.Hunter.Rotation rotation = 1
      */
     rotation?: Hunter_Rotation;
     /**
-     * @generated from protobuf field: proto.HunterTalents talents = 2;
+     * @generated from protobuf field: proto.HunterTalents talents = 2
      */
     talents?: HunterTalents;
     /**
-     * @generated from protobuf field: proto.Hunter.Options options = 3;
+     * @generated from protobuf field: proto.Hunter.Options options = 3
      */
     options?: Hunter_Options;
 }
@@ -221,51 +221,51 @@ export interface Hunter {
  */
 export interface Hunter_Rotation {
     /**
-     * @generated from protobuf field: bool use_multi_shot = 1;
+     * @generated from protobuf field: bool use_multi_shot = 1
      */
     useMultiShot: boolean;
     /**
-     * @generated from protobuf field: bool use_arcane_shot = 2;
+     * @generated from protobuf field: bool use_arcane_shot = 2
      */
     useArcaneShot: boolean;
     /**
-     * @generated from protobuf field: bool precast_aimed_shot = 3;
+     * @generated from protobuf field: bool precast_aimed_shot = 3
      */
     precastAimedShot: boolean;
     /**
-     * @generated from protobuf field: bool lazy_rotation = 12;
+     * @generated from protobuf field: bool lazy_rotation = 12
      */
     lazyRotation: boolean;
     /**
-     * @generated from protobuf field: proto.Hunter.Rotation.StingType sting = 5;
+     * @generated from protobuf field: proto.Hunter.Rotation.StingType sting = 5
      */
     sting: Hunter_Rotation_StingType;
     /**
      * Switch to Aspect of the Viper when mana goes below this percent.
      *
-     * @generated from protobuf field: double viper_start_mana_percent = 6;
+     * @generated from protobuf field: double viper_start_mana_percent = 6
      */
     viperStartManaPercent: number;
     /**
      * Switch back to Aspect of the Hawk when mana goes above this percent.
      *
-     * @generated from protobuf field: double viper_stop_mana_percent = 7;
+     * @generated from protobuf field: double viper_stop_mana_percent = 7
      */
     viperStopManaPercent: number;
     /**
-     * @generated from protobuf field: proto.Hunter.Rotation.WeaveType weave = 11;
+     * @generated from protobuf field: proto.Hunter.Rotation.WeaveType weave = 11
      */
     weave: Hunter_Rotation_WeaveType;
     /**
      * Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
      *
-     * @generated from protobuf field: int32 time_to_weave_ms = 9;
+     * @generated from protobuf field: int32 time_to_weave_ms = 9
      */
     timeToWeaveMs: number;
     /**
      * Percent of fight (0-1) to use melee weaving.
      *
-     * @generated from protobuf field: double percent_weaved = 10;
+     * @generated from protobuf field: double percent_weaved = 10
      */
     percentWeaved: number;
 }
@@ -312,27 +312,27 @@ export declare enum Hunter_Rotation_WeaveType {
  */
 export interface Hunter_Options {
     /**
-     * @generated from protobuf field: proto.Hunter.Options.QuiverBonus quiver_bonus = 1;
+     * @generated from protobuf field: proto.Hunter.Options.QuiverBonus quiver_bonus = 1
      */
     quiverBonus: Hunter_Options_QuiverBonus;
     /**
-     * @generated from protobuf field: proto.Hunter.Options.Ammo ammo = 2;
+     * @generated from protobuf field: proto.Hunter.Options.Ammo ammo = 2
      */
     ammo: Hunter_Options_Ammo;
     /**
-     * @generated from protobuf field: proto.Hunter.Options.PetType pet_type = 3;
+     * @generated from protobuf field: proto.Hunter.Options.PetType pet_type = 3
      */
     petType: Hunter_Options_PetType;
     /**
-     * @generated from protobuf field: double pet_uptime = 4;
+     * @generated from protobuf field: double pet_uptime = 4
      */
     petUptime: number;
     /**
-     * @generated from protobuf field: bool pet_single_ability = 6;
+     * @generated from protobuf field: bool pet_single_ability = 6
      */
     petSingleAbility: boolean;
     /**
-     * @generated from protobuf field: int32 latency_ms = 5;
+     * @generated from protobuf field: int32 latency_ms = 5
      */
     latencyMs: number;
     /**
@@ -340,7 +340,7 @@ export interface Hunter_Options {
      * Used for hunter presims to avoid artifacts caused by randomness when
      * calculating average ability damage from a low sample size.
      *
-     * @generated from protobuf field: bool remove_randomness = 7;
+     * @generated from protobuf field: bool remove_randomness = 7
      */
     removeRandomness: boolean;
 }

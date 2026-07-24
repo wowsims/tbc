@@ -25,27 +25,27 @@ import { Faction } from "./common";
  */
 export interface SimSettings {
     /**
-     * @generated from protobuf field: int32 iterations = 1;
+     * @generated from protobuf field: int32 iterations = 1
      */
     iterations: number;
     /**
-     * @generated from protobuf field: int32 phase = 2;
+     * @generated from protobuf field: int32 phase = 2
      */
     phase: number;
     /**
-     * @generated from protobuf field: int64 fixed_rng_seed = 3;
+     * @generated from protobuf field: int64 fixed_rng_seed = 3
      */
     fixedRngSeed: bigint;
     /**
-     * @generated from protobuf field: bool show_threat_metrics = 4;
+     * @generated from protobuf field: bool show_threat_metrics = 4
      */
     showThreatMetrics: boolean;
     /**
-     * @generated from protobuf field: bool show_experimental = 5;
+     * @generated from protobuf field: bool show_experimental = 5
      */
     showExperimental: boolean;
     /**
-     * @generated from protobuf field: proto.Faction faction = 6;
+     * @generated from protobuf field: proto.Faction faction = 6
      */
     faction: Faction;
 }
@@ -56,35 +56,35 @@ export interface SimSettings {
  */
 export interface IndividualSimSettings {
     /**
-     * @generated from protobuf field: proto.SimSettings settings = 5;
+     * @generated from protobuf field: proto.SimSettings settings = 5
      */
     settings?: SimSettings;
     /**
-     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1
      */
     raidBuffs?: RaidBuffs;
     /**
-     * @generated from protobuf field: proto.Debuffs debuffs = 8;
+     * @generated from protobuf field: proto.Debuffs debuffs = 8
      */
     debuffs?: Debuffs;
     /**
-     * @generated from protobuf field: repeated proto.RaidTarget tanks = 7;
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 7
      */
     tanks: RaidTarget[];
     /**
-     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2;
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2
      */
     partyBuffs?: PartyBuffs;
     /**
-     * @generated from protobuf field: proto.Player player = 3;
+     * @generated from protobuf field: proto.Player player = 3
      */
     player?: Player;
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 4;
+     * @generated from protobuf field: proto.Encounter encounter = 4
      */
     encounter?: Encounter;
     /**
-     * @generated from protobuf field: repeated double ep_weights = 6;
+     * @generated from protobuf field: repeated double ep_weights = 6
      */
     epWeights: number[];
 }
@@ -95,11 +95,11 @@ export interface IndividualSimSettings {
  */
 export interface SavedGearSet {
     /**
-     * @generated from protobuf field: proto.EquipmentSpec gear = 1;
+     * @generated from protobuf field: proto.EquipmentSpec gear = 1
      */
     gear?: EquipmentSpec;
     /**
-     * @generated from protobuf field: repeated double bonus_stats = 2;
+     * @generated from protobuf field: repeated double bonus_stats = 2
      */
     bonusStats: number[];
 }
@@ -110,31 +110,31 @@ export interface SavedGearSet {
  */
 export interface SavedSettings {
     /**
-     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1
      */
     raidBuffs?: RaidBuffs;
     /**
-     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2;
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2
      */
     partyBuffs?: PartyBuffs;
     /**
-     * @generated from protobuf field: proto.Debuffs debuffs = 7;
+     * @generated from protobuf field: proto.Debuffs debuffs = 7
      */
     debuffs?: Debuffs;
     /**
-     * @generated from protobuf field: proto.IndividualBuffs player_buffs = 3;
+     * @generated from protobuf field: proto.IndividualBuffs player_buffs = 3
      */
     playerBuffs?: IndividualBuffs;
     /**
-     * @generated from protobuf field: proto.Consumes consumes = 4;
+     * @generated from protobuf field: proto.Consumes consumes = 4
      */
     consumes?: Consumes;
     /**
-     * @generated from protobuf field: proto.Race race = 5;
+     * @generated from protobuf field: proto.Race race = 5
      */
     race: Race;
     /**
-     * @generated from protobuf field: proto.Cooldowns cooldowns = 6;
+     * @generated from protobuf field: proto.Cooldowns cooldowns = 6
      */
     cooldowns?: Cooldowns;
 }
@@ -143,7 +143,7 @@ export interface SavedSettings {
  */
 export interface SavedTalents {
     /**
-     * @generated from protobuf field: string talents_string = 1;
+     * @generated from protobuf field: string talents_string = 1
      */
     talentsString: string;
 }
@@ -156,23 +156,23 @@ export interface BuffBot {
     /**
      * Uniquely identifies which buffbot this is.
      *
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: string id = 1
      */
     id: string;
     /**
-     * @generated from protobuf field: int32 raid_index = 2;
+     * @generated from protobuf field: int32 raid_index = 2
      */
     raidIndex: number;
     /**
      * The assigned player to innervate. Only used for druid buffbots.
      *
-     * @generated from protobuf field: proto.RaidTarget innervate_assignment = 3;
+     * @generated from protobuf field: proto.RaidTarget innervate_assignment = 3
      */
     innervateAssignment?: RaidTarget;
     /**
      * The assigned player to PI. Only used for disc priest buffbots.
      *
-     * @generated from protobuf field: proto.RaidTarget power_infusion_assignment = 4;
+     * @generated from protobuf field: proto.RaidTarget power_infusion_assignment = 4
      */
     powerInfusionAssignment?: RaidTarget;
 }
@@ -183,7 +183,7 @@ export interface BlessingsAssignment {
     /**
      * Index corresponds to Spec that the blessing should be applied to.
      *
-     * @generated from protobuf field: repeated proto.Blessings blessings = 1;
+     * @generated from protobuf field: repeated proto.Blessings blessings = 1
      */
     blessings: Blessings[];
 }
@@ -194,7 +194,7 @@ export interface BlessingsAssignments {
     /**
      * Assignments for each paladin.
      *
-     * @generated from protobuf field: repeated proto.BlessingsAssignment paladins = 1;
+     * @generated from protobuf field: repeated proto.BlessingsAssignment paladins = 1
      */
     paladins: BlessingsAssignment[];
 }
@@ -205,7 +205,7 @@ export interface BlessingsAssignments {
  */
 export interface SavedEncounter {
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 1;
+     * @generated from protobuf field: proto.Encounter encounter = 1
      */
     encounter?: Encounter;
 }
@@ -216,23 +216,23 @@ export interface SavedEncounter {
  */
 export interface SavedRaid {
     /**
-     * @generated from protobuf field: proto.Raid raid = 1;
+     * @generated from protobuf field: proto.Raid raid = 1
      */
     raid?: Raid;
     /**
-     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2;
+     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2
      */
     buffBots: BuffBot[];
     /**
-     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3;
+     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3
      */
     blessings?: BlessingsAssignments;
     /**
-     * @generated from protobuf field: proto.Faction faction = 4;
+     * @generated from protobuf field: proto.Faction faction = 4
      */
     faction: Faction;
     /**
-     * @generated from protobuf field: int32 phase = 5;
+     * @generated from protobuf field: int32 phase = 5
      */
     phase: number;
 }
@@ -243,23 +243,23 @@ export interface SavedRaid {
  */
 export interface RaidSimSettings {
     /**
-     * @generated from protobuf field: proto.SimSettings settings = 5;
+     * @generated from protobuf field: proto.SimSettings settings = 5
      */
     settings?: SimSettings;
     /**
-     * @generated from protobuf field: proto.Raid raid = 1;
+     * @generated from protobuf field: proto.Raid raid = 1
      */
     raid?: Raid;
     /**
-     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2;
+     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2
      */
     buffBots: BuffBot[];
     /**
-     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3;
+     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3
      */
     blessings?: BlessingsAssignments;
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 4;
+     * @generated from protobuf field: proto.Encounter encounter = 4
      */
     encounter?: Encounter;
 }
@@ -270,11 +270,11 @@ export interface RaidSimSettings {
  */
 export interface SimRun {
     /**
-     * @generated from protobuf field: proto.RaidSimRequest request = 1;
+     * @generated from protobuf field: proto.RaidSimRequest request = 1
      */
     request?: RaidSimRequest;
     /**
-     * @generated from protobuf field: proto.RaidSimResult result = 2;
+     * @generated from protobuf field: proto.RaidSimResult result = 2
      */
     result?: RaidSimResult;
 }
@@ -285,13 +285,13 @@ export interface SimRun {
  */
 export interface SimRunData {
     /**
-     * @generated from protobuf field: proto.SimRun run = 1;
+     * @generated from protobuf field: proto.SimRun run = 1
      */
     run?: SimRun;
     /**
      * The run stored as a reference, for comparison to the current run.
      *
-     * @generated from protobuf field: proto.SimRun reference_run = 2;
+     * @generated from protobuf field: proto.SimRun reference_run = 2
      */
     referenceRun?: SimRun;
 }
@@ -309,7 +309,7 @@ export interface DetailedResultsUpdate {
         /**
          * Show results from a run.
          *
-         * @generated from protobuf field: proto.SimRunData run_data = 1;
+         * @generated from protobuf field: proto.SimRunData run_data = 1
          */
         runData: SimRunData;
     } | {
@@ -317,7 +317,7 @@ export interface DetailedResultsUpdate {
         /**
          * Update sim settings.
          *
-         * @generated from protobuf field: proto.SimSettings settings = 2;
+         * @generated from protobuf field: proto.SimSettings settings = 2
          */
         settings: SimSettings;
     } | {

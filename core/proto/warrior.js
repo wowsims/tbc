@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Warrior.Rotation.SunderArmor
@@ -154,8 +153,61 @@ class WarriorTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedHeroicStrike: 0, deflection: 0, improvedRend: 0, improvedCharge: 0, improvedThunderClap: 0, improvedOverpower: 0, angerManagement: false, deepWounds: 0, twoHandedWeaponSpecialization: 0, impale: 0, poleaxeSpecialization: 0, deathWish: false, maceSpecialization: 0, swordSpecialization: 0, improvedDisciplines: 0, bloodFrenzy: 0, mortalStrike: false, improvedMortalStrike: 0, endlessRage: false, boomingVoice: 0, cruelty: 0, improvedDemoralizingShout: 0, unbridledWrath: 0, improvedCleave: 0, commandingPresence: 0, dualWieldSpecialization: 0, improvedExecute: 0, improvedSlam: 0, sweepingStrikes: false, weaponMastery: 0, improvedBerserkerRage: 0, flurry: 0, precision: 0, bloodthirst: false, improvedWhirlwind: 0, improvedBerserkerStance: 0, rampage: false, improvedBloodrage: 0, tacticalMastery: 0, anticipation: 0, shieldSpecialization: 0, toughness: 0, lastStand: false, improvedShieldBlock: false, defiance: 0, improvedSunderArmor: 0, improvedShieldWall: 0, shieldMastery: 0, oneHandedWeaponSpecialization: 0, improvedDefensiveStance: 0, shieldSlam: false, focusedRage: 0, vitality: 0, devastate: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.improvedHeroicStrike = 0;
+        message.deflection = 0;
+        message.improvedRend = 0;
+        message.improvedCharge = 0;
+        message.improvedThunderClap = 0;
+        message.improvedOverpower = 0;
+        message.angerManagement = false;
+        message.deepWounds = 0;
+        message.twoHandedWeaponSpecialization = 0;
+        message.impale = 0;
+        message.poleaxeSpecialization = 0;
+        message.deathWish = false;
+        message.maceSpecialization = 0;
+        message.swordSpecialization = 0;
+        message.improvedDisciplines = 0;
+        message.bloodFrenzy = 0;
+        message.mortalStrike = false;
+        message.improvedMortalStrike = 0;
+        message.endlessRage = false;
+        message.boomingVoice = 0;
+        message.cruelty = 0;
+        message.improvedDemoralizingShout = 0;
+        message.unbridledWrath = 0;
+        message.improvedCleave = 0;
+        message.commandingPresence = 0;
+        message.dualWieldSpecialization = 0;
+        message.improvedExecute = 0;
+        message.improvedSlam = 0;
+        message.sweepingStrikes = false;
+        message.weaponMastery = 0;
+        message.improvedBerserkerRage = 0;
+        message.flurry = 0;
+        message.precision = 0;
+        message.bloodthirst = false;
+        message.improvedWhirlwind = 0;
+        message.improvedBerserkerStance = 0;
+        message.rampage = false;
+        message.improvedBloodrage = 0;
+        message.tacticalMastery = 0;
+        message.anticipation = 0;
+        message.shieldSpecialization = 0;
+        message.toughness = 0;
+        message.lastStand = false;
+        message.improvedShieldBlock = false;
+        message.defiance = 0;
+        message.improvedSunderArmor = 0;
+        message.improvedShieldWall = 0;
+        message.shieldMastery = 0;
+        message.oneHandedWeaponSpecialization = 0;
+        message.improvedDefensiveStance = 0;
+        message.shieldSlam = false;
+        message.focusedRage = 0;
+        message.vitality = 0;
+        message.devastate = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -342,9 +394,6 @@ class WarriorTalents$Type extends MessageType {
         /* int32 improved_heroic_strike = 1; */
         if (message.improvedHeroicStrike !== 0)
             writer.tag(1, WireType.Varint).int32(message.improvedHeroicStrike);
-        /* int32 deflection = 45; */
-        if (message.deflection !== 0)
-            writer.tag(45, WireType.Varint).int32(message.deflection);
         /* int32 improved_rend = 2; */
         if (message.improvedRend !== 0)
             writer.tag(2, WireType.Varint).int32(message.improvedRend);
@@ -402,9 +451,6 @@ class WarriorTalents$Type extends MessageType {
         /* int32 cruelty = 20; */
         if (message.cruelty !== 0)
             writer.tag(20, WireType.Varint).int32(message.cruelty);
-        /* int32 improved_demoralizing_shout = 46; */
-        if (message.improvedDemoralizingShout !== 0)
-            writer.tag(46, WireType.Varint).int32(message.improvedDemoralizingShout);
         /* int32 unbridled_wrath = 21; */
         if (message.unbridledWrath !== 0)
             writer.tag(21, WireType.Varint).int32(message.unbridledWrath);
@@ -456,39 +502,15 @@ class WarriorTalents$Type extends MessageType {
         /* int32 tactical_mastery = 37; */
         if (message.tacticalMastery !== 0)
             writer.tag(37, WireType.Varint).int32(message.tacticalMastery);
-        /* int32 anticipation = 47; */
-        if (message.anticipation !== 0)
-            writer.tag(47, WireType.Varint).int32(message.anticipation);
-        /* int32 shield_specialization = 48; */
-        if (message.shieldSpecialization !== 0)
-            writer.tag(48, WireType.Varint).int32(message.shieldSpecialization);
-        /* int32 toughness = 49; */
-        if (message.toughness !== 0)
-            writer.tag(49, WireType.Varint).int32(message.toughness);
-        /* bool last_stand = 53; */
-        if (message.lastStand !== false)
-            writer.tag(53, WireType.Varint).bool(message.lastStand);
-        /* bool improved_shield_block = 50; */
-        if (message.improvedShieldBlock !== false)
-            writer.tag(50, WireType.Varint).bool(message.improvedShieldBlock);
         /* int32 defiance = 38; */
         if (message.defiance !== 0)
             writer.tag(38, WireType.Varint).int32(message.defiance);
         /* int32 improved_sunder_armor = 39; */
         if (message.improvedSunderArmor !== 0)
             writer.tag(39, WireType.Varint).int32(message.improvedSunderArmor);
-        /* int32 improved_shield_wall = 54; */
-        if (message.improvedShieldWall !== 0)
-            writer.tag(54, WireType.Varint).int32(message.improvedShieldWall);
-        /* int32 shield_mastery = 51; */
-        if (message.shieldMastery !== 0)
-            writer.tag(51, WireType.Varint).int32(message.shieldMastery);
         /* int32 one_handed_weapon_specialization = 40; */
         if (message.oneHandedWeaponSpecialization !== 0)
             writer.tag(40, WireType.Varint).int32(message.oneHandedWeaponSpecialization);
-        /* int32 improved_defensive_stance = 52; */
-        if (message.improvedDefensiveStance !== 0)
-            writer.tag(52, WireType.Varint).int32(message.improvedDefensiveStance);
         /* bool shield_slam = 41; */
         if (message.shieldSlam !== false)
             writer.tag(41, WireType.Varint).bool(message.shieldSlam);
@@ -501,6 +523,36 @@ class WarriorTalents$Type extends MessageType {
         /* bool devastate = 44; */
         if (message.devastate !== false)
             writer.tag(44, WireType.Varint).bool(message.devastate);
+        /* int32 deflection = 45; */
+        if (message.deflection !== 0)
+            writer.tag(45, WireType.Varint).int32(message.deflection);
+        /* int32 improved_demoralizing_shout = 46; */
+        if (message.improvedDemoralizingShout !== 0)
+            writer.tag(46, WireType.Varint).int32(message.improvedDemoralizingShout);
+        /* int32 anticipation = 47; */
+        if (message.anticipation !== 0)
+            writer.tag(47, WireType.Varint).int32(message.anticipation);
+        /* int32 shield_specialization = 48; */
+        if (message.shieldSpecialization !== 0)
+            writer.tag(48, WireType.Varint).int32(message.shieldSpecialization);
+        /* int32 toughness = 49; */
+        if (message.toughness !== 0)
+            writer.tag(49, WireType.Varint).int32(message.toughness);
+        /* bool improved_shield_block = 50; */
+        if (message.improvedShieldBlock !== false)
+            writer.tag(50, WireType.Varint).bool(message.improvedShieldBlock);
+        /* int32 shield_mastery = 51; */
+        if (message.shieldMastery !== 0)
+            writer.tag(51, WireType.Varint).int32(message.shieldMastery);
+        /* int32 improved_defensive_stance = 52; */
+        if (message.improvedDefensiveStance !== 0)
+            writer.tag(52, WireType.Varint).int32(message.improvedDefensiveStance);
+        /* bool last_stand = 53; */
+        if (message.lastStand !== false)
+            writer.tag(53, WireType.Varint).bool(message.lastStand);
+        /* int32 improved_shield_wall = 54; */
+        if (message.improvedShieldWall !== 0)
+            writer.tag(54, WireType.Varint).int32(message.improvedShieldWall);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -521,8 +573,7 @@ class Warrior$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -599,8 +650,27 @@ class Warrior_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useCleave: false, useOverpower: false, useHamstring: false, useSlam: false, prioritizeWw: false, sunderArmor: 0, maintainDemoShout: false, maintainThunderClap: false, hsRageThreshold: 0, overpowerRageThreshold: 0, hamstringRageThreshold: 0, rampageCdThreshold: 0, slamLatency: 0, slamGcdDelay: 0, slamMsWwDelay: 0, useHsDuringExecute: false, useBtDuringExecute: false, useMsDuringExecute: false, useWwDuringExecute: false, useSlamDuringExecute: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.useCleave = false;
+        message.useOverpower = false;
+        message.useHamstring = false;
+        message.useSlam = false;
+        message.prioritizeWw = false;
+        message.sunderArmor = 0;
+        message.maintainDemoShout = false;
+        message.maintainThunderClap = false;
+        message.hsRageThreshold = 0;
+        message.overpowerRageThreshold = 0;
+        message.hamstringRageThreshold = 0;
+        message.rampageCdThreshold = 0;
+        message.slamLatency = 0;
+        message.slamGcdDelay = 0;
+        message.slamMsWwDelay = 0;
+        message.useHsDuringExecute = false;
+        message.useBtDuringExecute = false;
+        message.useMsDuringExecute = false;
+        message.useWwDuringExecute = false;
+        message.useSlamDuringExecute = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -682,9 +752,6 @@ class Warrior_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool use_cleave = 14; */
-        if (message.useCleave !== false)
-            writer.tag(14, WireType.Varint).bool(message.useCleave);
         /* bool use_overpower = 1; */
         if (message.useOverpower !== false)
             writer.tag(1, WireType.Varint).bool(message.useOverpower);
@@ -697,15 +764,6 @@ class Warrior_Rotation$Type extends MessageType {
         /* bool prioritize_ww = 4; */
         if (message.prioritizeWw !== false)
             writer.tag(4, WireType.Varint).bool(message.prioritizeWw);
-        /* proto.Warrior.Rotation.SunderArmor sunderArmor = 15; */
-        if (message.sunderArmor !== 0)
-            writer.tag(15, WireType.Varint).int32(message.sunderArmor);
-        /* bool maintain_demo_shout = 16; */
-        if (message.maintainDemoShout !== false)
-            writer.tag(16, WireType.Varint).bool(message.maintainDemoShout);
-        /* bool maintain_thunder_clap = 17; */
-        if (message.maintainThunderClap !== false)
-            writer.tag(17, WireType.Varint).bool(message.maintainThunderClap);
         /* double hs_rage_threshold = 5; */
         if (message.hsRageThreshold !== 0)
             writer.tag(5, WireType.Bit64).double(message.hsRageThreshold);
@@ -721,27 +779,39 @@ class Warrior_Rotation$Type extends MessageType {
         /* double slam_latency = 9; */
         if (message.slamLatency !== 0)
             writer.tag(9, WireType.Bit64).double(message.slamLatency);
+        /* bool use_hs_during_execute = 10; */
+        if (message.useHsDuringExecute !== false)
+            writer.tag(10, WireType.Varint).bool(message.useHsDuringExecute);
+        /* bool use_ww_during_execute = 11; */
+        if (message.useWwDuringExecute !== false)
+            writer.tag(11, WireType.Varint).bool(message.useWwDuringExecute);
+        /* bool use_ms_during_execute = 12; */
+        if (message.useMsDuringExecute !== false)
+            writer.tag(12, WireType.Varint).bool(message.useMsDuringExecute);
+        /* bool use_bt_during_execute = 13; */
+        if (message.useBtDuringExecute !== false)
+            writer.tag(13, WireType.Varint).bool(message.useBtDuringExecute);
+        /* bool use_cleave = 14; */
+        if (message.useCleave !== false)
+            writer.tag(14, WireType.Varint).bool(message.useCleave);
+        /* proto.Warrior.Rotation.SunderArmor sunderArmor = 15; */
+        if (message.sunderArmor !== 0)
+            writer.tag(15, WireType.Varint).int32(message.sunderArmor);
+        /* bool maintain_demo_shout = 16; */
+        if (message.maintainDemoShout !== false)
+            writer.tag(16, WireType.Varint).bool(message.maintainDemoShout);
+        /* bool maintain_thunder_clap = 17; */
+        if (message.maintainThunderClap !== false)
+            writer.tag(17, WireType.Varint).bool(message.maintainThunderClap);
+        /* bool use_slam_during_execute = 18; */
+        if (message.useSlamDuringExecute !== false)
+            writer.tag(18, WireType.Varint).bool(message.useSlamDuringExecute);
         /* double slam_gcd_delay = 19; */
         if (message.slamGcdDelay !== 0)
             writer.tag(19, WireType.Bit64).double(message.slamGcdDelay);
         /* double slam_ms_ww_delay = 20; */
         if (message.slamMsWwDelay !== 0)
             writer.tag(20, WireType.Bit64).double(message.slamMsWwDelay);
-        /* bool use_hs_during_execute = 10; */
-        if (message.useHsDuringExecute !== false)
-            writer.tag(10, WireType.Varint).bool(message.useHsDuringExecute);
-        /* bool use_bt_during_execute = 13; */
-        if (message.useBtDuringExecute !== false)
-            writer.tag(13, WireType.Varint).bool(message.useBtDuringExecute);
-        /* bool use_ms_during_execute = 12; */
-        if (message.useMsDuringExecute !== false)
-            writer.tag(12, WireType.Varint).bool(message.useMsDuringExecute);
-        /* bool use_ww_during_execute = 11; */
-        if (message.useWwDuringExecute !== false)
-            writer.tag(11, WireType.Varint).bool(message.useWwDuringExecute);
-        /* bool use_slam_during_execute = 18; */
-        if (message.useSlamDuringExecute !== false)
-            writer.tag(18, WireType.Varint).bool(message.useSlamDuringExecute);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -765,8 +835,13 @@ class Warrior_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, useRecklessness: false, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.startingRage = 0;
+        message.useRecklessness = false;
+        message.shout = 0;
+        message.precastShout = false;
+        message.precastShoutT2 = false;
+        message.precastShoutSapphire = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -844,8 +919,7 @@ class ProtectionWarrior$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -907,8 +981,12 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { demoShout: 0, thunderClap: 0, shieldBlock: 0, useCleave: false, hsRageThreshold: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.demoShout = 0;
+        message.thunderClap = 0;
+        message.shieldBlock = 0;
+        message.useCleave = false;
+        message.hsRageThreshold = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -951,15 +1029,15 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2; */
         if (message.thunderClap !== 0)
             writer.tag(2, WireType.Varint).int32(message.thunderClap);
-        /* proto.ProtectionWarrior.Rotation.ShieldBlock shield_block = 5; */
-        if (message.shieldBlock !== 0)
-            writer.tag(5, WireType.Varint).int32(message.shieldBlock);
-        /* bool use_cleave = 4; */
-        if (message.useCleave !== false)
-            writer.tag(4, WireType.Varint).bool(message.useCleave);
         /* int32 hs_rage_threshold = 3; */
         if (message.hsRageThreshold !== 0)
             writer.tag(3, WireType.Varint).int32(message.hsRageThreshold);
+        /* bool use_cleave = 4; */
+        if (message.useCleave !== false)
+            writer.tag(4, WireType.Varint).bool(message.useCleave);
+        /* proto.ProtectionWarrior.Rotation.ShieldBlock shield_block = 5; */
+        if (message.shieldBlock !== 0)
+            writer.tag(5, WireType.Varint).int32(message.shieldBlock);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -983,8 +1061,13 @@ class ProtectionWarrior_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, useShieldWall: false, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.startingRage = 0;
+        message.useShieldWall = false;
+        message.shout = 0;
+        message.precastShout = false;
+        message.precastShoutT2 = false;
+        message.precastShoutSapphire = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -1027,21 +1110,21 @@ class ProtectionWarrior_Options$Type extends MessageType {
         /* double starting_rage = 1; */
         if (message.startingRage !== 0)
             writer.tag(1, WireType.Bit64).double(message.startingRage);
-        /* bool use_shield_wall = 6; */
-        if (message.useShieldWall !== false)
-            writer.tag(6, WireType.Varint).bool(message.useShieldWall);
-        /* proto.WarriorShout shout = 4; */
-        if (message.shout !== 0)
-            writer.tag(4, WireType.Varint).int32(message.shout);
-        /* bool precast_shout = 5; */
-        if (message.precastShout !== false)
-            writer.tag(5, WireType.Varint).bool(message.precastShout);
         /* bool precast_shout_t2 = 2; */
         if (message.precastShoutT2 !== false)
             writer.tag(2, WireType.Varint).bool(message.precastShoutT2);
         /* bool precast_shout_sapphire = 3; */
         if (message.precastShoutSapphire !== false)
             writer.tag(3, WireType.Varint).bool(message.precastShoutSapphire);
+        /* proto.WarriorShout shout = 4; */
+        if (message.shout !== 0)
+            writer.tag(4, WireType.Varint).int32(message.shout);
+        /* bool precast_shout = 5; */
+        if (message.precastShout !== false)
+            writer.tag(5, WireType.Varint).bool(message.precastShout);
+        /* bool use_shield_wall = 6; */
+        if (message.useShieldWall !== false)
+            writer.tag(6, WireType.Varint).bool(message.useShieldWall);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

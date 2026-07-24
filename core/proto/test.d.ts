@@ -9,7 +9,7 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface CharacterStatsTestResult {
     /**
-     * @generated from protobuf field: repeated double final_stats = 1;
+     * @generated from protobuf field: repeated double final_stats = 1
      */
     finalStats: number[];
 }
@@ -18,7 +18,7 @@ export interface CharacterStatsTestResult {
  */
 export interface StatWeightsTestResult {
     /**
-     * @generated from protobuf field: repeated double weights = 1;
+     * @generated from protobuf field: repeated double weights = 1
      */
     weights: number[];
 }
@@ -27,15 +27,15 @@ export interface StatWeightsTestResult {
  */
 export interface DpsTestResult {
     /**
-     * @generated from protobuf field: double dps = 1;
+     * @generated from protobuf field: double dps = 1
      */
     dps: number;
     /**
-     * @generated from protobuf field: double tps = 2;
+     * @generated from protobuf field: double tps = 2
      */
     tps: number;
     /**
-     * @generated from protobuf field: double dtps = 3;
+     * @generated from protobuf field: double dtps = 3
      */
     dtps: number;
 }
@@ -46,7 +46,7 @@ export interface TestSuiteResult {
     /**
      * Maps test names to their results.
      *
-     * @generated from protobuf field: map<string, proto.CharacterStatsTestResult> character_stats_results = 2;
+     * @generated from protobuf field: map<string, proto.CharacterStatsTestResult> character_stats_results = 2
      */
     characterStatsResults: {
         [key: string]: CharacterStatsTestResult;
@@ -54,7 +54,7 @@ export interface TestSuiteResult {
     /**
      * Maps test names to their results.
      *
-     * @generated from protobuf field: map<string, proto.StatWeightsTestResult> stat_weights_results = 3;
+     * @generated from protobuf field: map<string, proto.StatWeightsTestResult> stat_weights_results = 3
      */
     statWeightsResults: {
         [key: string]: StatWeightsTestResult;
@@ -62,7 +62,7 @@ export interface TestSuiteResult {
     /**
      * Maps test names to their results.
      *
-     * @generated from protobuf field: map<string, proto.DpsTestResult> dps_results = 1;
+     * @generated from protobuf field: map<string, proto.DpsTestResult> dps_results = 1
      */
     dpsResults: {
         [key: string]: DpsTestResult;

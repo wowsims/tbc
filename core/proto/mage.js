@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Mage.Rotation.ArcaneRotation.Filler
@@ -163,8 +162,55 @@ class MageTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { arcaneSubtlety: 0, arcaneFocus: 0, wandSpecialization: 0, magicAbsorption: 0, arcaneConcentration: 0, arcaneImpact: 0, arcaneMeditation: 0, presenceOfMind: false, arcaneMind: 0, arcaneInstability: 0, arcanePotency: 0, empoweredArcaneMissiles: 0, arcanePower: false, spellPower: 0, mindMastery: 0, improvedFireball: 0, ignite: 0, improvedFireBlast: 0, incineration: 0, improvedFlamestrike: 0, pyroblast: false, burningSoul: 0, improvedScorch: 0, masterOfElements: 0, playingWithFire: 0, criticalMass: 0, blastWave: false, firePower: 0, pyromaniac: 0, combustion: false, moltenFury: 0, empoweredFireball: 0, dragonsBreath: false, improvedFrostbolt: 0, elementalPrecision: 0, iceShards: 0, improvedFrostNova: 0, piercingIce: 0, icyVeins: false, frostChanneling: 0, shatter: 0, coldSnap: false, improvedConeOfCold: 0, iceFloes: 0, wintersChill: 0, arcticWinds: 0, empoweredFrostbolt: 0, summonWaterElemental: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.arcaneSubtlety = 0;
+        message.arcaneFocus = 0;
+        message.wandSpecialization = 0;
+        message.magicAbsorption = 0;
+        message.arcaneConcentration = 0;
+        message.arcaneImpact = 0;
+        message.arcaneMeditation = 0;
+        message.presenceOfMind = false;
+        message.arcaneMind = 0;
+        message.arcaneInstability = 0;
+        message.arcanePotency = 0;
+        message.empoweredArcaneMissiles = 0;
+        message.arcanePower = false;
+        message.spellPower = 0;
+        message.mindMastery = 0;
+        message.improvedFireball = 0;
+        message.ignite = 0;
+        message.improvedFireBlast = 0;
+        message.incineration = 0;
+        message.improvedFlamestrike = 0;
+        message.pyroblast = false;
+        message.burningSoul = 0;
+        message.improvedScorch = 0;
+        message.masterOfElements = 0;
+        message.playingWithFire = 0;
+        message.criticalMass = 0;
+        message.blastWave = false;
+        message.firePower = 0;
+        message.pyromaniac = 0;
+        message.combustion = false;
+        message.moltenFury = 0;
+        message.empoweredFireball = 0;
+        message.dragonsBreath = false;
+        message.improvedFrostbolt = 0;
+        message.elementalPrecision = 0;
+        message.iceShards = 0;
+        message.improvedFrostNova = 0;
+        message.piercingIce = 0;
+        message.icyVeins = false;
+        message.frostChanneling = 0;
+        message.shatter = 0;
+        message.coldSnap = false;
+        message.improvedConeOfCold = 0;
+        message.iceFloes = 0;
+        message.wintersChill = 0;
+        message.arcticWinds = 0;
+        message.empoweredFrostbolt = 0;
+        message.summonWaterElemental = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -339,9 +385,6 @@ class MageTalents$Type extends MessageType {
         /* int32 wand_specialization = 3; */
         if (message.wandSpecialization !== 0)
             writer.tag(3, WireType.Varint).int32(message.wandSpecialization);
-        /* int32 magic_absorption = 48; */
-        if (message.magicAbsorption !== 0)
-            writer.tag(48, WireType.Varint).int32(message.magicAbsorption);
         /* int32 arcane_concentration = 4; */
         if (message.arcaneConcentration !== 0)
             writer.tag(4, WireType.Varint).int32(message.arcaneConcentration);
@@ -393,9 +436,6 @@ class MageTalents$Type extends MessageType {
         /* bool pyroblast = 20; */
         if (message.pyroblast !== false)
             writer.tag(20, WireType.Varint).bool(message.pyroblast);
-        /* int32 burning_soul = 47; */
-        if (message.burningSoul !== 0)
-            writer.tag(47, WireType.Varint).int32(message.burningSoul);
         /* int32 improved_scorch = 21; */
         if (message.improvedScorch !== 0)
             writer.tag(21, WireType.Varint).int32(message.improvedScorch);
@@ -474,6 +514,12 @@ class MageTalents$Type extends MessageType {
         /* bool summon_water_elemental = 46; */
         if (message.summonWaterElemental !== false)
             writer.tag(46, WireType.Varint).bool(message.summonWaterElemental);
+        /* int32 burning_soul = 47; */
+        if (message.burningSoul !== 0)
+            writer.tag(47, WireType.Varint).int32(message.burningSoul);
+        /* int32 magic_absorption = 48; */
+        if (message.magicAbsorption !== 0)
+            writer.tag(48, WireType.Varint).int32(message.magicAbsorption);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -494,8 +540,7 @@ class Mage$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -558,8 +603,9 @@ class Mage_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { type: 0, multiTargetRotation: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.type = 0;
+        message.multiTargetRotation = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -639,8 +685,12 @@ class Mage_Rotation_ArcaneRotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { filler: 0, arcaneBlastsBetweenFillers: 0, startRegenRotationPercent: 0, stopRegenRotationPercent: 0, disableDpsCooldownsDuringRegen: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.filler = 0;
+        message.arcaneBlastsBetweenFillers = 0;
+        message.startRegenRotationPercent = 0;
+        message.stopRegenRotationPercent = 0;
+        message.disableDpsCooldownsDuringRegen = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -712,8 +762,10 @@ class Mage_Rotation_FireRotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, maintainImprovedScorch: false, weaveFireBlast: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.primarySpell = 0;
+        message.maintainImprovedScorch = false;
+        message.weaveFireBlast = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -771,8 +823,8 @@ class Mage_Rotation_FrostRotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { waterElementalDisobeyChance: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.waterElementalDisobeyChance = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -818,8 +870,8 @@ class Mage_Rotation_AoeRotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { rotation: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.rotation = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -866,8 +918,9 @@ class Mage_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { armor: 0, evocationTicks: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.armor = 0;
+        message.evocationTicks = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

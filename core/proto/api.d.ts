@@ -45,35 +45,35 @@ export interface Player {
     /**
      * Label used for logging.
      *
-     * @generated from protobuf field: string name = 16;
+     * @generated from protobuf field: string name = 16
      */
     name: string;
     /**
-     * @generated from protobuf field: proto.Race race = 1;
+     * @generated from protobuf field: proto.Race race = 1
      */
     race: Race;
     /**
-     * @generated from protobuf field: proto.ShattrathFaction shatt_faction = 24;
+     * @generated from protobuf field: proto.ShattrathFaction shatt_faction = 24
      */
     shattFaction: ShattrathFaction;
     /**
-     * @generated from protobuf field: proto.Class class = 2;
+     * @generated from protobuf field: proto.Class class = 2
      */
     class: Class;
     /**
-     * @generated from protobuf field: proto.EquipmentSpec equipment = 3;
+     * @generated from protobuf field: proto.EquipmentSpec equipment = 3
      */
     equipment?: EquipmentSpec;
     /**
-     * @generated from protobuf field: proto.Consumes consumes = 4;
+     * @generated from protobuf field: proto.Consumes consumes = 4
      */
     consumes?: Consumes;
     /**
-     * @generated from protobuf field: repeated double bonus_stats = 5;
+     * @generated from protobuf field: repeated double bonus_stats = 5
      */
     bonusStats: number[];
     /**
-     * @generated from protobuf field: proto.IndividualBuffs buffs = 15;
+     * @generated from protobuf field: proto.IndividualBuffs buffs = 15
      */
     buffs?: IndividualBuffs;
     /**
@@ -82,91 +82,91 @@ export interface Player {
     spec: {
         oneofKind: "balanceDruid";
         /**
-         * @generated from protobuf field: proto.BalanceDruid balance_druid = 6;
+         * @generated from protobuf field: proto.BalanceDruid balance_druid = 6
          */
         balanceDruid: BalanceDruid;
     } | {
         oneofKind: "feralDruid";
         /**
-         * @generated from protobuf field: proto.FeralDruid feral_druid = 22;
+         * @generated from protobuf field: proto.FeralDruid feral_druid = 22
          */
         feralDruid: FeralDruid;
     } | {
         oneofKind: "feralTankDruid";
         /**
-         * @generated from protobuf field: proto.FeralTankDruid feral_tank_druid = 26;
+         * @generated from protobuf field: proto.FeralTankDruid feral_tank_druid = 26
          */
         feralTankDruid: FeralTankDruid;
     } | {
         oneofKind: "hunter";
         /**
-         * @generated from protobuf field: proto.Hunter hunter = 7;
+         * @generated from protobuf field: proto.Hunter hunter = 7
          */
         hunter: Hunter;
     } | {
         oneofKind: "mage";
         /**
-         * @generated from protobuf field: proto.Mage mage = 8;
+         * @generated from protobuf field: proto.Mage mage = 8
          */
         mage: Mage;
     } | {
         oneofKind: "retributionPaladin";
         /**
-         * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 9;
+         * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 9
          */
         retributionPaladin: RetributionPaladin;
     } | {
         oneofKind: "protectionPaladin";
         /**
-         * @generated from protobuf field: proto.ProtectionPaladin protection_paladin = 25;
+         * @generated from protobuf field: proto.ProtectionPaladin protection_paladin = 25
          */
         protectionPaladin: ProtectionPaladin;
     } | {
         oneofKind: "shadowPriest";
         /**
-         * @generated from protobuf field: proto.ShadowPriest shadow_priest = 10;
+         * @generated from protobuf field: proto.ShadowPriest shadow_priest = 10
          */
         shadowPriest: ShadowPriest;
     } | {
         oneofKind: "smitePriest";
         /**
-         * @generated from protobuf field: proto.SmitePriest smite_priest = 20;
+         * @generated from protobuf field: proto.SmitePriest smite_priest = 20
          */
         smitePriest: SmitePriest;
     } | {
         oneofKind: "rogue";
         /**
-         * @generated from protobuf field: proto.Rogue rogue = 11;
+         * @generated from protobuf field: proto.Rogue rogue = 11
          */
         rogue: Rogue;
     } | {
         oneofKind: "elementalShaman";
         /**
-         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 12;
+         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 12
          */
         elementalShaman: ElementalShaman;
     } | {
         oneofKind: "enhancementShaman";
         /**
-         * @generated from protobuf field: proto.EnhancementShaman enhancement_shaman = 18;
+         * @generated from protobuf field: proto.EnhancementShaman enhancement_shaman = 18
          */
         enhancementShaman: EnhancementShaman;
     } | {
         oneofKind: "warlock";
         /**
-         * @generated from protobuf field: proto.Warlock warlock = 13;
+         * @generated from protobuf field: proto.Warlock warlock = 13
          */
         warlock: Warlock;
     } | {
         oneofKind: "warrior";
         /**
-         * @generated from protobuf field: proto.Warrior warrior = 14;
+         * @generated from protobuf field: proto.Warrior warrior = 14
          */
         warrior: Warrior;
     } | {
         oneofKind: "protectionWarrior";
         /**
-         * @generated from protobuf field: proto.ProtectionWarrior protection_warrior = 21;
+         * @generated from protobuf field: proto.ProtectionWarrior protection_warrior = 21
          */
         protectionWarrior: ProtectionWarrior;
     } | {
@@ -175,19 +175,19 @@ export interface Player {
     /**
      * Only used by the UI. Sim uses talents within the spec protos.
      *
-     * @generated from protobuf field: string talentsString = 17;
+     * @generated from protobuf field: string talentsString = 17
      */
     talentsString: string;
     /**
-     * @generated from protobuf field: proto.Cooldowns cooldowns = 19;
+     * @generated from protobuf field: proto.Cooldowns cooldowns = 19
      */
     cooldowns?: Cooldowns;
     /**
-     * @generated from protobuf field: bool in_front_of_target = 23;
+     * @generated from protobuf field: bool in_front_of_target = 23
      */
     inFrontOfTarget: boolean;
     /**
-     * @generated from protobuf field: proto.HealingModel healing_model = 27;
+     * @generated from protobuf field: proto.HealingModel healing_model = 27
      */
     healingModel?: HealingModel;
 }
@@ -196,11 +196,11 @@ export interface Player {
  */
 export interface Party {
     /**
-     * @generated from protobuf field: repeated proto.Player players = 1;
+     * @generated from protobuf field: repeated proto.Player players = 1
      */
     players: Player[];
     /**
-     * @generated from protobuf field: proto.PartyBuffs buffs = 2;
+     * @generated from protobuf field: proto.PartyBuffs buffs = 2
      */
     buffs?: PartyBuffs;
 }
@@ -209,30 +209,30 @@ export interface Party {
  */
 export interface Raid {
     /**
-     * @generated from protobuf field: repeated proto.Party parties = 1;
+     * @generated from protobuf field: repeated proto.Party parties = 1
      */
     parties: Party[];
     /**
-     * @generated from protobuf field: proto.RaidBuffs buffs = 2;
+     * @generated from protobuf field: proto.RaidBuffs buffs = 2
      */
     buffs?: RaidBuffs;
     /**
      * Extra debuffs provided by buff bots in this raid.
      * This is also used for debuffs in the individual sims.
      *
-     * @generated from protobuf field: proto.Debuffs debuffs = 5;
+     * @generated from protobuf field: proto.Debuffs debuffs = 5
      */
     debuffs?: Debuffs;
     /**
      * Players who will be tanking mobs.
      *
-     * @generated from protobuf field: repeated proto.RaidTarget tanks = 4;
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 4
      */
     tanks: RaidTarget[];
     /**
      * Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
      *
-     * @generated from protobuf field: bool stagger_stormstrikes = 3;
+     * @generated from protobuf field: bool stagger_stormstrikes = 3
      */
     staggerStormstrikes: boolean;
 }
@@ -241,23 +241,23 @@ export interface Raid {
  */
 export interface SimOptions {
     /**
-     * @generated from protobuf field: int32 iterations = 1;
+     * @generated from protobuf field: int32 iterations = 1
      */
     iterations: number;
     /**
-     * @generated from protobuf field: int64 random_seed = 2;
+     * @generated from protobuf field: int64 random_seed = 2
      */
     randomSeed: bigint;
     /**
-     * @generated from protobuf field: bool debug = 3;
+     * @generated from protobuf field: bool debug = 3
      */
     debug: boolean;
     /**
-     * @generated from protobuf field: bool debug_first_iteration = 6;
+     * @generated from protobuf field: bool debug_first_iteration = 6
      */
     debugFirstIteration: boolean;
     /**
-     * @generated from protobuf field: bool is_test = 5;
+     * @generated from protobuf field: bool is_test = 5
      */
     isTest: boolean;
 }
@@ -268,13 +268,13 @@ export interface SimOptions {
  */
 export interface ActionMetrics {
     /**
-     * @generated from protobuf field: proto.ActionID id = 1;
+     * @generated from protobuf field: proto.ActionID id = 1
      */
     id?: ActionID;
     /**
      * True if a melee action, false if a spell action.
      *
-     * @generated from protobuf field: bool is_melee = 2;
+     * @generated from protobuf field: bool is_melee = 2
      */
     isMelee: boolean;
     /**
@@ -282,7 +282,7 @@ export interface ActionMetrics {
      * Note that some spells are untargeted, these will always have a single
      * element in this array.
      *
-     * @generated from protobuf field: repeated proto.TargetedActionMetrics targets = 3;
+     * @generated from protobuf field: repeated proto.TargetedActionMetrics targets = 3
      */
     targets: TargetedActionMetrics[];
 }
@@ -295,73 +295,73 @@ export interface TargetedActionMetrics {
     /**
      * Raid/Target Index of the unit these metrics are targeted at.
      *
-     * @generated from protobuf field: int32 unit_index = 12;
+     * @generated from protobuf field: int32 unit_index = 12
      */
     unitIndex: number;
     /**
      * # of times this action was used by the agent.
      *
-     * @generated from protobuf field: int32 casts = 1;
+     * @generated from protobuf field: int32 casts = 1
      */
     casts: number;
     /**
      * # of times this action hit a target. For cleave spells this can be larger than casts.
      *
-     * @generated from protobuf field: int32 hits = 2;
+     * @generated from protobuf field: int32 hits = 2
      */
     hits: number;
     /**
      * # of times this action was a critical strike.
      *
-     * @generated from protobuf field: int32 crits = 3;
+     * @generated from protobuf field: int32 crits = 3
      */
     crits: number;
     /**
      * # of times this action was a crushing blow.
      *
-     * @generated from protobuf field: int32 crushes = 11;
+     * @generated from protobuf field: int32 crushes = 11
      */
     crushes: number;
     /**
      * # of times this action was a Miss or Resist.
      *
-     * @generated from protobuf field: int32 misses = 4;
+     * @generated from protobuf field: int32 misses = 4
      */
     misses: number;
     /**
      * # of times this action was a Dodge.
      *
-     * @generated from protobuf field: int32 dodges = 5;
+     * @generated from protobuf field: int32 dodges = 5
      */
     dodges: number;
     /**
      * # of times this action was a Parry.
      *
-     * @generated from protobuf field: int32 parries = 6;
+     * @generated from protobuf field: int32 parries = 6
      */
     parries: number;
     /**
      * # of times this action was a Block.
      *
-     * @generated from protobuf field: int32 blocks = 7;
+     * @generated from protobuf field: int32 blocks = 7
      */
     blocks: number;
     /**
      * # of times this action was a Glance.
      *
-     * @generated from protobuf field: int32 glances = 8;
+     * @generated from protobuf field: int32 glances = 8
      */
     glances: number;
     /**
      * Total damage done to all targets by this action.
      *
-     * @generated from protobuf field: double damage = 9;
+     * @generated from protobuf field: double damage = 9
      */
     damage: number;
     /**
      * Total threat done to all targets by this action.
      *
-     * @generated from protobuf field: double threat = 10;
+     * @generated from protobuf field: double threat = 10
      */
     threat: number;
 }
@@ -370,15 +370,15 @@ export interface TargetedActionMetrics {
  */
 export interface AuraMetrics {
     /**
-     * @generated from protobuf field: proto.ActionID id = 1;
+     * @generated from protobuf field: proto.ActionID id = 1
      */
     id?: ActionID;
     /**
-     * @generated from protobuf field: double uptime_seconds_avg = 2;
+     * @generated from protobuf field: double uptime_seconds_avg = 2
      */
     uptimeSecondsAvg: number;
     /**
-     * @generated from protobuf field: double uptime_seconds_stdev = 3;
+     * @generated from protobuf field: double uptime_seconds_stdev = 3
      */
     uptimeSecondsStdev: number;
 }
@@ -387,29 +387,29 @@ export interface AuraMetrics {
  */
 export interface ResourceMetrics {
     /**
-     * @generated from protobuf field: proto.ActionID id = 1;
+     * @generated from protobuf field: proto.ActionID id = 1
      */
     id?: ActionID;
     /**
-     * @generated from protobuf field: proto.ResourceType type = 2;
+     * @generated from protobuf field: proto.ResourceType type = 2
      */
     type: ResourceType;
     /**
      * # of times this action was used by the agent.
      *
-     * @generated from protobuf field: int32 events = 3;
+     * @generated from protobuf field: int32 events = 3
      */
     events: number;
     /**
      * Total resource gain from this action. Will be negative for spend actions.
      *
-     * @generated from protobuf field: double gain = 4;
+     * @generated from protobuf field: double gain = 4
      */
     gain: number;
     /**
      * Like gain, but doesn't include gains over resource cap.
      *
-     * @generated from protobuf field: double actual_gain = 5;
+     * @generated from protobuf field: double actual_gain = 5
      */
     actualGain: number;
 }
@@ -418,19 +418,19 @@ export interface ResourceMetrics {
  */
 export interface DistributionMetrics {
     /**
-     * @generated from protobuf field: double avg = 1;
+     * @generated from protobuf field: double avg = 1
      */
     avg: number;
     /**
-     * @generated from protobuf field: double stdev = 2;
+     * @generated from protobuf field: double stdev = 2
      */
     stdev: number;
     /**
-     * @generated from protobuf field: double max = 3;
+     * @generated from protobuf field: double max = 3
      */
     max: number;
     /**
-     * @generated from protobuf field: map<int32, int32> hist = 4;
+     * @generated from protobuf field: map<int32, int32> hist = 4
      */
     hist: {
         [key: number]: number;
@@ -443,47 +443,47 @@ export interface DistributionMetrics {
  */
 export interface UnitMetrics {
     /**
-     * @generated from protobuf field: string name = 9;
+     * @generated from protobuf field: string name = 9
      */
     name: string;
     /**
-     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1
      */
     dps?: DistributionMetrics;
     /**
-     * @generated from protobuf field: proto.DistributionMetrics threat = 8;
+     * @generated from protobuf field: proto.DistributionMetrics threat = 8
      */
     threat?: DistributionMetrics;
     /**
-     * @generated from protobuf field: proto.DistributionMetrics dtps = 11;
+     * @generated from protobuf field: proto.DistributionMetrics dtps = 11
      */
     dtps?: DistributionMetrics;
     /**
      * average seconds spent oom per iteration
      *
-     * @generated from protobuf field: double seconds_oom_avg = 3;
+     * @generated from protobuf field: double seconds_oom_avg = 3
      */
     secondsOomAvg: number;
     /**
      * Chance (0-1) representing probability of death. Used for tank sims.
      *
-     * @generated from protobuf field: double chance_of_death = 12;
+     * @generated from protobuf field: double chance_of_death = 12
      */
     chanceOfDeath: number;
     /**
-     * @generated from protobuf field: repeated proto.ActionMetrics actions = 5;
+     * @generated from protobuf field: repeated proto.ActionMetrics actions = 5
      */
     actions: ActionMetrics[];
     /**
-     * @generated from protobuf field: repeated proto.AuraMetrics auras = 6;
+     * @generated from protobuf field: repeated proto.AuraMetrics auras = 6
      */
     auras: AuraMetrics[];
     /**
-     * @generated from protobuf field: repeated proto.ResourceMetrics resources = 10;
+     * @generated from protobuf field: repeated proto.ResourceMetrics resources = 10
      */
     resources: ResourceMetrics[];
     /**
-     * @generated from protobuf field: repeated proto.UnitMetrics pets = 7;
+     * @generated from protobuf field: repeated proto.UnitMetrics pets = 7
      */
     pets: UnitMetrics[];
 }
@@ -494,11 +494,11 @@ export interface UnitMetrics {
  */
 export interface PartyMetrics {
     /**
-     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1
      */
     dps?: DistributionMetrics;
     /**
-     * @generated from protobuf field: repeated proto.UnitMetrics players = 2;
+     * @generated from protobuf field: repeated proto.UnitMetrics players = 2
      */
     players: UnitMetrics[];
 }
@@ -509,11 +509,11 @@ export interface PartyMetrics {
  */
 export interface RaidMetrics {
     /**
-     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1
      */
     dps?: DistributionMetrics;
     /**
-     * @generated from protobuf field: repeated proto.PartyMetrics parties = 2;
+     * @generated from protobuf field: repeated proto.PartyMetrics parties = 2
      */
     parties: PartyMetrics[];
 }
@@ -522,7 +522,7 @@ export interface RaidMetrics {
  */
 export interface EncounterMetrics {
     /**
-     * @generated from protobuf field: repeated proto.UnitMetrics targets = 1;
+     * @generated from protobuf field: repeated proto.UnitMetrics targets = 1
      */
     targets: UnitMetrics[];
 }
@@ -533,15 +533,15 @@ export interface EncounterMetrics {
  */
 export interface RaidSimRequest {
     /**
-     * @generated from protobuf field: proto.Raid raid = 1;
+     * @generated from protobuf field: proto.Raid raid = 1
      */
     raid?: Raid;
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 2;
+     * @generated from protobuf field: proto.Encounter encounter = 2
      */
     encounter?: Encounter;
     /**
-     * @generated from protobuf field: proto.SimOptions sim_options = 3;
+     * @generated from protobuf field: proto.SimOptions sim_options = 3
      */
     simOptions?: SimOptions;
 }
@@ -552,30 +552,30 @@ export interface RaidSimRequest {
  */
 export interface RaidSimResult {
     /**
-     * @generated from protobuf field: proto.RaidMetrics raid_metrics = 1;
+     * @generated from protobuf field: proto.RaidMetrics raid_metrics = 1
      */
     raidMetrics?: RaidMetrics;
     /**
-     * @generated from protobuf field: proto.EncounterMetrics encounter_metrics = 2;
+     * @generated from protobuf field: proto.EncounterMetrics encounter_metrics = 2
      */
     encounterMetrics?: EncounterMetrics;
     /**
-     * @generated from protobuf field: string logs = 3;
+     * @generated from protobuf field: string logs = 3
      */
     logs: string;
     /**
      * Needed for displaying the timeline properly when the duration +/- option
      * is used.
      *
-     * @generated from protobuf field: double first_iteration_duration = 4;
+     * @generated from protobuf field: double first_iteration_duration = 4
      */
     firstIterationDuration: number;
     /**
-     * @generated from protobuf field: double avg_iteration_duration = 6;
+     * @generated from protobuf field: double avg_iteration_duration = 6
      */
     avgIterationDuration: number;
     /**
-     * @generated from protobuf field: string error_result = 5;
+     * @generated from protobuf field: string error_result = 5
      */
     errorResult: string;
 }
@@ -591,19 +591,19 @@ export interface GearListRequest {
  */
 export interface GearListResult {
     /**
-     * @generated from protobuf field: repeated proto.Item items = 1;
+     * @generated from protobuf field: repeated proto.Item items = 1
      */
     items: Item[];
     /**
-     * @generated from protobuf field: repeated proto.Enchant enchants = 2;
+     * @generated from protobuf field: repeated proto.Enchant enchants = 2
      */
     enchants: Enchant[];
     /**
-     * @generated from protobuf field: repeated proto.Gem gems = 3;
+     * @generated from protobuf field: repeated proto.Gem gems = 3
      */
     gems: Gem[];
     /**
-     * @generated from protobuf field: repeated proto.PresetEncounter encounters = 4;
+     * @generated from protobuf field: repeated proto.PresetEncounter encounters = 4
      */
     encounters: PresetEncounter[];
 }
@@ -612,11 +612,11 @@ export interface GearListResult {
  */
 export interface PresetTarget {
     /**
-     * @generated from protobuf field: string path = 1;
+     * @generated from protobuf field: string path = 1
      */
     path: string;
     /**
-     * @generated from protobuf field: proto.Target target = 2;
+     * @generated from protobuf field: proto.Target target = 2
      */
     target?: Target;
 }
@@ -625,11 +625,11 @@ export interface PresetTarget {
  */
 export interface PresetEncounter {
     /**
-     * @generated from protobuf field: string path = 1;
+     * @generated from protobuf field: string path = 1
      */
     path: string;
     /**
-     * @generated from protobuf field: repeated proto.PresetTarget targets = 2;
+     * @generated from protobuf field: repeated proto.PresetTarget targets = 2
      */
     targets: PresetTarget[];
 }
@@ -640,7 +640,7 @@ export interface PresetEncounter {
  */
 export interface ComputeStatsRequest {
     /**
-     * @generated from protobuf field: proto.Raid raid = 1;
+     * @generated from protobuf field: proto.Raid raid = 1
      */
     raid?: Raid;
 }
@@ -651,39 +651,39 @@ export interface PlayerStats {
     /**
      * Stats
      *
-     * @generated from protobuf field: repeated double base_stats = 6;
+     * @generated from protobuf field: repeated double base_stats = 6
      */
     baseStats: number[];
     /**
-     * @generated from protobuf field: repeated double gear_stats = 1;
+     * @generated from protobuf field: repeated double gear_stats = 1
      */
     gearStats: number[];
     /**
-     * @generated from protobuf field: repeated double talents_stats = 7;
+     * @generated from protobuf field: repeated double talents_stats = 7
      */
     talentsStats: number[];
     /**
-     * @generated from protobuf field: repeated double buffs_stats = 8;
+     * @generated from protobuf field: repeated double buffs_stats = 8
      */
     buffsStats: number[];
     /**
-     * @generated from protobuf field: repeated double consumes_stats = 9;
+     * @generated from protobuf field: repeated double consumes_stats = 9
      */
     consumesStats: number[];
     /**
-     * @generated from protobuf field: repeated double final_stats = 2;
+     * @generated from protobuf field: repeated double final_stats = 2
      */
     finalStats: number[];
     /**
-     * @generated from protobuf field: repeated string sets = 3;
+     * @generated from protobuf field: repeated string sets = 3
      */
     sets: string[];
     /**
-     * @generated from protobuf field: proto.IndividualBuffs buffs = 4;
+     * @generated from protobuf field: proto.IndividualBuffs buffs = 4
      */
     buffs?: IndividualBuffs;
     /**
-     * @generated from protobuf field: repeated proto.ActionID cooldowns = 5;
+     * @generated from protobuf field: repeated proto.ActionID cooldowns = 5
      */
     cooldowns: ActionID[];
 }
@@ -692,7 +692,7 @@ export interface PlayerStats {
  */
 export interface PartyStats {
     /**
-     * @generated from protobuf field: repeated proto.PlayerStats players = 1;
+     * @generated from protobuf field: repeated proto.PlayerStats players = 1
      */
     players: PlayerStats[];
 }
@@ -701,7 +701,7 @@ export interface PartyStats {
  */
 export interface RaidStats {
     /**
-     * @generated from protobuf field: repeated proto.PartyStats parties = 1;
+     * @generated from protobuf field: repeated proto.PartyStats parties = 1
      */
     parties: PartyStats[];
 }
@@ -710,11 +710,11 @@ export interface RaidStats {
  */
 export interface ComputeStatsResult {
     /**
-     * @generated from protobuf field: proto.RaidStats raid_stats = 1;
+     * @generated from protobuf field: proto.RaidStats raid_stats = 1
      */
     raidStats?: RaidStats;
     /**
-     * @generated from protobuf field: string error_result = 2;
+     * @generated from protobuf field: string error_result = 2
      */
     errorResult: string;
 }
@@ -725,39 +725,39 @@ export interface ComputeStatsResult {
  */
 export interface StatWeightsRequest {
     /**
-     * @generated from protobuf field: proto.Player player = 1;
+     * @generated from protobuf field: proto.Player player = 1
      */
     player?: Player;
     /**
-     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2
      */
     raidBuffs?: RaidBuffs;
     /**
-     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3
      */
     partyBuffs?: PartyBuffs;
     /**
-     * @generated from protobuf field: proto.Debuffs debuffs = 9;
+     * @generated from protobuf field: proto.Debuffs debuffs = 9
      */
     debuffs?: Debuffs;
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 4;
+     * @generated from protobuf field: proto.Encounter encounter = 4
      */
     encounter?: Encounter;
     /**
-     * @generated from protobuf field: proto.SimOptions sim_options = 5;
+     * @generated from protobuf field: proto.SimOptions sim_options = 5
      */
     simOptions?: SimOptions;
     /**
-     * @generated from protobuf field: repeated proto.RaidTarget tanks = 8;
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 8
      */
     tanks: RaidTarget[];
     /**
-     * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 6;
+     * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 6
      */
     statsToWeigh: Stat[];
     /**
-     * @generated from protobuf field: proto.Stat ep_reference_stat = 7;
+     * @generated from protobuf field: proto.Stat ep_reference_stat = 7
      */
     epReferenceStat: Stat;
 }
@@ -766,15 +766,15 @@ export interface StatWeightsRequest {
  */
 export interface StatWeightsResult {
     /**
-     * @generated from protobuf field: proto.StatWeightValues dps = 1;
+     * @generated from protobuf field: proto.StatWeightValues dps = 1
      */
     dps?: StatWeightValues;
     /**
-     * @generated from protobuf field: proto.StatWeightValues tps = 2;
+     * @generated from protobuf field: proto.StatWeightValues tps = 2
      */
     tps?: StatWeightValues;
     /**
-     * @generated from protobuf field: proto.StatWeightValues dtps = 3;
+     * @generated from protobuf field: proto.StatWeightValues dtps = 3
      */
     dtps?: StatWeightValues;
 }
@@ -783,19 +783,19 @@ export interface StatWeightsResult {
  */
 export interface StatWeightValues {
     /**
-     * @generated from protobuf field: repeated double weights = 1;
+     * @generated from protobuf field: repeated double weights = 1
      */
     weights: number[];
     /**
-     * @generated from protobuf field: repeated double weights_stdev = 2;
+     * @generated from protobuf field: repeated double weights_stdev = 2
      */
     weightsStdev: number[];
     /**
-     * @generated from protobuf field: repeated double ep_values = 3;
+     * @generated from protobuf field: repeated double ep_values = 3
      */
     epValues: number[];
     /**
-     * @generated from protobuf field: repeated double ep_values_stdev = 4;
+     * @generated from protobuf field: repeated double ep_values_stdev = 4
      */
     epValuesStdev: number[];
 }
@@ -804,7 +804,7 @@ export interface StatWeightValues {
  */
 export interface AsyncAPIResult {
     /**
-     * @generated from protobuf field: string progress_id = 1;
+     * @generated from protobuf field: string progress_id = 1
      */
     progressId: string;
 }
@@ -815,39 +815,39 @@ export interface AsyncAPIResult {
  */
 export interface ProgressMetrics {
     /**
-     * @generated from protobuf field: int32 completed_iterations = 1;
+     * @generated from protobuf field: int32 completed_iterations = 1
      */
     completedIterations: number;
     /**
-     * @generated from protobuf field: int32 total_iterations = 2;
+     * @generated from protobuf field: int32 total_iterations = 2
      */
     totalIterations: number;
     /**
-     * @generated from protobuf field: int32 completed_sims = 3;
+     * @generated from protobuf field: int32 completed_sims = 3
      */
     completedSims: number;
     /**
-     * @generated from protobuf field: int32 total_sims = 4;
+     * @generated from protobuf field: int32 total_sims = 4
      */
     totalSims: number;
     /**
-     * @generated from protobuf field: bool presim_running = 8;
+     * @generated from protobuf field: bool presim_running = 8
      */
     presimRunning: boolean;
     /**
      * Partial Results
      *
-     * @generated from protobuf field: double dps = 5;
+     * @generated from protobuf field: double dps = 5
      */
     dps: number;
     /**
      * Final Results
      *
-     * @generated from protobuf field: proto.RaidSimResult final_raid_result = 6;
+     * @generated from protobuf field: proto.RaidSimResult final_raid_result = 6
      */
     finalRaidResult?: RaidSimResult;
     /**
-     * @generated from protobuf field: proto.StatWeightsResult final_weight_result = 7;
+     * @generated from protobuf field: proto.StatWeightsResult final_weight_result = 7
      */
     finalWeightResult?: StatWeightsResult;
 }

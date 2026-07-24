@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.ElementalShaman.Rotation.RotationType
@@ -181,8 +180,46 @@ class ShamanTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { convection: 0, concussion: 0, callOfFlame: 0, elementalFocus: false, reverberation: 0, callOfThunder: 0, improvedFireTotems: 0, elementalDevastation: 0, elementalFury: false, unrelentingStorm: 0, elementalPrecision: 0, lightningMastery: 0, elementalMastery: false, lightningOverload: 0, totemOfWrath: false, ancestralKnowledge: 0, shieldSpecialization: 0, thunderingStrikes: 0, enhancingTotems: 0, shamanisticFocus: false, anticipation: 0, flurry: 0, toughness: 0, improvedWeaponTotems: 0, spiritWeapons: false, elementalWeapons: 0, mentalQuickness: 0, weaponMastery: 0, dualWieldSpecialization: 0, unleashedRage: 0, stormstrike: false, shamanisticRage: false, totemicFocus: 0, naturesGuidance: 0, restorativeTotems: 0, tidalMastery: 0, naturesSwiftness: false, manaTideTotem: false, naturesBlessing: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.convection = 0;
+        message.concussion = 0;
+        message.callOfFlame = 0;
+        message.elementalFocus = false;
+        message.reverberation = 0;
+        message.callOfThunder = 0;
+        message.improvedFireTotems = 0;
+        message.elementalDevastation = 0;
+        message.elementalFury = false;
+        message.unrelentingStorm = 0;
+        message.elementalPrecision = 0;
+        message.lightningMastery = 0;
+        message.elementalMastery = false;
+        message.lightningOverload = 0;
+        message.totemOfWrath = false;
+        message.ancestralKnowledge = 0;
+        message.shieldSpecialization = 0;
+        message.thunderingStrikes = 0;
+        message.enhancingTotems = 0;
+        message.shamanisticFocus = false;
+        message.anticipation = 0;
+        message.flurry = 0;
+        message.toughness = 0;
+        message.improvedWeaponTotems = 0;
+        message.spiritWeapons = false;
+        message.elementalWeapons = 0;
+        message.mentalQuickness = 0;
+        message.weaponMastery = 0;
+        message.dualWieldSpecialization = 0;
+        message.unleashedRage = 0;
+        message.stormstrike = false;
+        message.shamanisticRage = false;
+        message.totemicFocus = 0;
+        message.naturesGuidance = 0;
+        message.restorativeTotems = 0;
+        message.tidalMastery = 0;
+        message.naturesSwiftness = false;
+        message.manaTideTotem = false;
+        message.naturesBlessing = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -363,15 +400,9 @@ class ShamanTalents$Type extends MessageType {
         /* int32 lightning_overload = 14; */
         if (message.lightningOverload !== 0)
             writer.tag(14, WireType.Varint).int32(message.lightningOverload);
-        /* bool totemOfWrath = 33; */
-        if (message.totemOfWrath !== false)
-            writer.tag(33, WireType.Varint).bool(message.totemOfWrath);
         /* int32 ancestral_knowledge = 15; */
         if (message.ancestralKnowledge !== 0)
             writer.tag(15, WireType.Varint).int32(message.ancestralKnowledge);
-        /* int32 shield_specialization = 37; */
-        if (message.shieldSpecialization !== 0)
-            writer.tag(37, WireType.Varint).int32(message.shieldSpecialization);
         /* int32 thundering_strikes = 16; */
         if (message.thunderingStrikes !== 0)
             writer.tag(16, WireType.Varint).int32(message.thunderingStrikes);
@@ -381,21 +412,12 @@ class ShamanTalents$Type extends MessageType {
         /* bool shamanistic_focus = 18; */
         if (message.shamanisticFocus !== false)
             writer.tag(18, WireType.Varint).bool(message.shamanisticFocus);
-        /* int32 anticipation = 38; */
-        if (message.anticipation !== 0)
-            writer.tag(38, WireType.Varint).int32(message.anticipation);
         /* int32 flurry = 19; */
         if (message.flurry !== 0)
             writer.tag(19, WireType.Varint).int32(message.flurry);
-        /* int32 toughness = 39; */
-        if (message.toughness !== 0)
-            writer.tag(39, WireType.Varint).int32(message.toughness);
         /* int32 improved_weapon_totems = 20; */
         if (message.improvedWeaponTotems !== 0)
             writer.tag(20, WireType.Varint).int32(message.improvedWeaponTotems);
-        /* bool spirit_weapons = 36; */
-        if (message.spiritWeapons !== false)
-            writer.tag(36, WireType.Varint).bool(message.spiritWeapons);
         /* int32 elemental_weapons = 21; */
         if (message.elementalWeapons !== 0)
             writer.tag(21, WireType.Varint).int32(message.elementalWeapons);
@@ -411,12 +433,6 @@ class ShamanTalents$Type extends MessageType {
         /* int32 unleashed_rage = 25; */
         if (message.unleashedRage !== 0)
             writer.tag(25, WireType.Varint).int32(message.unleashedRage);
-        /* bool stormstrike = 34; */
-        if (message.stormstrike !== false)
-            writer.tag(34, WireType.Varint).bool(message.stormstrike);
-        /* bool shamanistic_rage = 35; */
-        if (message.shamanisticRage !== false)
-            writer.tag(35, WireType.Varint).bool(message.shamanisticRage);
         /* int32 totemic_focus = 26; */
         if (message.totemicFocus !== 0)
             writer.tag(26, WireType.Varint).int32(message.totemicFocus);
@@ -438,6 +454,27 @@ class ShamanTalents$Type extends MessageType {
         /* int32 natures_blessing = 32; */
         if (message.naturesBlessing !== 0)
             writer.tag(32, WireType.Varint).int32(message.naturesBlessing);
+        /* bool totemOfWrath = 33; */
+        if (message.totemOfWrath !== false)
+            writer.tag(33, WireType.Varint).bool(message.totemOfWrath);
+        /* bool stormstrike = 34; */
+        if (message.stormstrike !== false)
+            writer.tag(34, WireType.Varint).bool(message.stormstrike);
+        /* bool shamanistic_rage = 35; */
+        if (message.shamanisticRage !== false)
+            writer.tag(35, WireType.Varint).bool(message.shamanisticRage);
+        /* bool spirit_weapons = 36; */
+        if (message.spiritWeapons !== false)
+            writer.tag(36, WireType.Varint).bool(message.spiritWeapons);
+        /* int32 shield_specialization = 37; */
+        if (message.shieldSpecialization !== 0)
+            writer.tag(37, WireType.Varint).int32(message.shieldSpecialization);
+        /* int32 anticipation = 38; */
+        if (message.anticipation !== 0)
+            writer.tag(38, WireType.Varint).int32(message.anticipation);
+        /* int32 toughness = 39; */
+        if (message.toughness !== 0)
+            writer.tag(39, WireType.Varint).int32(message.toughness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -466,8 +503,18 @@ class ShamanTotems$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, windfuryTotemRank: 0, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.earth = 0;
+        message.air = 0;
+        message.fire = 0;
+        message.water = 0;
+        message.twistWindfury = false;
+        message.windfuryTotemRank = 0;
+        message.twistFireNova = false;
+        message.useManaTide = false;
+        message.useFireElemental = false;
+        message.recallFireElementalOnOom = false;
+        message.recallTotems = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -537,9 +584,6 @@ class ShamanTotems$Type extends MessageType {
         /* bool twist_windfury = 5; */
         if (message.twistWindfury !== false)
             writer.tag(5, WireType.Varint).bool(message.twistWindfury);
-        /* int32 windfury_totem_rank = 11; */
-        if (message.windfuryTotemRank !== 0)
-            writer.tag(11, WireType.Varint).int32(message.windfuryTotemRank);
         /* bool twist_fire_nova = 6; */
         if (message.twistFireNova !== false)
             writer.tag(6, WireType.Varint).bool(message.twistFireNova);
@@ -555,6 +599,9 @@ class ShamanTotems$Type extends MessageType {
         /* bool recall_totems = 10; */
         if (message.recallTotems !== false)
             writer.tag(10, WireType.Varint).bool(message.recallTotems);
+        /* int32 windfury_totem_rank = 11; */
+        if (message.windfuryTotemRank !== 0)
+            writer.tag(11, WireType.Varint).int32(message.windfuryTotemRank);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -575,8 +622,7 @@ class ElementalShaman$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -636,8 +682,9 @@ class ElementalShaman_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { type: 0, lbsPerCl: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.type = 0;
+        message.lbsPerCl = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -668,15 +715,15 @@ class ElementalShaman_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.ShamanTotems totems = 3; */
-        if (message.totems)
-            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* proto.ElementalShaman.Rotation.RotationType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
         /* int32 lbs_per_cl = 2; */
         if (message.lbsPerCl !== 0)
             writer.tag(2, WireType.Varint).int32(message.lbsPerCl);
+        /* proto.ShamanTotems totems = 3; */
+        if (message.totems)
+            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -697,8 +744,10 @@ class ElementalShaman_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, snapshotT42Pc: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.waterShield = false;
+        message.bloodlust = false;
+        message.snapshotT42Pc = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -714,7 +763,7 @@ class ElementalShaman_Options$Type extends MessageType {
                 case /* bool bloodlust */ 2:
                     message.bloodlust = reader.bool();
                     break;
-                case /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];*/ 6:
+                case /* bool snapshot_t4_2pc */ 6:
                     message.snapshotT42Pc = reader.bool();
                     break;
                 default:
@@ -735,7 +784,7 @@ class ElementalShaman_Options$Type extends MessageType {
         /* bool bloodlust = 2; */
         if (message.bloodlust !== false)
             writer.tag(2, WireType.Varint).bool(message.bloodlust);
-        /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"]; */
+        /* bool snapshot_t4_2pc = 6; */
         if (message.snapshotT42Pc !== false)
             writer.tag(6, WireType.Varint).bool(message.snapshotT42Pc);
         let u = options.writeUnknownFields;
@@ -758,8 +807,7 @@ class EnhancementShaman$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -820,8 +868,10 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { primaryShock: 0, weaveFlameShock: false, firstStormstrikeDelay: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.primaryShock = 0;
+        message.weaveFlameShock = false;
+        message.firstStormstrikeDelay = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -888,8 +938,11 @@ class EnhancementShaman_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, delayOffhandSwings: false, snapshotT42Pc: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.waterShield = false;
+        message.bloodlust = false;
+        message.delayOffhandSwings = false;
+        message.snapshotT42Pc = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -908,7 +961,7 @@ class EnhancementShaman_Options$Type extends MessageType {
                 case /* bool delay_offhand_swings */ 5:
                     message.delayOffhandSwings = reader.bool();
                     break;
-                case /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];*/ 6:
+                case /* bool snapshot_t4_2pc */ 6:
                     message.snapshotT42Pc = reader.bool();
                     break;
                 default:
@@ -932,7 +985,7 @@ class EnhancementShaman_Options$Type extends MessageType {
         /* bool delay_offhand_swings = 5; */
         if (message.delayOffhandSwings !== false)
             writer.tag(5, WireType.Varint).bool(message.delayOffhandSwings);
-        /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"]; */
+        /* bool snapshot_t4_2pc = 6; */
         if (message.snapshotT42Pc !== false)
             writer.tag(6, WireType.Varint).bool(message.snapshotT42Pc);
         let u = options.writeUnknownFields;

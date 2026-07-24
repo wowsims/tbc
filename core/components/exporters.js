@@ -1,6 +1,7 @@
+import { Race } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
-import { classNames } from '/tbc/core/proto_utils/names.js';
+import { classNames, raceNames } from '/tbc/core/proto_utils/names.js';
 import { downloadString, getEnumValues } from '/tbc/core/utils.js';
 import { Popup } from './popup.js';
 export function newIndividualExporters(simUI) {
@@ -29,6 +30,7 @@ export function newIndividualExporters(simUI) {
     };
     addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI), false);
     addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI), true);
+    addMenuItem('New sim', () => new IndividualNewSimJsonExporter(menuElem, simUI), true);
     addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI), false);
     addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI), false);
     return exportSettings;
@@ -101,6 +103,35 @@ class IndividualJsonExporter extends Exporter {
     }
     getData() {
         return JSON.stringify(IndividualSimSettings.toJson(this.simUI.toProto()), null, 2);
+    }
+}
+// Exports gear/talents/race in the WoWSims Exporter (WSE) addon format, which
+// the new sim at wowsims.com accepts via Import > Addon. That import path only
+// touches gear/talents/race, so nothing else (rotation, consumes, encounter,
+// etc, which all changed format) needs to be translated.
+class IndividualNewSimJsonExporter extends Exporter {
+    constructor(parent, simUI) {
+        super(parent, 'Export to the new sim (use Import &gt; Addon at wowsims.com)', true);
+        this.simUI = simUI;
+        this.init();
+    }
+    getData() {
+        const json = IndividualSimSettings.toJson(this.simUI.toProto());
+        const player = (json && json.player) || {};
+        // The new sim has a single Troll race.
+        const oldRace = this.simUI.player.getRace();
+        const race = (oldRace == Race.RaceTroll10 || oldRace == Race.RaceTroll30)
+            ? 'Troll'
+            : raceNames[oldRace];
+        return JSON.stringify({
+            version: 'wowsims-tbc-old-sim-export',
+            level: 70,
+            class: classNames[this.simUI.player.getClass()],
+            race: race,
+            professions: [],
+            talents: player.talentsString || '',
+            gear: player.equipment || { items: [] },
+        }, null, 2);
     }
 }
 class Individual70UEPExporter extends Exporter {

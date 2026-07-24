@@ -1,6 +1,16 @@
 import { PbLong, PbULong } from './pb-long.js';
 import { varint32write, varint64write } from './goog-varint.js';
 import { assertFloat32, assertInt32, assertUInt32 } from './assert.js';
+const defaultsWrite = {
+    writeUnknownFields: true,
+    writerFactory: () => new BinaryWriter(),
+};
+/**
+ * Make options for writing binary data form partial options.
+ */
+export function binaryWriteOptions(options) {
+    return options ? Object.assign(Object.assign({}, defaultsWrite), options) : defaultsWrite;
+}
 export class BinaryWriter {
     constructor(textEncoder) {
         /**

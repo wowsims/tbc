@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Hunter.Rotation.StingType
@@ -206,8 +205,53 @@ class HunterTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedAspectOfTheHawk: 0, enduranceTraining: 0, focusedFire: 0, unleashedFury: 0, ferocity: 0, bestialDiscipline: 0, animalHandler: 0, frenzy: 0, ferociousInspiration: 0, bestialWrath: false, serpentsSwiftness: 0, theBeastWithin: false, lethalShots: 0, improvedHuntersMark: 0, efficiency: 0, goForTheThroat: 0, improvedArcaneShot: 0, aimedShot: false, rapidKilling: 0, improvedStings: 0, mortalShots: 0, scatterShot: false, barrage: 0, combatExperience: 0, rangedWeaponSpecialization: 0, carefulAim: 0, trueshotAura: false, improvedBarrage: 0, masterMarksman: 0, silencingShot: false, monsterSlaying: 0, humanoidSlaying: 0, savageStrikes: 0, deflection: 0, cleverTraps: 0, survivalist: 0, trapMastery: 0, surefooted: 0, survivalInstincts: 0, killerInstinct: 0, resourcefulness: 0, lightningReflexes: 0, thrillOfTheHunt: 0, exposeWeakness: 0, masterTactician: 0, readiness: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.improvedAspectOfTheHawk = 0;
+        message.enduranceTraining = 0;
+        message.focusedFire = 0;
+        message.unleashedFury = 0;
+        message.ferocity = 0;
+        message.bestialDiscipline = 0;
+        message.animalHandler = 0;
+        message.frenzy = 0;
+        message.ferociousInspiration = 0;
+        message.bestialWrath = false;
+        message.serpentsSwiftness = 0;
+        message.theBeastWithin = false;
+        message.lethalShots = 0;
+        message.improvedHuntersMark = 0;
+        message.efficiency = 0;
+        message.goForTheThroat = 0;
+        message.improvedArcaneShot = 0;
+        message.aimedShot = false;
+        message.rapidKilling = 0;
+        message.improvedStings = 0;
+        message.mortalShots = 0;
+        message.scatterShot = false;
+        message.barrage = 0;
+        message.combatExperience = 0;
+        message.rangedWeaponSpecialization = 0;
+        message.carefulAim = 0;
+        message.trueshotAura = false;
+        message.improvedBarrage = 0;
+        message.masterMarksman = 0;
+        message.silencingShot = false;
+        message.monsterSlaying = 0;
+        message.humanoidSlaying = 0;
+        message.savageStrikes = 0;
+        message.deflection = 0;
+        message.cleverTraps = 0;
+        message.survivalist = 0;
+        message.trapMastery = 0;
+        message.surefooted = 0;
+        message.survivalInstincts = 0;
+        message.killerInstinct = 0;
+        message.resourcefulness = 0;
+        message.lightningReflexes = 0;
+        message.thrillOfTheHunt = 0;
+        message.exposeWeakness = 0;
+        message.masterTactician = 0;
+        message.readiness = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -385,9 +429,6 @@ class HunterTalents$Type extends MessageType {
         /* int32 bestial_discipline = 6; */
         if (message.bestialDiscipline !== 0)
             writer.tag(6, WireType.Varint).int32(message.bestialDiscipline);
-        /* int32 animal_handler = 45; */
-        if (message.animalHandler !== 0)
-            writer.tag(45, WireType.Varint).int32(message.animalHandler);
         /* int32 frenzy = 7; */
         if (message.frenzy !== 0)
             writer.tag(7, WireType.Varint).int32(message.frenzy);
@@ -466,9 +507,6 @@ class HunterTalents$Type extends MessageType {
         /* int32 savage_strikes = 32; */
         if (message.savageStrikes !== 0)
             writer.tag(32, WireType.Varint).int32(message.savageStrikes);
-        /* int32 deflection = 46; */
-        if (message.deflection !== 0)
-            writer.tag(46, WireType.Varint).int32(message.deflection);
         /* int32 clever_traps = 33; */
         if (message.cleverTraps !== 0)
             writer.tag(33, WireType.Varint).int32(message.cleverTraps);
@@ -505,6 +543,12 @@ class HunterTalents$Type extends MessageType {
         /* bool readiness = 44; */
         if (message.readiness !== false)
             writer.tag(44, WireType.Varint).bool(message.readiness);
+        /* int32 animal_handler = 45; */
+        if (message.animalHandler !== 0)
+            writer.tag(45, WireType.Varint).int32(message.animalHandler);
+        /* int32 deflection = 46; */
+        if (message.deflection !== 0)
+            writer.tag(46, WireType.Varint).int32(message.deflection);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -525,8 +569,7 @@ class Hunter$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -593,8 +636,17 @@ class Hunter_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, weave: 0, timeToWeaveMs: 0, percentWeaved: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.useMultiShot = false;
+        message.useArcaneShot = false;
+        message.precastAimedShot = false;
+        message.lazyRotation = false;
+        message.sting = 0;
+        message.viperStartManaPercent = 0;
+        message.viperStopManaPercent = 0;
+        message.weave = 0;
+        message.timeToWeaveMs = 0;
+        message.percentWeaved = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -655,9 +707,6 @@ class Hunter_Rotation$Type extends MessageType {
         /* bool precast_aimed_shot = 3; */
         if (message.precastAimedShot !== false)
             writer.tag(3, WireType.Varint).bool(message.precastAimedShot);
-        /* bool lazy_rotation = 12; */
-        if (message.lazyRotation !== false)
-            writer.tag(12, WireType.Varint).bool(message.lazyRotation);
         /* proto.Hunter.Rotation.StingType sting = 5; */
         if (message.sting !== 0)
             writer.tag(5, WireType.Varint).int32(message.sting);
@@ -667,15 +716,18 @@ class Hunter_Rotation$Type extends MessageType {
         /* double viper_stop_mana_percent = 7; */
         if (message.viperStopManaPercent !== 0)
             writer.tag(7, WireType.Bit64).double(message.viperStopManaPercent);
-        /* proto.Hunter.Rotation.WeaveType weave = 11; */
-        if (message.weave !== 0)
-            writer.tag(11, WireType.Varint).int32(message.weave);
         /* int32 time_to_weave_ms = 9; */
         if (message.timeToWeaveMs !== 0)
             writer.tag(9, WireType.Varint).int32(message.timeToWeaveMs);
         /* double percent_weaved = 10; */
         if (message.percentWeaved !== 0)
             writer.tag(10, WireType.Bit64).double(message.percentWeaved);
+        /* proto.Hunter.Rotation.WeaveType weave = 11; */
+        if (message.weave !== 0)
+            writer.tag(11, WireType.Varint).int32(message.weave);
+        /* bool lazy_rotation = 12; */
+        if (message.lazyRotation !== false)
+            writer.tag(12, WireType.Varint).bool(message.lazyRotation);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -700,8 +752,14 @@ class Hunter_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, petSingleAbility: false, latencyMs: 0, removeRandomness: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.quiverBonus = 0;
+        message.ammo = 0;
+        message.petType = 0;
+        message.petUptime = 0;
+        message.petSingleAbility = false;
+        message.latencyMs = 0;
+        message.removeRandomness = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -756,12 +814,12 @@ class Hunter_Options$Type extends MessageType {
         /* double pet_uptime = 4; */
         if (message.petUptime !== 0)
             writer.tag(4, WireType.Bit64).double(message.petUptime);
-        /* bool pet_single_ability = 6; */
-        if (message.petSingleAbility !== false)
-            writer.tag(6, WireType.Varint).bool(message.petSingleAbility);
         /* int32 latency_ms = 5; */
         if (message.latencyMs !== 0)
             writer.tag(5, WireType.Varint).int32(message.latencyMs);
+        /* bool pet_single_ability = 6; */
+        if (message.petSingleAbility !== false)
+            writer.tag(6, WireType.Varint).bool(message.petSingleAbility);
         /* bool remove_randomness = 7; */
         if (message.removeRandomness !== false)
             writer.tag(7, WireType.Varint).bool(message.removeRandomness);

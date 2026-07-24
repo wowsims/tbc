@@ -8,11 +8,11 @@ export { base64decode, base64encode } from './base64.js';
 // UTF8 encoding
 export { utf8read } from './protobufjs-utf8.js';
 // Binary format contracts, options for reading and writing, for example
-export { WireType, binaryWriteOptions, binaryReadOptions, mergeBinaryOptions, UnknownFieldHandler, } from './binary-format-contract.js';
+export { WireType, mergeBinaryOptions, UnknownFieldHandler, } from './binary-format-contract.js';
 // Standard IBinaryReader implementation
-export { BinaryReader } from './binary-reader.js';
+export { BinaryReader, binaryReadOptions } from './binary-reader.js';
 // Standard IBinaryWriter implementation
-export { BinaryWriter } from './binary-writer.js';
+export { BinaryWriter, binaryWriteOptions } from './binary-writer.js';
 // Int64 and UInt64 implementations required for the binary format
 export { PbLong, PbULong } from './pb-long.js';
 // JSON format contracts, options for reading and writing, for example

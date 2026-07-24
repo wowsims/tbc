@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Rogue.Rotation.Builder
@@ -89,8 +88,56 @@ class RogueTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, lightningReflexes: 0, improvedSliceAndDice: 0, deflection: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: 0, shadowstep: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.improvedEviscerate = 0;
+        message.malice = 0;
+        message.ruthlessness = 0;
+        message.murder = 0;
+        message.puncturingWounds = 0;
+        message.relentlessStrikes = false;
+        message.improvedExposeArmor = 0;
+        message.lethality = 0;
+        message.vilePoisons = 0;
+        message.improvedPoisons = 0;
+        message.coldBlood = false;
+        message.quickRecovery = 0;
+        message.sealFate = 0;
+        message.masterPoisoner = 0;
+        message.vigor = false;
+        message.findWeakness = 0;
+        message.mutilate = false;
+        message.improvedSinisterStrike = 0;
+        message.lightningReflexes = 0;
+        message.improvedSliceAndDice = 0;
+        message.deflection = 0;
+        message.precision = 0;
+        message.daggerSpecialization = 0;
+        message.dualWieldSpecialization = 0;
+        message.maceSpecialization = 0;
+        message.bladeFlurry = false;
+        message.swordSpecialization = 0;
+        message.fistWeaponSpecialization = 0;
+        message.weaponExpertise = 0;
+        message.aggression = 0;
+        message.vitality = 0;
+        message.adrenalineRush = false;
+        message.combatPotency = 0;
+        message.surpriseAttacks = false;
+        message.opportunity = 0;
+        message.sleightOfHand = 0;
+        message.initiative = 0;
+        message.ghostlyStrike = false;
+        message.improvedAmbush = 0;
+        message.elusiveness = 0;
+        message.serratedBlades = 0;
+        message.preparation = false;
+        message.dirtyDeeds = 0;
+        message.hemorrhage = false;
+        message.masterOfSubtlety = 0;
+        message.deadliness = 0;
+        message.premeditation = false;
+        message.sinisterCalling = 0;
+        message.shadowstep = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -313,15 +360,9 @@ class RogueTalents$Type extends MessageType {
         /* int32 improved_sinister_strike = 18; */
         if (message.improvedSinisterStrike !== 0)
             writer.tag(18, WireType.Varint).int32(message.improvedSinisterStrike);
-        /* int32 lightning_reflexes = 48; */
-        if (message.lightningReflexes !== 0)
-            writer.tag(48, WireType.Varint).int32(message.lightningReflexes);
         /* int32 improved_slice_and_dice = 19; */
         if (message.improvedSliceAndDice !== 0)
             writer.tag(19, WireType.Varint).int32(message.improvedSliceAndDice);
-        /* int32 deflection = 49; */
-        if (message.deflection !== 0)
-            writer.tag(49, WireType.Varint).int32(message.deflection);
         /* int32 precision = 20; */
         if (message.precision !== 0)
             writer.tag(20, WireType.Varint).int32(message.precision);
@@ -364,9 +405,6 @@ class RogueTalents$Type extends MessageType {
         /* int32 opportunity = 33; */
         if (message.opportunity !== 0)
             writer.tag(33, WireType.Varint).int32(message.opportunity);
-        /* int32 sleight_of_hand = 46; */
-        if (message.sleightOfHand !== 0)
-            writer.tag(46, WireType.Varint).int32(message.sleightOfHand);
         /* int32 initiative = 34; */
         if (message.initiative !== 0)
             writer.tag(34, WireType.Varint).int32(message.initiative);
@@ -376,9 +414,6 @@ class RogueTalents$Type extends MessageType {
         /* int32 improved_ambush = 36; */
         if (message.improvedAmbush !== 0)
             writer.tag(36, WireType.Varint).int32(message.improvedAmbush);
-        /* int32 elusiveness = 47; */
-        if (message.elusiveness !== 0)
-            writer.tag(47, WireType.Varint).int32(message.elusiveness);
         /* int32 serrated_blades = 37; */
         if (message.serratedBlades !== 0)
             writer.tag(37, WireType.Varint).int32(message.serratedBlades);
@@ -406,6 +441,18 @@ class RogueTalents$Type extends MessageType {
         /* bool shadowstep = 45; */
         if (message.shadowstep !== false)
             writer.tag(45, WireType.Varint).bool(message.shadowstep);
+        /* int32 sleight_of_hand = 46; */
+        if (message.sleightOfHand !== 0)
+            writer.tag(46, WireType.Varint).int32(message.sleightOfHand);
+        /* int32 elusiveness = 47; */
+        if (message.elusiveness !== 0)
+            writer.tag(47, WireType.Varint).int32(message.elusiveness);
+        /* int32 lightning_reflexes = 48; */
+        if (message.lightningReflexes !== 0)
+            writer.tag(48, WireType.Varint).int32(message.lightningReflexes);
+        /* int32 deflection = 49; */
+        if (message.deflection !== 0)
+            writer.tag(49, WireType.Varint).int32(message.deflection);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -426,8 +473,7 @@ class Rogue$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -489,8 +535,12 @@ class Rogue_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { builder: 0, maintainExposeArmor: false, useRupture: false, useShiv: false, minComboPointsForDamageFinisher: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.builder = 0;
+        message.maintainExposeArmor = false;
+        message.useRupture = false;
+        message.useShiv = false;
+        message.minComboPointsForDamageFinisher = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -527,21 +577,21 @@ class Rogue_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.Rogue.Rotation.Builder builder = 3; */
-        if (message.builder !== 0)
-            writer.tag(3, WireType.Varint).int32(message.builder);
         /* bool maintain_expose_armor = 1; */
         if (message.maintainExposeArmor !== false)
             writer.tag(1, WireType.Varint).bool(message.maintainExposeArmor);
         /* bool use_rupture = 2; */
         if (message.useRupture !== false)
             writer.tag(2, WireType.Varint).bool(message.useRupture);
-        /* bool use_shiv = 5; */
-        if (message.useShiv !== false)
-            writer.tag(5, WireType.Varint).bool(message.useShiv);
+        /* proto.Rogue.Rotation.Builder builder = 3; */
+        if (message.builder !== 0)
+            writer.tag(3, WireType.Varint).int32(message.builder);
         /* int32 min_combo_points_for_damage_finisher = 4; */
         if (message.minComboPointsForDamageFinisher !== 0)
             writer.tag(4, WireType.Varint).int32(message.minComboPointsForDamageFinisher);
+        /* bool use_shiv = 5; */
+        if (message.useShiv !== false)
+            writer.tag(5, WireType.Varint).bool(message.useShiv);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -558,14 +608,26 @@ class Rogue_Options$Type extends MessageType {
         super("proto.Rogue.Options", []);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
         let u = options.writeUnknownFields;

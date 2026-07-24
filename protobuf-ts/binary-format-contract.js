@@ -1,5 +1,3 @@
-import { BinaryReader } from './binary-reader.js';
-import { BinaryWriter } from './binary-writer.js';
 /**
  * This handler implements the default behaviour for unknown fields.
  * When reading data, unknown fields are stored on the message, in a
@@ -13,7 +11,7 @@ export var UnknownFieldHandler;
      * The symbol used to store unknown fields for a message.
      * The property must conform to `UnknownFieldContainer`.
      */
-    UnknownFieldHandler.symbol = Symbol("protobuf-ts/unknown");
+    UnknownFieldHandler.symbol = Symbol.for("protobuf-ts/unknown");
     /**
      * Store an unknown field during binary read directly on the message.
      * This method is compatible with `BinaryReadOptions.readUnknownField`.
@@ -47,25 +45,6 @@ export var UnknownFieldHandler;
     UnknownFieldHandler.last = (message, fieldNo) => UnknownFieldHandler.list(message, fieldNo).slice(-1)[0];
     const is = (message) => message && Array.isArray(message[UnknownFieldHandler.symbol]);
 })(UnknownFieldHandler || (UnknownFieldHandler = {}));
-/**
- * Make options for writing binary data form partial options.
- */
-export function binaryWriteOptions(options) {
-    return options ? Object.assign(Object.assign({}, defaultsWrite), options) : defaultsWrite;
-}
-/**
- * Make options for reading binary data form partial options.
- */
-export function binaryReadOptions(options) {
-    return options ? Object.assign(Object.assign({}, defaultsRead), options) : defaultsRead;
-}
-const defaultsRead = {
-    readUnknownField: true,
-    readerFactory: bytes => new BinaryReader(bytes),
-}, defaultsWrite = {
-    writeUnknownFields: true,
-    writerFactory: () => new BinaryWriter(),
-};
 /**
  * Merges binary write or read options. Later values override earlier values.
  */

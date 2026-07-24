@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Warlock.Rotation.PrimarySpell
@@ -160,8 +159,57 @@ class WarlockTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { suppression: 0, improvedCorruption: 0, improvedDrainSoul: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, shadowEmbrace: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSayaad: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.suppression = 0;
+        message.improvedCorruption = 0;
+        message.improvedDrainSoul = 0;
+        message.improvedLifeTap = 0;
+        message.soulSiphon = 0;
+        message.improvedCurseOfAgony = 0;
+        message.amplifyCurse = false;
+        message.nightfall = 0;
+        message.empoweredCorruption = 0;
+        message.shadowEmbrace = 0;
+        message.siphonLife = false;
+        message.shadowMastery = 0;
+        message.contagion = 0;
+        message.darkPact = false;
+        message.malediction = 0;
+        message.unstableAffliction = false;
+        message.improvedImp = 0;
+        message.demonicEmbrace = 0;
+        message.improvedVoidwalker = 0;
+        message.felIntellect = 0;
+        message.improvedSayaad = 0;
+        message.felStamina = 0;
+        message.demonicAegis = 0;
+        message.unholyPower = 0;
+        message.improvedEnslaveDemon = 0;
+        message.demonicSacrifice = false;
+        message.masterConjuror = 0;
+        message.manaFeed = 0;
+        message.masterDemonologist = 0;
+        message.soulLink = false;
+        message.demonicKnowledge = 0;
+        message.demonicTactics = 0;
+        message.summonFelguard = false;
+        message.improvedShadowBolt = 0;
+        message.cataclysm = 0;
+        message.bane = 0;
+        message.improvedFirebolt = 0;
+        message.improvedLashOfPain = 0;
+        message.destructiveReach = 0;
+        message.devastation = 0;
+        message.shadowburn = false;
+        message.improvedSearingPain = 0;
+        message.improvedImmolate = 0;
+        message.ruin = false;
+        message.emberstorm = 0;
+        message.backlash = 0;
+        message.conflagrate = false;
+        message.soulLeech = 0;
+        message.shadowAndFlame = 0;
+        message.shadowfury = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -339,9 +387,6 @@ class WarlockTalents$Type extends MessageType {
         /* int32 improved_corruption = 2; */
         if (message.improvedCorruption !== 0)
             writer.tag(2, WireType.Varint).int32(message.improvedCorruption);
-        /* int32 improved_drain_soul = 49; */
-        if (message.improvedDrainSoul !== 0)
-            writer.tag(49, WireType.Varint).int32(message.improvedDrainSoul);
         /* int32 improved_life_tap = 3; */
         if (message.improvedLifeTap !== 0)
             writer.tag(3, WireType.Varint).int32(message.improvedLifeTap);
@@ -360,9 +405,6 @@ class WarlockTalents$Type extends MessageType {
         /* int32 empowered_corruption = 8; */
         if (message.empoweredCorruption !== 0)
             writer.tag(8, WireType.Varint).int32(message.empoweredCorruption);
-        /* int32 shadow_embrace = 50; */
-        if (message.shadowEmbrace !== 0)
-            writer.tag(50, WireType.Varint).int32(message.shadowEmbrace);
         /* bool siphon_life = 9; */
         if (message.siphonLife !== false)
             writer.tag(9, WireType.Varint).bool(message.siphonLife);
@@ -447,9 +489,6 @@ class WarlockTalents$Type extends MessageType {
         /* int32 improved_lash_of_pain = 36; */
         if (message.improvedLashOfPain !== 0)
             writer.tag(36, WireType.Varint).int32(message.improvedLashOfPain);
-        /* int32 destructive_reach = 48; */
-        if (message.destructiveReach !== 0)
-            writer.tag(48, WireType.Varint).int32(message.destructiveReach);
         /* int32 devastation = 37; */
         if (message.devastation !== 0)
             writer.tag(37, WireType.Varint).int32(message.devastation);
@@ -483,6 +522,15 @@ class WarlockTalents$Type extends MessageType {
         /* bool shadowfury = 47; */
         if (message.shadowfury !== false)
             writer.tag(47, WireType.Varint).bool(message.shadowfury);
+        /* int32 destructive_reach = 48; */
+        if (message.destructiveReach !== 0)
+            writer.tag(48, WireType.Varint).int32(message.destructiveReach);
+        /* int32 improved_drain_soul = 49; */
+        if (message.improvedDrainSoul !== 0)
+            writer.tag(49, WireType.Varint).int32(message.improvedDrainSoul);
+        /* int32 shadow_embrace = 50; */
+        if (message.shadowEmbrace !== 0)
+            writer.tag(50, WireType.Varint).int32(message.shadowEmbrace);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -503,8 +551,7 @@ class Warlock$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -566,8 +613,12 @@ class Warlock_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, curse: 0, immolate: false, corruption: false, detonateSeed: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.primarySpell = 0;
+        message.curse = 0;
+        message.immolate = false;
+        message.corruption = false;
+        message.detonateSeed = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -639,8 +690,10 @@ class Warlock_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { armor: 0, summon: 0, sacrificeSummon: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.armor = 0;
+        message.summon = 0;
+        message.sacrificeSummon = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

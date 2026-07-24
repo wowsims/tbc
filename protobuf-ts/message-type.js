@@ -1,3 +1,4 @@
+import { MESSAGE_TYPE } from './message-type-contract.js';
 import { normalizeFieldInfo } from './reflection-info.js';
 import { ReflectionTypeCheck } from './reflection-type-check.js';
 import { ReflectionJsonReader } from './reflection-json-reader.js';
@@ -8,8 +9,11 @@ import { reflectionCreate } from './reflection-create.js';
 import { reflectionMergePartial } from './reflection-merge-partial.js';
 import { typeofJsonValue } from './json-typings.js';
 import { jsonReadOptions, jsonWriteOptions, } from './json-format-contract.js';
-import { binaryReadOptions, binaryWriteOptions } from './binary-format-contract.js';
 import { reflectionEquals } from './reflection-equals.js';
+import { binaryWriteOptions } from './binary-writer.js';
+import { binaryReadOptions } from './binary-reader.js';
+const baseDescriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf({}));
+const messageTypeDescriptor = baseDescriptors[MESSAGE_TYPE] = {};
 /**
  * This standard message type provides reflection-based
  * operations to work with a message.
@@ -20,6 +24,8 @@ export class MessageType {
         this.typeName = name;
         this.fields = fields.map(normalizeFieldInfo);
         this.options = options !== null && options !== void 0 ? options : {};
+        messageTypeDescriptor.value = this;
+        this.messagePrototype = Object.create(null, baseDescriptors);
         this.refTypeCheck = new ReflectionTypeCheck(this);
         this.refJsonReader = new ReflectionJsonReader(this);
         this.refJsonWriter = new ReflectionJsonWriter(this);
@@ -68,8 +74,6 @@ export class MessageType {
     }
     /**
      * Copy partial data into the target message.
-     *
-     * See MessageCreator.merge() for details.
      */
     mergePartial(target, source) {
         reflectionMergePartial(this, target, source);

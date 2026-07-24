@@ -1,12 +1,13 @@
 import { int64fromString, int64toString } from './goog-varint.js';
-function detectBi() {
+let BI;
+export function detectBi() {
     const dv = new DataView(new ArrayBuffer(8));
     const ok = globalThis.BigInt !== undefined
         && typeof dv.getBigInt64 === "function"
         && typeof dv.getBigUint64 === "function"
         && typeof dv.setBigInt64 === "function"
         && typeof dv.setBigUint64 === "function";
-    return ok ? {
+    BI = ok ? {
         MIN: BigInt("-9223372036854775808"),
         MAX: BigInt("9223372036854775807"),
         UMIN: BigInt("0"),
@@ -15,7 +16,7 @@ function detectBi() {
         V: dv,
     } : undefined;
 }
-const BI = detectBi();
+detectBi();
 function assertBi(bi) {
     if (!bi)
         throw new Error("BigInt unavailable, see https://github.com/timostamm/protobuf-ts/blob/v1.0.8/MANUAL.md#bigint-support");
@@ -23,7 +24,8 @@ function assertBi(bi) {
 // used to validate from(string) input (when bigint is unavailable)
 const RE_DECIMAL_STR = /^-?[0-9]+$/;
 // constants for binary math
-const TWO_PWR_32_DBL = (1 << 16) * (1 << 16);
+const TWO_PWR_32_DBL = 0x100000000;
+const HALF_2_PWR_32 = 0x080000000;
 // base class for PbLong and PbULong provides shared code
 class SharedPbLong {
     /**
@@ -91,7 +93,7 @@ export class PbULong extends SharedPbLong {
                         throw new Error('string is no integer');
                     let [minus, lo, hi] = int64fromString(value);
                     if (minus)
-                        throw new Error('signed value');
+                        throw new Error('signed value for ulong');
                     return new PbULong(lo, hi);
                 case "number":
                     if (value == 0)
@@ -150,9 +152,9 @@ export class PbLong extends SharedPbLong {
                     if (!value)
                         return this.ZERO;
                     if (value < BI.MIN)
-                        throw new Error('ulong too small');
+                        throw new Error('signed long too small');
                     if (value > BI.MAX)
-                        throw new Error('ulong too large');
+                        throw new Error('signed long too large');
                     BI.V.setBigInt64(0, value, true);
                     return new PbLong(BI.V.getInt32(0, true), BI.V.getInt32(4, true));
             }
@@ -165,6 +167,12 @@ export class PbLong extends SharedPbLong {
                     if (!RE_DECIMAL_STR.test(value))
                         throw new Error('string is no integer');
                     let [minus, lo, hi] = int64fromString(value);
+                    if (minus) {
+                        if (hi > HALF_2_PWR_32 || (hi == HALF_2_PWR_32 && lo != 0))
+                            throw new Error('signed long too small');
+                    }
+                    else if (hi >= HALF_2_PWR_32)
+                        throw new Error('signed long too large');
                     let pbl = new PbLong(lo, hi);
                     return minus ? pbl.negate() : pbl;
                 case "number":
@@ -182,7 +190,7 @@ export class PbLong extends SharedPbLong {
      * Do we have a minus sign?
      */
     isNegative() {
-        return (this.hi & 0x80000000) !== 0;
+        return (this.hi & HALF_2_PWR_32) !== 0;
     }
     /**
      * Negate two's complement.

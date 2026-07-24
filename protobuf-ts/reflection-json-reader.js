@@ -57,6 +57,9 @@ export class ReflectionJsonReader {
             // handle oneof ADT
             let target; // this will be the target for the field value, whether it is member of a oneof or not
             if (field.oneof) {
+                if (jsonValue === null && (field.kind !== 'enum' || field.T()[0] !== 'google.protobuf.NullValue')) {
+                    continue;
+                }
                 // since json objects are unordered by specification, it is not possible to take the last of multiple oneofs
                 if (oneofsHandled.includes(field.oneof))
                     throw new Error(`Multiple members of the oneof group "${field.oneof}" of ${this.info.typeName} are present in JSON.`);
@@ -87,7 +90,9 @@ export class ReflectionJsonReader {
                             val = field.V.T().internalJsonRead(jsonObjValue, options);
                             break;
                         case "enum":
-                            val = this.enum(field.V.T(), jsonObjValue, field.name);
+                            val = this.enum(field.V.T(), jsonObjValue, field.name, options.ignoreUnknownFields);
+                            if (val === false)
+                                continue;
                             break;
                         case "scalar":
                             val = this.scalar(jsonObjValue, field.V.T, field.V.L, field.name);
@@ -118,7 +123,9 @@ export class ReflectionJsonReader {
                             val = field.T().internalJsonRead(jsonItem, options);
                             break;
                         case "enum":
-                            val = this.enum(field.T(), jsonItem, field.name);
+                            val = this.enum(field.T(), jsonItem, field.name, options.ignoreUnknownFields);
+                            if (val === false)
+                                continue;
                             break;
                         case "scalar":
                             val = this.scalar(jsonItem, field.T, field.L, field.name);
@@ -138,9 +145,16 @@ export class ReflectionJsonReader {
                         target[localName] = field.T().internalJsonRead(jsonValue, options, target[localName]);
                         break;
                     case "enum":
-                        target[localName] = this.enum(field.T(), jsonValue, field.name);
+                        if (jsonValue === null)
+                            continue;
+                        let val = this.enum(field.T(), jsonValue, field.name, options.ignoreUnknownFields);
+                        if (val === false)
+                            continue;
+                        target[localName] = val;
                         break;
                     case "scalar":
+                        if (jsonValue === null)
+                            continue;
                         target[localName] = this.scalar(jsonValue, field.T, field.L, field.name);
                         break;
                 }
@@ -148,11 +162,13 @@ export class ReflectionJsonReader {
         }
     }
     /**
-     * google.protobuf.NullValue accepts only JSON `null`.
+     * Returns `false` for unrecognized string representations.
+     *
+     * google.protobuf.NullValue accepts only JSON `null` (or the old `"NULL_VALUE"`).
      */
-    enum(type, json, fieldName) {
+    enum(type, json, fieldName, ignoreUnknownFields) {
         if (type[0] == 'google.protobuf.NullValue')
-            assert(json === null, `Unable to parse field ${this.info.typeName}#${fieldName}, enum ${type[0]} only accepts null.`);
+            assert(json === null || json === "NULL_VALUE", `Unable to parse field ${this.info.typeName}#${fieldName}, enum ${type[0]} only accepts null.`);
         if (json === null)
             // we require 0 to be default value for all enums
             return 0;
@@ -166,6 +182,9 @@ export class ReflectionJsonReader {
                     // lookup without the shared prefix
                     localEnumName = json.substring(type[2].length);
                 let enumNumber = type[1][localEnumName];
+                if (typeof enumNumber === 'undefined' && ignoreUnknownFields) {
+                    return false;
+                }
                 assert(typeof enumNumber == "number", `Unable to parse field ${this.info.typeName}#${fieldName}, enum ${type[0]} has no value for "${json}".`);
                 return enumNumber;
         }

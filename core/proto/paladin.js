@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.RetributionPaladin.Rotation.ConsecrationRank
@@ -187,8 +186,58 @@ class PaladinTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { divineStrength: 0, divineIntellect: 0, improvedSealOfRighteousness: 0, illumination: 0, improvedBlessingOfWisdom: 0, divineFavor: false, purifyingPower: 0, holyPower: 0, holyShock: false, blessedLife: 0, holyGuidance: 0, divineIllumination: false, improvedDevotionAura: 0, redoubt: 0, precision: 0, toughness: 0, blessingOfKings: false, improvedRighteousFury: 0, shieldSpecialization: 0, anticipation: 0, spellWarding: 0, blessingOfSanctuary: false, reckoning: 0, sacredDuty: 0, oneHandedWeaponSpecialization: 0, improvedHolyShield: 0, holyShield: false, ardentDefender: 0, combatExpertise: 0, avengersShield: false, improvedBlessingOfMight: 0, benediction: 0, improvedJudgement: 0, improvedSealOfTheCrusader: 0, deflection: 0, vindication: 0, conviction: 0, sealOfCommand: false, pursuitOfJustice: 0, eyeForAnEye: 0, improvedRetributionAura: 0, crusade: 0, twoHandedWeaponSpecialization: 0, sanctityAura: false, improvedSanctityAura: 0, vengeance: 0, sanctifiedJudgement: 0, sanctifiedSeals: 0, divinePurpose: 0, fanaticism: 0, crusaderStrike: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.divineStrength = 0;
+        message.divineIntellect = 0;
+        message.improvedSealOfRighteousness = 0;
+        message.illumination = 0;
+        message.improvedBlessingOfWisdom = 0;
+        message.divineFavor = false;
+        message.purifyingPower = 0;
+        message.holyPower = 0;
+        message.holyShock = false;
+        message.blessedLife = 0;
+        message.holyGuidance = 0;
+        message.divineIllumination = false;
+        message.improvedDevotionAura = 0;
+        message.redoubt = 0;
+        message.precision = 0;
+        message.toughness = 0;
+        message.blessingOfKings = false;
+        message.improvedRighteousFury = 0;
+        message.shieldSpecialization = 0;
+        message.anticipation = 0;
+        message.spellWarding = 0;
+        message.blessingOfSanctuary = false;
+        message.reckoning = 0;
+        message.sacredDuty = 0;
+        message.oneHandedWeaponSpecialization = 0;
+        message.improvedHolyShield = 0;
+        message.holyShield = false;
+        message.ardentDefender = 0;
+        message.combatExpertise = 0;
+        message.avengersShield = false;
+        message.improvedBlessingOfMight = 0;
+        message.benediction = 0;
+        message.improvedJudgement = 0;
+        message.improvedSealOfTheCrusader = 0;
+        message.deflection = 0;
+        message.vindication = 0;
+        message.conviction = 0;
+        message.sealOfCommand = false;
+        message.pursuitOfJustice = 0;
+        message.eyeForAnEye = 0;
+        message.improvedRetributionAura = 0;
+        message.crusade = 0;
+        message.twoHandedWeaponSpecialization = 0;
+        message.sanctityAura = false;
+        message.improvedSanctityAura = 0;
+        message.vengeance = 0;
+        message.sanctifiedJudgement = 0;
+        message.sanctifiedSeals = 0;
+        message.divinePurpose = 0;
+        message.fanaticism = 0;
+        message.crusaderStrike = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -372,9 +421,6 @@ class PaladinTalents$Type extends MessageType {
         /* int32 improved_seal_of_righteousness = 3; */
         if (message.improvedSealOfRighteousness !== 0)
             writer.tag(3, WireType.Varint).int32(message.improvedSealOfRighteousness);
-        /* int32 illumination = 34; */
-        if (message.illumination !== 0)
-            writer.tag(34, WireType.Varint).int32(message.illumination);
         /* int32 improved_blessing_of_wisdom = 4; */
         if (message.improvedBlessingOfWisdom !== 0)
             writer.tag(4, WireType.Varint).int32(message.improvedBlessingOfWisdom);
@@ -390,45 +436,18 @@ class PaladinTalents$Type extends MessageType {
         /* bool holy_shock = 8; */
         if (message.holyShock !== false)
             writer.tag(8, WireType.Varint).bool(message.holyShock);
-        /* int32 blessed_life = 51; */
-        if (message.blessedLife !== 0)
-            writer.tag(51, WireType.Varint).int32(message.blessedLife);
         /* int32 holy_guidance = 9; */
         if (message.holyGuidance !== 0)
             writer.tag(9, WireType.Varint).int32(message.holyGuidance);
         /* bool divine_illumination = 10; */
         if (message.divineIllumination !== false)
             writer.tag(10, WireType.Varint).bool(message.divineIllumination);
-        /* int32 improved_devotion_aura = 35; */
-        if (message.improvedDevotionAura !== 0)
-            writer.tag(35, WireType.Varint).int32(message.improvedDevotionAura);
-        /* int32 redoubt = 36; */
-        if (message.redoubt !== 0)
-            writer.tag(36, WireType.Varint).int32(message.redoubt);
         /* int32 precision = 11; */
         if (message.precision !== 0)
             writer.tag(11, WireType.Varint).int32(message.precision);
-        /* int32 toughness = 37; */
-        if (message.toughness !== 0)
-            writer.tag(37, WireType.Varint).int32(message.toughness);
         /* bool blessing_of_kings = 12; */
         if (message.blessingOfKings !== false)
             writer.tag(12, WireType.Varint).bool(message.blessingOfKings);
-        /* int32 improved_righteous_fury = 38; */
-        if (message.improvedRighteousFury !== 0)
-            writer.tag(38, WireType.Varint).int32(message.improvedRighteousFury);
-        /* int32 shield_specialization = 39; */
-        if (message.shieldSpecialization !== 0)
-            writer.tag(39, WireType.Varint).int32(message.shieldSpecialization);
-        /* int32 anticipation = 40; */
-        if (message.anticipation !== 0)
-            writer.tag(40, WireType.Varint).int32(message.anticipation);
-        /* int32 spell_warding = 41; */
-        if (message.spellWarding !== 0)
-            writer.tag(41, WireType.Varint).int32(message.spellWarding);
-        /* bool blessing_of_sanctuary = 42; */
-        if (message.blessingOfSanctuary !== false)
-            writer.tag(42, WireType.Varint).bool(message.blessingOfSanctuary);
         /* int32 reckoning = 13; */
         if (message.reckoning !== 0)
             writer.tag(13, WireType.Varint).int32(message.reckoning);
@@ -438,15 +457,6 @@ class PaladinTalents$Type extends MessageType {
         /* int32 one_handed_weapon_specialization = 15; */
         if (message.oneHandedWeaponSpecialization !== 0)
             writer.tag(15, WireType.Varint).int32(message.oneHandedWeaponSpecialization);
-        /* int32 improved_holy_shield = 43; */
-        if (message.improvedHolyShield !== 0)
-            writer.tag(43, WireType.Varint).int32(message.improvedHolyShield);
-        /* bool holy_shield = 44; */
-        if (message.holyShield !== false)
-            writer.tag(44, WireType.Varint).bool(message.holyShield);
-        /* int32 ardent_defender = 45; */
-        if (message.ardentDefender !== 0)
-            writer.tag(45, WireType.Varint).int32(message.ardentDefender);
         /* int32 combat_expertise = 16; */
         if (message.combatExpertise !== 0)
             writer.tag(16, WireType.Varint).int32(message.combatExpertise);
@@ -465,9 +475,6 @@ class PaladinTalents$Type extends MessageType {
         /* int32 improved_seal_of_the_crusader = 21; */
         if (message.improvedSealOfTheCrusader !== 0)
             writer.tag(21, WireType.Varint).int32(message.improvedSealOfTheCrusader);
-        /* int32 deflection = 46; */
-        if (message.deflection !== 0)
-            writer.tag(46, WireType.Varint).int32(message.deflection);
         /* int32 vindication = 22; */
         if (message.vindication !== 0)
             writer.tag(22, WireType.Varint).int32(message.vindication);
@@ -477,15 +484,6 @@ class PaladinTalents$Type extends MessageType {
         /* bool seal_of_command = 24; */
         if (message.sealOfCommand !== false)
             writer.tag(24, WireType.Varint).bool(message.sealOfCommand);
-        /* int32 pursuit_of_justice = 47; */
-        if (message.pursuitOfJustice !== 0)
-            writer.tag(47, WireType.Varint).int32(message.pursuitOfJustice);
-        /* int32 eye_for_an_eye = 48; */
-        if (message.eyeForAnEye !== 0)
-            writer.tag(48, WireType.Varint).int32(message.eyeForAnEye);
-        /* int32 improved_retribution_aura = 49; */
-        if (message.improvedRetributionAura !== 0)
-            writer.tag(49, WireType.Varint).int32(message.improvedRetributionAura);
         /* int32 crusade = 25; */
         if (message.crusade !== 0)
             writer.tag(25, WireType.Varint).int32(message.crusade);
@@ -507,15 +505,66 @@ class PaladinTalents$Type extends MessageType {
         /* int32 sanctified_seals = 31; */
         if (message.sanctifiedSeals !== 0)
             writer.tag(31, WireType.Varint).int32(message.sanctifiedSeals);
-        /* int32 divine_purpose = 50; */
-        if (message.divinePurpose !== 0)
-            writer.tag(50, WireType.Varint).int32(message.divinePurpose);
         /* int32 fanaticism = 32; */
         if (message.fanaticism !== 0)
             writer.tag(32, WireType.Varint).int32(message.fanaticism);
         /* bool crusader_strike = 33; */
         if (message.crusaderStrike !== false)
             writer.tag(33, WireType.Varint).bool(message.crusaderStrike);
+        /* int32 illumination = 34; */
+        if (message.illumination !== 0)
+            writer.tag(34, WireType.Varint).int32(message.illumination);
+        /* int32 improved_devotion_aura = 35; */
+        if (message.improvedDevotionAura !== 0)
+            writer.tag(35, WireType.Varint).int32(message.improvedDevotionAura);
+        /* int32 redoubt = 36; */
+        if (message.redoubt !== 0)
+            writer.tag(36, WireType.Varint).int32(message.redoubt);
+        /* int32 toughness = 37; */
+        if (message.toughness !== 0)
+            writer.tag(37, WireType.Varint).int32(message.toughness);
+        /* int32 improved_righteous_fury = 38; */
+        if (message.improvedRighteousFury !== 0)
+            writer.tag(38, WireType.Varint).int32(message.improvedRighteousFury);
+        /* int32 shield_specialization = 39; */
+        if (message.shieldSpecialization !== 0)
+            writer.tag(39, WireType.Varint).int32(message.shieldSpecialization);
+        /* int32 anticipation = 40; */
+        if (message.anticipation !== 0)
+            writer.tag(40, WireType.Varint).int32(message.anticipation);
+        /* int32 spell_warding = 41; */
+        if (message.spellWarding !== 0)
+            writer.tag(41, WireType.Varint).int32(message.spellWarding);
+        /* bool blessing_of_sanctuary = 42; */
+        if (message.blessingOfSanctuary !== false)
+            writer.tag(42, WireType.Varint).bool(message.blessingOfSanctuary);
+        /* int32 improved_holy_shield = 43; */
+        if (message.improvedHolyShield !== 0)
+            writer.tag(43, WireType.Varint).int32(message.improvedHolyShield);
+        /* bool holy_shield = 44; */
+        if (message.holyShield !== false)
+            writer.tag(44, WireType.Varint).bool(message.holyShield);
+        /* int32 ardent_defender = 45; */
+        if (message.ardentDefender !== 0)
+            writer.tag(45, WireType.Varint).int32(message.ardentDefender);
+        /* int32 deflection = 46; */
+        if (message.deflection !== 0)
+            writer.tag(46, WireType.Varint).int32(message.deflection);
+        /* int32 pursuit_of_justice = 47; */
+        if (message.pursuitOfJustice !== 0)
+            writer.tag(47, WireType.Varint).int32(message.pursuitOfJustice);
+        /* int32 eye_for_an_eye = 48; */
+        if (message.eyeForAnEye !== 0)
+            writer.tag(48, WireType.Varint).int32(message.eyeForAnEye);
+        /* int32 improved_retribution_aura = 49; */
+        if (message.improvedRetributionAura !== 0)
+            writer.tag(49, WireType.Varint).int32(message.improvedRetributionAura);
+        /* int32 divine_purpose = 50; */
+        if (message.divinePurpose !== 0)
+            writer.tag(50, WireType.Varint).int32(message.divinePurpose);
+        /* int32 blessed_life = 51; */
+        if (message.blessedLife !== 0)
+            writer.tag(51, WireType.Varint).int32(message.blessedLife);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -536,8 +585,7 @@ class RetributionPaladin$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -596,8 +644,9 @@ class RetributionPaladin_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { consecrationRank: 0, useExorcism: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.consecrationRank = 0;
+        message.useExorcism = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -653,8 +702,12 @@ class RetributionPaladin_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { judgement: 0, aura: 0, crusaderStrikeDelayMs: 0, hasteLeewayMs: 0, damageTakenPerSecond: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.judgement = 0;
+        message.aura = 0;
+        message.crusaderStrikeDelayMs = 0;
+        message.hasteLeewayMs = 0;
+        message.damageTakenPerSecond = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -694,9 +747,6 @@ class RetributionPaladin_Options$Type extends MessageType {
         /* proto.RetributionPaladin.Options.Judgement judgement = 1; */
         if (message.judgement !== 0)
             writer.tag(1, WireType.Varint).int32(message.judgement);
-        /* proto.PaladinAura aura = 5; */
-        if (message.aura !== 0)
-            writer.tag(5, WireType.Varint).int32(message.aura);
         /* int32 crusader_strike_delay_ms = 2; */
         if (message.crusaderStrikeDelayMs !== 0)
             writer.tag(2, WireType.Varint).int32(message.crusaderStrikeDelayMs);
@@ -706,6 +756,9 @@ class RetributionPaladin_Options$Type extends MessageType {
         /* double damage_taken_per_second = 4; */
         if (message.damageTakenPerSecond !== 0)
             writer.tag(4, WireType.Bit64).double(message.damageTakenPerSecond);
+        /* proto.PaladinAura aura = 5; */
+        if (message.aura !== 0)
+            writer.tag(5, WireType.Varint).int32(message.aura);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -726,8 +779,7 @@ class ProtectionPaladin$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -788,8 +840,11 @@ class ProtectionPaladin_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { prioritizeHolyShield: false, consecrationRank: 0, useExorcism: false, maintainJudgement: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.prioritizeHolyShield = false;
+        message.consecrationRank = 0;
+        message.useExorcism = false;
+        message.maintainJudgement = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -854,8 +909,9 @@ class ProtectionPaladin_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { aura: 0, useAvengingWrath: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.aura = 0;
+        message.useAvengingWrath = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

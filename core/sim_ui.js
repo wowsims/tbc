@@ -2,6 +2,7 @@ import { Component } from '/tbc/core/components/component.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
 import { Title } from '/tbc/core/components/title.js';
+import { addOutdatedSimBar, makeOutdatedSimSidebarWarning, showOutdatedSimModal } from '/tbc/core/outdated_sim.js';
 import { TypedEvent } from './typed_event.js';
 const noticeText = 'We are looking for help migrating our sims to Wrath of the Lich King. If you\'d like to participate in a fun side project working with an open-source community please <a href="https://discord.gg/jJMPr9JWwx" target="_blank">join our discord!</a>';
 // Shared UI for all individual sims and the raid sim.
@@ -85,6 +86,11 @@ export class SimUI extends Component {
                 sim.setIterations(eventID, newValue);
             },
         });
+        if (!this.isWithinRaidSim) {
+            makeOutdatedSimSidebarWarning(simActionsContainer);
+            addOutdatedSimBar();
+            showOutdatedSimModal();
+        }
         // Commented out because TBC repo isn't actively supported anymore.
         //const reportBug = document.createElement('span');
         //reportBug.classList.add('report-bug', 'fa', 'fa-bug');

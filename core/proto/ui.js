@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { RaidSimResult } from './api.js';
 import { RaidSimRequest } from './api.js';
@@ -32,8 +31,13 @@ class SimSettings$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false, showExperimental: false, faction: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.iterations = 0;
+        message.phase = 0;
+        message.fixedRngSeed = 0n;
+        message.showThreatMetrics = false;
+        message.showExperimental = false;
+        message.faction = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -108,7 +112,7 @@ class IndividualSimSettings$Type extends MessageType {
             { no: 5, name: "settings", kind: "message", T: () => SimSettings },
             { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
             { no: 8, name: "debuffs", kind: "message", T: () => Debuffs },
-            { no: 7, name: "tanks", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RaidTarget },
+            { no: 7, name: "tanks", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => RaidTarget },
             { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
             { no: 3, name: "player", kind: "message", T: () => Player },
             { no: 4, name: "encounter", kind: "message", T: () => Encounter },
@@ -116,8 +120,9 @@ class IndividualSimSettings$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { tanks: [], epWeights: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.tanks = [];
+        message.epWeights = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -167,18 +172,9 @@ class IndividualSimSettings$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.SimSettings settings = 5; */
-        if (message.settings)
-            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* proto.RaidBuffs raid_buffs = 1; */
         if (message.raidBuffs)
             RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Debuffs debuffs = 8; */
-        if (message.debuffs)
-            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
-        /* repeated proto.RaidTarget tanks = 7; */
-        for (let i = 0; i < message.tanks.length; i++)
-            RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* proto.PartyBuffs party_buffs = 2; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
@@ -188,6 +184,9 @@ class IndividualSimSettings$Type extends MessageType {
         /* proto.Encounter encounter = 4; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimSettings settings = 5; */
+        if (message.settings)
+            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* repeated double ep_weights = 6; */
         if (message.epWeights.length) {
             writer.tag(6, WireType.LengthDelimited).fork();
@@ -195,6 +194,12 @@ class IndividualSimSettings$Type extends MessageType {
                 writer.double(message.epWeights[i]);
             writer.join();
         }
+        /* repeated proto.RaidTarget tanks = 7; */
+        for (let i = 0; i < message.tanks.length; i++)
+            RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Debuffs debuffs = 8; */
+        if (message.debuffs)
+            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -214,8 +219,8 @@ class SavedGearSet$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bonusStats: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.bonusStats = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -281,8 +286,8 @@ class SavedSettings$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { race: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.race = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -331,9 +336,6 @@ class SavedSettings$Type extends MessageType {
         /* proto.PartyBuffs party_buffs = 2; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Debuffs debuffs = 7; */
-        if (message.debuffs)
-            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* proto.IndividualBuffs player_buffs = 3; */
         if (message.playerBuffs)
             IndividualBuffs.internalBinaryWrite(message.playerBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
@@ -346,6 +348,9 @@ class SavedSettings$Type extends MessageType {
         /* proto.Cooldowns cooldowns = 6; */
         if (message.cooldowns)
             Cooldowns.internalBinaryWrite(message.cooldowns, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Debuffs debuffs = 7; */
+        if (message.debuffs)
+            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -364,8 +369,8 @@ class SavedTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { talentsString: "" };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.talentsString = "";
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -414,8 +419,9 @@ class BuffBot$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: "", raidIndex: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = "";
+        message.raidIndex = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -479,8 +485,8 @@ class BlessingsAssignment$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { blessings: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.blessings = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -530,12 +536,12 @@ export const BlessingsAssignment = new BlessingsAssignment$Type();
 class BlessingsAssignments$Type extends MessageType {
     constructor() {
         super("proto.BlessingsAssignments", [
-            { no: 1, name: "paladins", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BlessingsAssignment }
+            { no: 1, name: "paladins", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => BlessingsAssignment }
         ]);
     }
     create(value) {
-        const message = { paladins: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.paladins = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -581,8 +587,7 @@ class SavedEncounter$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -625,15 +630,17 @@ class SavedRaid$Type extends MessageType {
     constructor() {
         super("proto.SavedRaid", [
             { no: 1, name: "raid", kind: "message", T: () => Raid },
-            { no: 2, name: "buff_bots", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuffBot },
+            { no: 2, name: "buff_bots", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => BuffBot },
             { no: 3, name: "blessings", kind: "message", T: () => BlessingsAssignments },
             { no: 4, name: "faction", kind: "enum", T: () => ["proto.Faction", Faction] },
             { no: 5, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { buffBots: [], faction: 0, phase: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.buffBots = [];
+        message.faction = 0;
+        message.phase = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -701,14 +708,14 @@ class RaidSimSettings$Type extends MessageType {
         super("proto.RaidSimSettings", [
             { no: 5, name: "settings", kind: "message", T: () => SimSettings },
             { no: 1, name: "raid", kind: "message", T: () => Raid },
-            { no: 2, name: "buff_bots", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuffBot },
+            { no: 2, name: "buff_bots", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => BuffBot },
             { no: 3, name: "blessings", kind: "message", T: () => BlessingsAssignments },
             { no: 4, name: "encounter", kind: "message", T: () => Encounter }
         ]);
     }
     create(value) {
-        const message = { buffBots: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.buffBots = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -745,9 +752,6 @@ class RaidSimSettings$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.SimSettings settings = 5; */
-        if (message.settings)
-            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* proto.Raid raid = 1; */
         if (message.raid)
             Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
@@ -760,6 +764,9 @@ class RaidSimSettings$Type extends MessageType {
         /* proto.Encounter encounter = 4; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimSettings settings = 5; */
+        if (message.settings)
+            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -779,8 +786,7 @@ class SimRun$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -833,8 +839,7 @@ class SimRunData$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -887,8 +892,8 @@ class DetailedResultsUpdate$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { data: { oneofKind: undefined } };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.data = { oneofKind: undefined };
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

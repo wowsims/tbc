@@ -11,27 +11,27 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface RaidBuffs {
     /**
-     * @generated from protobuf field: bool arcane_brilliance = 1;
+     * @generated from protobuf field: bool arcane_brilliance = 1
      */
     arcaneBrilliance: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect power_word_fortitude = 7;
+     * @generated from protobuf field: proto.TristateEffect power_word_fortitude = 7
      */
     powerWordFortitude: TristateEffect;
     /**
-     * @generated from protobuf field: bool shadow_protection = 8;
+     * @generated from protobuf field: bool shadow_protection = 8
      */
     shadowProtection: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect divine_spirit = 4;
+     * @generated from protobuf field: proto.TristateEffect divine_spirit = 4
      */
     divineSpirit: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect gift_of_the_wild = 5;
+     * @generated from protobuf field: proto.TristateEffect gift_of_the_wild = 5
      */
     giftOfTheWild: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect thorns = 6;
+     * @generated from protobuf field: proto.TristateEffect thorns = 6
      */
     thorns: TristateEffect;
 }
@@ -42,151 +42,151 @@ export interface RaidBuffs {
  */
 export interface PartyBuffs {
     /**
-     * @generated from protobuf field: int32 bloodlust = 1;
+     * @generated from protobuf field: int32 bloodlust = 1
      */
     bloodlust: number;
     /**
-     * @generated from protobuf field: int32 ferocious_inspiration = 22;
+     * @generated from protobuf field: int32 ferocious_inspiration = 22
      */
     ferociousInspiration: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect blood_pact = 34;
+     * @generated from protobuf field: proto.TristateEffect blood_pact = 34
      */
     bloodPact: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
+     * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2
      */
     moonkinAura: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect leader_of_the_pack = 19;
+     * @generated from protobuf field: proto.TristateEffect leader_of_the_pack = 19
      */
     leaderOfThePack: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect sanctity_aura = 20;
+     * @generated from protobuf field: proto.TristateEffect sanctity_aura = 20
      */
     sanctityAura: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect devotion_aura = 35;
+     * @generated from protobuf field: proto.TristateEffect devotion_aura = 35
      */
     devotionAura: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect retribution_aura = 36;
+     * @generated from protobuf field: proto.TristateEffect retribution_aura = 36
      */
     retributionAura: TristateEffect;
     /**
-     * @generated from protobuf field: bool trueshot_aura = 21;
+     * @generated from protobuf field: bool trueshot_aura = 21
      */
     trueshotAura: boolean;
     /**
-     * @generated from protobuf field: bool draenei_racial_melee = 3;
+     * @generated from protobuf field: bool draenei_racial_melee = 3
      */
     draeneiRacialMelee: boolean;
     /**
-     * @generated from protobuf field: bool draenei_racial_caster = 4;
+     * @generated from protobuf field: bool draenei_racial_caster = 4
      */
     draeneiRacialCaster: boolean;
     /**
      * Drums
      *
-     * @generated from protobuf field: proto.Drums drums = 5;
+     * @generated from protobuf field: proto.Drums drums = 5
      */
     drums: Drums;
     /**
      * Item Buffs
      *
-     * @generated from protobuf field: int32 atiesh_mage = 6;
+     * @generated from protobuf field: int32 atiesh_mage = 6
      */
     atieshMage: number;
     /**
-     * @generated from protobuf field: int32 atiesh_warlock = 7;
+     * @generated from protobuf field: int32 atiesh_warlock = 7
      */
     atieshWarlock: number;
     /**
-     * @generated from protobuf field: bool braided_eternium_chain = 8;
+     * @generated from protobuf field: bool braided_eternium_chain = 8
      */
     braidedEterniumChain: boolean;
     /**
-     * @generated from protobuf field: bool eye_of_the_night = 9;
+     * @generated from protobuf field: bool eye_of_the_night = 9
      */
     eyeOfTheNight: boolean;
     /**
-     * @generated from protobuf field: bool chain_of_the_twilight_owl = 10;
+     * @generated from protobuf field: bool chain_of_the_twilight_owl = 10
      */
     chainOfTheTwilightOwl: boolean;
     /**
-     * @generated from protobuf field: bool jade_pendant_of_blasting = 11;
+     * @generated from protobuf field: bool jade_pendant_of_blasting = 11
      */
     jadePendantOfBlasting: boolean;
     /**
      * Totems
      *
-     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 12;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 12
      */
     manaSpringTotem: TristateEffect;
     /**
-     * @generated from protobuf field: int32 mana_tide_totems = 17;
+     * @generated from protobuf field: int32 mana_tide_totems = 17
      */
     manaTideTotems: number;
     /**
-     * @generated from protobuf field: int32 totem_of_wrath = 13;
+     * @generated from protobuf field: int32 totem_of_wrath = 13
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 14;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 14
      */
     wrathOfAirTotem: TristateEffect;
     /**
-     * @generated from protobuf field: bool snapshot_improved_wrath_of_air_totem = 25;
+     * @generated from protobuf field: bool snapshot_improved_wrath_of_air_totem = 25
      */
     snapshotImprovedWrathOfAirTotem: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect grace_of_air_totem = 15;
+     * @generated from protobuf field: proto.TristateEffect grace_of_air_totem = 15
      */
     graceOfAirTotem: TristateEffect;
     /**
-     * @generated from protobuf field: proto.StrengthOfEarthType strength_of_earth_totem = 16;
+     * @generated from protobuf field: proto.StrengthOfEarthType strength_of_earth_totem = 16
      */
     strengthOfEarthTotem: StrengthOfEarthType;
     /**
-     * @generated from protobuf field: bool snapshot_improved_strength_of_earth_totem = 31;
+     * @generated from protobuf field: bool snapshot_improved_strength_of_earth_totem = 31
      */
     snapshotImprovedStrengthOfEarthTotem: boolean;
     /**
-     * @generated from protobuf field: bool tranquil_air_totem = 26;
+     * @generated from protobuf field: bool tranquil_air_totem = 26
      */
     tranquilAirTotem: boolean;
     /**
-     * @generated from protobuf field: int32 windfury_totem_rank = 23;
+     * @generated from protobuf field: int32 windfury_totem_rank = 23
      */
     windfuryTotemRank: number;
     /**
-     * @generated from protobuf field: int32 windfury_totem_iwt = 24;
+     * @generated from protobuf field: int32 windfury_totem_iwt = 24
      */
     windfuryTotemIwt: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect battle_shout = 18;
+     * @generated from protobuf field: proto.TristateEffect battle_shout = 18
      */
     battleShout: TristateEffect;
     /**
-     * @generated from protobuf field: bool bs_solarian_sapphire = 28;
+     * @generated from protobuf field: bool bs_solarian_sapphire = 28
      */
     bsSolarianSapphire: boolean;
     /**
-     * @generated from protobuf field: bool snapshot_bs_solarian_sapphire = 29;
+     * @generated from protobuf field: bool snapshot_bs_solarian_sapphire = 29
      */
     snapshotBsSolarianSapphire: boolean;
     /**
-     * @generated from protobuf field: bool snapshot_bs_t2 = 30;
+     * @generated from protobuf field: bool snapshot_bs_t2 = 30
      */
     snapshotBsT2: boolean;
     /**
-     * @generated from protobuf field: int32 snapshot_bs_booming_voice_rank = 33;
+     * @generated from protobuf field: int32 snapshot_bs_booming_voice_rank = 33
      */
     snapshotBsBoomingVoiceRank: number;
     /**
      * Mitigation buffs
      *
-     * @generated from protobuf field: proto.TristateEffect commanding_shout = 32;
+     * @generated from protobuf field: proto.TristateEffect commanding_shout = 32
      */
     commandingShout: TristateEffect;
 }
@@ -198,45 +198,45 @@ export interface PartyBuffs {
  */
 export interface IndividualBuffs {
     /**
-     * @generated from protobuf field: bool blessing_of_kings = 1;
+     * @generated from protobuf field: bool blessing_of_kings = 1
      */
     blessingOfKings: boolean;
     /**
-     * @generated from protobuf field: bool blessing_of_salvation = 8;
+     * @generated from protobuf field: bool blessing_of_salvation = 8
      */
     blessingOfSalvation: boolean;
     /**
-     * @generated from protobuf field: bool blessing_of_sanctuary = 9;
+     * @generated from protobuf field: bool blessing_of_sanctuary = 9
      */
     blessingOfSanctuary: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 2;
+     * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 2
      */
     blessingOfWisdom: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect blessing_of_might = 3;
+     * @generated from protobuf field: proto.TristateEffect blessing_of_might = 3
      */
     blessingOfMight: TristateEffect;
     /**
-     * @generated from protobuf field: int32 shadow_priest_dps = 4;
+     * @generated from protobuf field: int32 shadow_priest_dps = 4
      */
     shadowPriestDps: number;
     /**
-     * @generated from protobuf field: bool unleashed_rage = 7;
+     * @generated from protobuf field: bool unleashed_rage = 7
      */
     unleashedRage: boolean;
     /**
      * How many of each of these buffs the player will be receiving.
      *
-     * @generated from protobuf field: int32 innervates = 5;
+     * @generated from protobuf field: int32 innervates = 5
      */
     innervates: number;
     /**
-     * @generated from protobuf field: int32 power_infusions = 6;
+     * @generated from protobuf field: int32 power_infusions = 6
      */
     powerInfusions: number;
     /**
-     * @generated from protobuf field: double inspiration_uptime = 10;
+     * @generated from protobuf field: double inspiration_uptime = 10
      */
     inspirationUptime: number;
 }
@@ -245,102 +245,102 @@ export interface IndividualBuffs {
  */
 export interface Consumes {
     /**
-     * @generated from protobuf field: proto.Flask flask = 38;
+     * @generated from protobuf field: proto.Flask flask = 38
      */
     flask: Flask;
     /**
-     * @generated from protobuf field: proto.BattleElixir battle_elixir = 39;
+     * @generated from protobuf field: proto.BattleElixir battle_elixir = 39
      */
     battleElixir: BattleElixir;
     /**
-     * @generated from protobuf field: proto.GuardianElixir guardian_elixir = 40;
+     * @generated from protobuf field: proto.GuardianElixir guardian_elixir = 40
      */
     guardianElixir: GuardianElixir;
     /**
-     * @generated from protobuf field: proto.WeaponImbue main_hand_imbue = 32;
+     * @generated from protobuf field: proto.WeaponImbue main_hand_imbue = 32
      */
     mainHandImbue: WeaponImbue;
     /**
-     * @generated from protobuf field: proto.WeaponImbue off_hand_imbue = 33;
+     * @generated from protobuf field: proto.WeaponImbue off_hand_imbue = 33
      */
     offHandImbue: WeaponImbue;
     /**
-     * @generated from protobuf field: proto.Food food = 41;
+     * @generated from protobuf field: proto.Food food = 41
      */
     food: Food;
     /**
-     * @generated from protobuf field: proto.PetFood pet_food = 37;
+     * @generated from protobuf field: proto.PetFood pet_food = 37
      */
     petFood: PetFood;
     /**
-     * @generated from protobuf field: proto.Alchohol alchohol = 42;
+     * @generated from protobuf field: proto.Alchohol alchohol = 42
      */
     alchohol: Alchohol;
     /**
      * 0 means no scroll, otherwise value is the scroll level.
      * E.g. 5 indicates Scroll of Agility V.
      *
-     * @generated from protobuf field: int32 scroll_of_agility = 44;
+     * @generated from protobuf field: int32 scroll_of_agility = 44
      */
     scrollOfAgility: number;
     /**
-     * @generated from protobuf field: int32 scroll_of_strength = 43;
+     * @generated from protobuf field: int32 scroll_of_strength = 43
      */
     scrollOfStrength: number;
     /**
-     * @generated from protobuf field: int32 scroll_of_spirit = 45;
+     * @generated from protobuf field: int32 scroll_of_spirit = 45
      */
     scrollOfSpirit: number;
     /**
-     * @generated from protobuf field: int32 scroll_of_protection = 53;
+     * @generated from protobuf field: int32 scroll_of_protection = 53
      */
     scrollOfProtection: number;
     /**
-     * @generated from protobuf field: int32 pet_scroll_of_agility = 46;
+     * @generated from protobuf field: int32 pet_scroll_of_agility = 46
      */
     petScrollOfAgility: number;
     /**
-     * @generated from protobuf field: int32 pet_scroll_of_strength = 47;
+     * @generated from protobuf field: int32 pet_scroll_of_strength = 47
      */
     petScrollOfStrength: number;
     /**
-     * @generated from protobuf field: proto.Potions default_potion = 15;
+     * @generated from protobuf field: proto.Potions default_potion = 15
      */
     defaultPotion: Potions;
     /**
-     * @generated from protobuf field: proto.Potions starting_potion = 16;
+     * @generated from protobuf field: proto.Potions starting_potion = 16
      */
     startingPotion: Potions;
     /**
-     * @generated from protobuf field: int32 num_starting_potions = 17;
+     * @generated from protobuf field: int32 num_starting_potions = 17
      */
     numStartingPotions: number;
     /**
-     * @generated from protobuf field: proto.Conjured default_conjured = 27;
+     * @generated from protobuf field: proto.Conjured default_conjured = 27
      */
     defaultConjured: Conjured;
     /**
-     * @generated from protobuf field: proto.Conjured starting_conjured = 48;
+     * @generated from protobuf field: proto.Conjured starting_conjured = 48
      */
     startingConjured: Conjured;
     /**
-     * @generated from protobuf field: int32 num_starting_conjured = 49;
+     * @generated from protobuf field: int32 num_starting_conjured = 49
      */
     numStartingConjured: number;
     /**
-     * @generated from protobuf field: proto.Drums drums = 19;
+     * @generated from protobuf field: proto.Drums drums = 19
      */
     drums: Drums;
     /**
-     * @generated from protobuf field: bool super_sapper = 50;
+     * @generated from protobuf field: bool super_sapper = 50
      */
     superSapper: boolean;
     /**
-     * @generated from protobuf field: bool goblin_sapper = 51;
+     * @generated from protobuf field: bool goblin_sapper = 51
      */
     goblinSapper: boolean;
     /**
-     * @generated from protobuf field: proto.Explosive filler_explosive = 52;
+     * @generated from protobuf field: proto.Explosive filler_explosive = 52
      */
     fillerExplosive: Explosive;
 }
@@ -349,107 +349,107 @@ export interface Consumes {
  */
 export interface Debuffs {
     /**
-     * @generated from protobuf field: bool judgement_of_wisdom = 1;
+     * @generated from protobuf field: bool judgement_of_wisdom = 1
      */
     judgementOfWisdom: boolean;
     /**
-     * @generated from protobuf field: bool judgement_of_light = 25;
+     * @generated from protobuf field: bool judgement_of_light = 25
      */
     judgementOfLight: boolean;
     /**
-     * @generated from protobuf field: bool improved_seal_of_the_crusader = 2;
+     * @generated from protobuf field: bool improved_seal_of_the_crusader = 2
      */
     improvedSealOfTheCrusader: boolean;
     /**
-     * @generated from protobuf field: bool misery = 3;
+     * @generated from protobuf field: bool misery = 3
      */
     misery: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect curse_of_elements = 4;
+     * @generated from protobuf field: proto.TristateEffect curse_of_elements = 4
      */
     curseOfElements: TristateEffect;
     /**
-     * @generated from protobuf field: double isb_uptime = 5;
+     * @generated from protobuf field: double isb_uptime = 5
      */
     isbUptime: number;
     /**
-     * @generated from protobuf field: bool shadow_weaving = 18;
+     * @generated from protobuf field: bool shadow_weaving = 18
      */
     shadowWeaving: boolean;
     /**
-     * @generated from protobuf field: bool improved_scorch = 6;
+     * @generated from protobuf field: bool improved_scorch = 6
      */
     improvedScorch: boolean;
     /**
-     * @generated from protobuf field: bool winters_chill = 7;
+     * @generated from protobuf field: bool winters_chill = 7
      */
     wintersChill: boolean;
     /**
-     * @generated from protobuf field: bool blood_frenzy = 8;
+     * @generated from protobuf field: bool blood_frenzy = 8
      */
     bloodFrenzy: boolean;
     /**
-     * @generated from protobuf field: bool gift_of_arthas = 17;
+     * @generated from protobuf field: bool gift_of_arthas = 17
      */
     giftOfArthas: boolean;
     /**
-     * @generated from protobuf field: bool mangle = 16;
+     * @generated from protobuf field: bool mangle = 16
      */
     mangle: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect expose_armor = 9;
+     * @generated from protobuf field: proto.TristateEffect expose_armor = 9
      */
     exposeArmor: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect faerie_fire = 10;
+     * @generated from protobuf field: proto.TristateEffect faerie_fire = 10
      */
     faerieFire: TristateEffect;
     /**
-     * @generated from protobuf field: bool sunder_armor = 11;
+     * @generated from protobuf field: bool sunder_armor = 11
      */
     sunderArmor: boolean;
     /**
-     * @generated from protobuf field: bool curse_of_recklessness = 12;
+     * @generated from protobuf field: bool curse_of_recklessness = 12
      */
     curseOfRecklessness: boolean;
     /**
-     * @generated from protobuf field: proto.TristateEffect hunters_mark = 15;
+     * @generated from protobuf field: proto.TristateEffect hunters_mark = 15
      */
     huntersMark: TristateEffect;
     /**
-     * @generated from protobuf field: double expose_weakness_uptime = 13;
+     * @generated from protobuf field: double expose_weakness_uptime = 13
      */
     exposeWeaknessUptime: number;
     /**
-     * @generated from protobuf field: double expose_weakness_hunter_agility = 14;
+     * @generated from protobuf field: double expose_weakness_hunter_agility = 14
      */
     exposeWeaknessHunterAgility: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect demoralizing_roar = 19;
+     * @generated from protobuf field: proto.TristateEffect demoralizing_roar = 19
      */
     demoralizingRoar: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect demoralizing_shout = 20;
+     * @generated from protobuf field: proto.TristateEffect demoralizing_shout = 20
      */
     demoralizingShout: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect thunder_clap = 21;
+     * @generated from protobuf field: proto.TristateEffect thunder_clap = 21
      */
     thunderClap: TristateEffect;
     /**
-     * @generated from protobuf field: bool insect_swarm = 22;
+     * @generated from protobuf field: bool insect_swarm = 22
      */
     insectSwarm: boolean;
     /**
-     * @generated from protobuf field: bool scorpid_sting = 23;
+     * @generated from protobuf field: bool scorpid_sting = 23
      */
     scorpidSting: boolean;
     /**
-     * @generated from protobuf field: bool shadow_embrace = 24;
+     * @generated from protobuf field: bool shadow_embrace = 24
      */
     shadowEmbrace: boolean;
     /**
-     * @generated from protobuf field: bool screech = 26;
+     * @generated from protobuf field: bool screech = 26
      */
     screech: boolean;
 }
@@ -460,64 +460,64 @@ export interface Target {
     /**
      * The in-game NPC ID.
      *
-     * @generated from protobuf field: int32 id = 14;
+     * @generated from protobuf field: int32 id = 14
      */
     id: number;
     /**
-     * @generated from protobuf field: string name = 15;
+     * @generated from protobuf field: string name = 15
      */
     name: string;
     /**
-     * @generated from protobuf field: int32 level = 4;
+     * @generated from protobuf field: int32 level = 4
      */
     level: number;
     /**
-     * @generated from protobuf field: proto.MobType mob_type = 3;
+     * @generated from protobuf field: proto.MobType mob_type = 3
      */
     mobType: MobType;
     /**
-     * @generated from protobuf field: repeated double stats = 5;
+     * @generated from protobuf field: repeated double stats = 5
      */
     stats: number[];
     /**
      * Auto attack parameters.
      *
-     * @generated from protobuf field: double min_base_damage = 7;
+     * @generated from protobuf field: double min_base_damage = 7
      */
     minBaseDamage: number;
     /**
-     * @generated from protobuf field: double swing_speed = 8;
+     * @generated from protobuf field: double swing_speed = 8
      */
     swingSpeed: number;
     /**
-     * @generated from protobuf field: bool dual_wield = 9;
+     * @generated from protobuf field: bool dual_wield = 9
      */
     dualWield: boolean;
     /**
-     * @generated from protobuf field: bool dual_wield_penalty = 10;
+     * @generated from protobuf field: bool dual_wield_penalty = 10
      */
     dualWieldPenalty: boolean;
     /**
-     * @generated from protobuf field: bool can_crush = 11;
+     * @generated from protobuf field: bool can_crush = 11
      */
     canCrush: boolean;
     /**
-     * @generated from protobuf field: bool parry_haste = 12;
+     * @generated from protobuf field: bool parry_haste = 12
      */
     parryHaste: boolean;
     /**
-     * @generated from protobuf field: bool suppress_dodge = 16;
+     * @generated from protobuf field: bool suppress_dodge = 16
      */
     suppressDodge: boolean;
     /**
-     * @generated from protobuf field: proto.SpellSchool spell_school = 13;
+     * @generated from protobuf field: proto.SpellSchool spell_school = 13
      */
     spellSchool: SpellSchool;
     /**
      * Index in Raid.tanks indicating the player tanking this mob.
      * -1 or invalid index indicates not being tanked.
      *
-     * @generated from protobuf field: int32 tank_index = 6;
+     * @generated from protobuf field: int32 tank_index = 6
      */
     tankIndex: number;
 }
@@ -526,13 +526,13 @@ export interface Target {
  */
 export interface Encounter {
     /**
-     * @generated from protobuf field: double duration = 1;
+     * @generated from protobuf field: double duration = 1
      */
     duration: number;
     /**
      * Variation in the duration
      *
-     * @generated from protobuf field: double duration_variation = 4;
+     * @generated from protobuf field: double duration_variation = 4
      */
     durationVariation: number;
     /**
@@ -540,19 +540,19 @@ export interface Encounter {
      * will be in execute range for the purposes of Warrior Execute, Mage Molten
      * Fury, etc.
      *
-     * @generated from protobuf field: double execute_proportion = 3;
+     * @generated from protobuf field: double execute_proportion = 3
      */
     executeProportion: number;
     /**
      * If set, will use the targets health value instead of a duration for fight length.
      *
-     * @generated from protobuf field: bool use_health = 5;
+     * @generated from protobuf field: bool use_health = 5
      */
     useHealth: boolean;
     /**
      * If type != Simple or Custom, then this may be empty.
      *
-     * @generated from protobuf field: repeated proto.Target targets = 2;
+     * @generated from protobuf field: repeated proto.Target targets = 2
      */
     targets: Target[];
 }
@@ -561,15 +561,15 @@ export interface Encounter {
  */
 export interface ItemSpec {
     /**
-     * @generated from protobuf field: int32 id = 2;
+     * @generated from protobuf field: int32 id = 2
      */
     id: number;
     /**
-     * @generated from protobuf field: int32 enchant = 3;
+     * @generated from protobuf field: int32 enchant = 3
      */
     enchant: number;
     /**
-     * @generated from protobuf field: repeated int32 gems = 4;
+     * @generated from protobuf field: repeated int32 gems = 4
      */
     gems: number[];
 }
@@ -578,7 +578,7 @@ export interface ItemSpec {
  */
 export interface EquipmentSpec {
     /**
-     * @generated from protobuf field: repeated proto.ItemSpec items = 1;
+     * @generated from protobuf field: repeated proto.ItemSpec items = 1
      */
     items: ItemSpec[];
 }
@@ -587,7 +587,7 @@ export interface EquipmentSpec {
  */
 export interface Item {
     /**
-     * @generated from protobuf field: int32 id = 1;
+     * @generated from protobuf field: int32 id = 1
      */
     id: number;
     /**
@@ -595,79 +595,79 @@ export interface Item {
      * wowhead/in-game ID directly. For random enchant items though we need to
      * use unique hardcoded IDs so this field holds the wowhead ID instead.
      *
-     * @generated from protobuf field: int32 wowhead_id = 16;
+     * @generated from protobuf field: int32 wowhead_id = 16
      */
     wowheadId: number;
     /**
-     * @generated from protobuf field: string name = 2;
+     * @generated from protobuf field: string name = 2
      */
     name: string;
     /**
      * Classes that are allowed to use the item. Empty indicates no special class restrictions.
      *
-     * @generated from protobuf field: repeated proto.Class class_allowlist = 15;
+     * @generated from protobuf field: repeated proto.Class class_allowlist = 15
      */
     classAllowlist: Class[];
     /**
-     * @generated from protobuf field: proto.ItemType type = 3;
+     * @generated from protobuf field: proto.ItemType type = 3
      */
     type: ItemType;
     /**
-     * @generated from protobuf field: proto.ArmorType armor_type = 4;
+     * @generated from protobuf field: proto.ArmorType armor_type = 4
      */
     armorType: ArmorType;
     /**
-     * @generated from protobuf field: proto.WeaponType weapon_type = 5;
+     * @generated from protobuf field: proto.WeaponType weapon_type = 5
      */
     weaponType: WeaponType;
     /**
-     * @generated from protobuf field: proto.HandType hand_type = 6;
+     * @generated from protobuf field: proto.HandType hand_type = 6
      */
     handType: HandType;
     /**
-     * @generated from protobuf field: proto.RangedWeaponType ranged_weapon_type = 7;
+     * @generated from protobuf field: proto.RangedWeaponType ranged_weapon_type = 7
      */
     rangedWeaponType: RangedWeaponType;
     /**
-     * @generated from protobuf field: repeated double stats = 8;
+     * @generated from protobuf field: repeated double stats = 8
      */
     stats: number[];
     /**
-     * @generated from protobuf field: repeated proto.GemColor gem_sockets = 9;
+     * @generated from protobuf field: repeated proto.GemColor gem_sockets = 9
      */
     gemSockets: GemColor[];
     /**
-     * @generated from protobuf field: repeated double socketBonus = 10;
+     * @generated from protobuf field: repeated double socketBonus = 10
      */
     socketBonus: number[];
     /**
      * Weapon stats, needed for computing proper EP for melee weapons
      *
-     * @generated from protobuf field: double weapon_damage_min = 17;
+     * @generated from protobuf field: double weapon_damage_min = 17
      */
     weaponDamageMin: number;
     /**
-     * @generated from protobuf field: double weapon_damage_max = 18;
+     * @generated from protobuf field: double weapon_damage_max = 18
      */
     weaponDamageMax: number;
     /**
-     * @generated from protobuf field: double weapon_speed = 19;
+     * @generated from protobuf field: double weapon_speed = 19
      */
     weaponSpeed: number;
     /**
-     * @generated from protobuf field: int32 phase = 11;
+     * @generated from protobuf field: int32 phase = 11
      */
     phase: number;
     /**
-     * @generated from protobuf field: proto.ItemQuality quality = 12;
+     * @generated from protobuf field: proto.ItemQuality quality = 12
      */
     quality: ItemQuality;
     /**
-     * @generated from protobuf field: bool unique = 13;
+     * @generated from protobuf field: bool unique = 13
      */
     unique: boolean;
     /**
-     * @generated from protobuf field: int32 ilvl = 20;
+     * @generated from protobuf field: int32 ilvl = 20
      */
     ilvl: number;
 }
@@ -676,48 +676,48 @@ export interface Item {
  */
 export interface Enchant {
     /**
-     * @generated from protobuf field: int32 id = 1;
+     * @generated from protobuf field: int32 id = 1
      */
     id: number;
     /**
-     * @generated from protobuf field: int32 effect_id = 2;
+     * @generated from protobuf field: int32 effect_id = 2
      */
     effectId: number;
     /**
-     * @generated from protobuf field: string name = 3;
+     * @generated from protobuf field: string name = 3
      */
     name: string;
     /**
      * If true, then id is the ID of the enchant spell instead of the formula item.
      * This is used by enchants for which a formula doesn't exist (its taught by a trainer).
      *
-     * @generated from protobuf field: bool is_spell_id = 10;
+     * @generated from protobuf field: bool is_spell_id = 10
      */
     isSpellId: boolean;
     /**
-     * @generated from protobuf field: proto.ItemType type = 4;
+     * @generated from protobuf field: proto.ItemType type = 4
      */
     type: ItemType;
     /**
-     * @generated from protobuf field: proto.EnchantType enchant_type = 9;
+     * @generated from protobuf field: proto.EnchantType enchant_type = 9
      */
     enchantType: EnchantType;
     /**
-     * @generated from protobuf field: repeated double stats = 7;
+     * @generated from protobuf field: repeated double stats = 7
      */
     stats: number[];
     /**
-     * @generated from protobuf field: proto.ItemQuality quality = 8;
+     * @generated from protobuf field: proto.ItemQuality quality = 8
      */
     quality: ItemQuality;
     /**
-     * @generated from protobuf field: int32 phase = 11;
+     * @generated from protobuf field: int32 phase = 11
      */
     phase: number;
     /**
      * Classes that are allowed to use the enchant. Empty indicates no special class restrictions.
      *
-     * @generated from protobuf field: repeated proto.Class class_allowlist = 12;
+     * @generated from protobuf field: repeated proto.Class class_allowlist = 12
      */
     classAllowlist: Class[];
 }
@@ -726,31 +726,31 @@ export interface Enchant {
  */
 export interface Gem {
     /**
-     * @generated from protobuf field: int32 id = 1;
+     * @generated from protobuf field: int32 id = 1
      */
     id: number;
     /**
-     * @generated from protobuf field: string name = 2;
+     * @generated from protobuf field: string name = 2
      */
     name: string;
     /**
-     * @generated from protobuf field: repeated double stats = 3;
+     * @generated from protobuf field: repeated double stats = 3
      */
     stats: number[];
     /**
-     * @generated from protobuf field: proto.GemColor color = 4;
+     * @generated from protobuf field: proto.GemColor color = 4
      */
     color: GemColor;
     /**
-     * @generated from protobuf field: int32 phase = 5;
+     * @generated from protobuf field: int32 phase = 5
      */
     phase: number;
     /**
-     * @generated from protobuf field: proto.ItemQuality quality = 6;
+     * @generated from protobuf field: proto.ItemQuality quality = 6
      */
     quality: ItemQuality;
     /**
-     * @generated from protobuf field: bool unique = 7;
+     * @generated from protobuf field: bool unique = 7
      */
     unique: boolean;
 }
@@ -761,7 +761,7 @@ export interface RaidTarget {
     /**
      * Raid index of the player to target. A value of -1 indicates no target.
      *
-     * @generated from protobuf field: int32 target_index = 1;
+     * @generated from protobuf field: int32 target_index = 1
      */
     targetIndex: number;
 }
@@ -770,24 +770,26 @@ export interface RaidTarget {
  */
 export interface ActionID {
     /**
+     * Identifies this action.
+     *
      * @generated from protobuf oneof: raw_id
      */
     rawId: {
         oneofKind: "spellId";
         /**
-         * @generated from protobuf field: int32 spell_id = 1;
+         * @generated from protobuf field: int32 spell_id = 1
          */
         spellId: number;
     } | {
         oneofKind: "itemId";
         /**
-         * @generated from protobuf field: int32 item_id = 2;
+         * @generated from protobuf field: int32 item_id = 2
          */
         itemId: number;
     } | {
         oneofKind: "otherId";
         /**
-         * @generated from protobuf field: proto.OtherAction other_id = 3;
+         * @generated from protobuf field: proto.OtherAction other_id = 3
          */
         otherId: OtherAction;
     } | {
@@ -797,7 +799,7 @@ export interface ActionID {
      * Distinguishes between different versions of the same action.
      * Currently the only use for this is Shaman Lightning Overload.
      *
-     * @generated from protobuf field: int32 tag = 4;
+     * @generated from protobuf field: int32 tag = 4
      */
     tag: number;
 }
@@ -810,7 +812,7 @@ export interface Cooldown {
     /**
      * Identifies the cooldown to which these settings will apply.
      *
-     * @generated from protobuf field: proto.ActionID id = 1;
+     * @generated from protobuf field: proto.ActionID id = 1
      */
     id?: ActionID;
     /**
@@ -819,7 +821,7 @@ export interface Cooldown {
      * Any usages after the specified timings will occur as soon as possible, subject
      * to the ShouldActivate() condition.
      *
-     * @generated from protobuf field: repeated double timings = 2;
+     * @generated from protobuf field: repeated double timings = 2
      */
     timings: number[];
 }
@@ -828,13 +830,13 @@ export interface Cooldown {
  */
 export interface Cooldowns {
     /**
-     * @generated from protobuf field: repeated proto.Cooldown cooldowns = 1;
+     * @generated from protobuf field: repeated proto.Cooldown cooldowns = 1
      */
     cooldowns: Cooldown[];
     /**
      * % HP threshold, below which defensive cooldowns can be used.
      *
-     * @generated from protobuf field: double hp_percent_for_defensives = 2;
+     * @generated from protobuf field: double hp_percent_for_defensives = 2
      */
     hpPercentForDefensives: number;
 }
@@ -845,13 +847,13 @@ export interface HealingModel {
     /**
      * Healing per second to apply.
      *
-     * @generated from protobuf field: double hps = 1;
+     * @generated from protobuf field: double hps = 1
      */
     hps: number;
     /**
      * How often healing is applied.
      *
-     * @generated from protobuf field: double cadence_seconds = 2;
+     * @generated from protobuf field: double cadence_seconds = 2
      */
     cadenceSeconds: number;
 }

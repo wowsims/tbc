@@ -5,8 +5,19 @@ import { MESSAGE_TYPE } from './message-type-contract.js';
  * information.
  */
 export function reflectionCreate(type) {
-    const msg = {};
-    Object.defineProperty(msg, MESSAGE_TYPE, { enumerable: false, value: type });
+    /**
+     * This ternary can be removed in the next major version.
+     * The `Object.create()` code path utilizes a new `messagePrototype`
+     * property on the `IMessageType` which has this same `MESSAGE_TYPE`
+     * non-enumerable property on it. Doing it this way means that we only
+     * pay the cost of `Object.defineProperty()` once per `IMessageType`
+     * class of once per "instance". The falsy code path is only provided
+     * for backwards compatibility in cases where the runtime library is
+     * updated without also updating the generated code.
+     */
+    const msg = type.messagePrototype
+        ? Object.create(type.messagePrototype)
+        : Object.defineProperty({}, MESSAGE_TYPE, { value: type });
     for (let field of type.fields) {
         let name = field.localName;
         if (field.opt)

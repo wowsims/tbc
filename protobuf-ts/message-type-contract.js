@@ -4,4 +4,4 @@
  * Note that this is an experimental feature - it is here to stay, but
  * implementation details may change without notice.
  */
-export const MESSAGE_TYPE = Symbol("protobuf-ts/message-type");
+export const MESSAGE_TYPE = Symbol.for("protobuf-ts/message-type");

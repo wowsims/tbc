@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum proto.Spec
@@ -1331,8 +1330,13 @@ class RaidBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { arcaneBrilliance: false, powerWordFortitude: 0, shadowProtection: false, divineSpirit: 0, giftOfTheWild: 0, thorns: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.arcaneBrilliance = false;
+        message.powerWordFortitude = 0;
+        message.shadowProtection = false;
+        message.divineSpirit = 0;
+        message.giftOfTheWild = 0;
+        message.thorns = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -1375,12 +1379,6 @@ class RaidBuffs$Type extends MessageType {
         /* bool arcane_brilliance = 1; */
         if (message.arcaneBrilliance !== false)
             writer.tag(1, WireType.Varint).bool(message.arcaneBrilliance);
-        /* proto.TristateEffect power_word_fortitude = 7; */
-        if (message.powerWordFortitude !== 0)
-            writer.tag(7, WireType.Varint).int32(message.powerWordFortitude);
-        /* bool shadow_protection = 8; */
-        if (message.shadowProtection !== false)
-            writer.tag(8, WireType.Varint).bool(message.shadowProtection);
         /* proto.TristateEffect divine_spirit = 4; */
         if (message.divineSpirit !== 0)
             writer.tag(4, WireType.Varint).int32(message.divineSpirit);
@@ -1390,6 +1388,12 @@ class RaidBuffs$Type extends MessageType {
         /* proto.TristateEffect thorns = 6; */
         if (message.thorns !== 0)
             writer.tag(6, WireType.Varint).int32(message.thorns);
+        /* proto.TristateEffect power_word_fortitude = 7; */
+        if (message.powerWordFortitude !== 0)
+            writer.tag(7, WireType.Varint).int32(message.powerWordFortitude);
+        /* bool shadow_protection = 8; */
+        if (message.shadowProtection !== false)
+            writer.tag(8, WireType.Varint).bool(message.shadowProtection);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1442,8 +1446,42 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, bloodPact: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, devotionAura: 0, retributionAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false, snapshotBsBoomingVoiceRank: 0, commandingShout: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.bloodlust = 0;
+        message.ferociousInspiration = 0;
+        message.bloodPact = 0;
+        message.moonkinAura = 0;
+        message.leaderOfThePack = 0;
+        message.sanctityAura = 0;
+        message.devotionAura = 0;
+        message.retributionAura = 0;
+        message.trueshotAura = false;
+        message.draeneiRacialMelee = false;
+        message.draeneiRacialCaster = false;
+        message.drums = 0;
+        message.atieshMage = 0;
+        message.atieshWarlock = 0;
+        message.braidedEterniumChain = false;
+        message.eyeOfTheNight = false;
+        message.chainOfTheTwilightOwl = false;
+        message.jadePendantOfBlasting = false;
+        message.manaSpringTotem = 0;
+        message.manaTideTotems = 0;
+        message.totemOfWrath = 0;
+        message.wrathOfAirTotem = 0;
+        message.snapshotImprovedWrathOfAirTotem = false;
+        message.graceOfAirTotem = 0;
+        message.strengthOfEarthTotem = 0;
+        message.snapshotImprovedStrengthOfEarthTotem = false;
+        message.tranquilAirTotem = false;
+        message.windfuryTotemRank = 0;
+        message.windfuryTotemIwt = 0;
+        message.battleShout = 0;
+        message.bsSolarianSapphire = false;
+        message.snapshotBsSolarianSapphire = false;
+        message.snapshotBsT2 = false;
+        message.snapshotBsBoomingVoiceRank = 0;
+        message.commandingShout = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -1573,30 +1611,9 @@ class PartyBuffs$Type extends MessageType {
         /* int32 bloodlust = 1; */
         if (message.bloodlust !== 0)
             writer.tag(1, WireType.Varint).int32(message.bloodlust);
-        /* int32 ferocious_inspiration = 22; */
-        if (message.ferociousInspiration !== 0)
-            writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
-        /* proto.TristateEffect blood_pact = 34; */
-        if (message.bloodPact !== 0)
-            writer.tag(34, WireType.Varint).int32(message.bloodPact);
         /* proto.TristateEffect moonkin_aura = 2; */
         if (message.moonkinAura !== 0)
             writer.tag(2, WireType.Varint).int32(message.moonkinAura);
-        /* proto.TristateEffect leader_of_the_pack = 19; */
-        if (message.leaderOfThePack !== 0)
-            writer.tag(19, WireType.Varint).int32(message.leaderOfThePack);
-        /* proto.TristateEffect sanctity_aura = 20; */
-        if (message.sanctityAura !== 0)
-            writer.tag(20, WireType.Varint).int32(message.sanctityAura);
-        /* proto.TristateEffect devotion_aura = 35; */
-        if (message.devotionAura !== 0)
-            writer.tag(35, WireType.Varint).int32(message.devotionAura);
-        /* proto.TristateEffect retribution_aura = 36; */
-        if (message.retributionAura !== 0)
-            writer.tag(36, WireType.Varint).int32(message.retributionAura);
-        /* bool trueshot_aura = 21; */
-        if (message.trueshotAura !== false)
-            writer.tag(21, WireType.Varint).bool(message.trueshotAura);
         /* bool draenei_racial_melee = 3; */
         if (message.draeneiRacialMelee !== false)
             writer.tag(3, WireType.Varint).bool(message.draeneiRacialMelee);
@@ -1627,39 +1644,48 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect mana_spring_totem = 12; */
         if (message.manaSpringTotem !== 0)
             writer.tag(12, WireType.Varint).int32(message.manaSpringTotem);
-        /* int32 mana_tide_totems = 17; */
-        if (message.manaTideTotems !== 0)
-            writer.tag(17, WireType.Varint).int32(message.manaTideTotems);
         /* int32 totem_of_wrath = 13; */
         if (message.totemOfWrath !== 0)
             writer.tag(13, WireType.Varint).int32(message.totemOfWrath);
         /* proto.TristateEffect wrath_of_air_totem = 14; */
         if (message.wrathOfAirTotem !== 0)
             writer.tag(14, WireType.Varint).int32(message.wrathOfAirTotem);
-        /* bool snapshot_improved_wrath_of_air_totem = 25; */
-        if (message.snapshotImprovedWrathOfAirTotem !== false)
-            writer.tag(25, WireType.Varint).bool(message.snapshotImprovedWrathOfAirTotem);
         /* proto.TristateEffect grace_of_air_totem = 15; */
         if (message.graceOfAirTotem !== 0)
             writer.tag(15, WireType.Varint).int32(message.graceOfAirTotem);
         /* proto.StrengthOfEarthType strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
-        /* bool snapshot_improved_strength_of_earth_totem = 31; */
-        if (message.snapshotImprovedStrengthOfEarthTotem !== false)
-            writer.tag(31, WireType.Varint).bool(message.snapshotImprovedStrengthOfEarthTotem);
-        /* bool tranquil_air_totem = 26; */
-        if (message.tranquilAirTotem !== false)
-            writer.tag(26, WireType.Varint).bool(message.tranquilAirTotem);
+        /* int32 mana_tide_totems = 17; */
+        if (message.manaTideTotems !== 0)
+            writer.tag(17, WireType.Varint).int32(message.manaTideTotems);
+        /* proto.TristateEffect battle_shout = 18; */
+        if (message.battleShout !== 0)
+            writer.tag(18, WireType.Varint).int32(message.battleShout);
+        /* proto.TristateEffect leader_of_the_pack = 19; */
+        if (message.leaderOfThePack !== 0)
+            writer.tag(19, WireType.Varint).int32(message.leaderOfThePack);
+        /* proto.TristateEffect sanctity_aura = 20; */
+        if (message.sanctityAura !== 0)
+            writer.tag(20, WireType.Varint).int32(message.sanctityAura);
+        /* bool trueshot_aura = 21; */
+        if (message.trueshotAura !== false)
+            writer.tag(21, WireType.Varint).bool(message.trueshotAura);
+        /* int32 ferocious_inspiration = 22; */
+        if (message.ferociousInspiration !== 0)
+            writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
         /* int32 windfury_totem_rank = 23; */
         if (message.windfuryTotemRank !== 0)
             writer.tag(23, WireType.Varint).int32(message.windfuryTotemRank);
         /* int32 windfury_totem_iwt = 24; */
         if (message.windfuryTotemIwt !== 0)
             writer.tag(24, WireType.Varint).int32(message.windfuryTotemIwt);
-        /* proto.TristateEffect battle_shout = 18; */
-        if (message.battleShout !== 0)
-            writer.tag(18, WireType.Varint).int32(message.battleShout);
+        /* bool snapshot_improved_wrath_of_air_totem = 25; */
+        if (message.snapshotImprovedWrathOfAirTotem !== false)
+            writer.tag(25, WireType.Varint).bool(message.snapshotImprovedWrathOfAirTotem);
+        /* bool tranquil_air_totem = 26; */
+        if (message.tranquilAirTotem !== false)
+            writer.tag(26, WireType.Varint).bool(message.tranquilAirTotem);
         /* bool bs_solarian_sapphire = 28; */
         if (message.bsSolarianSapphire !== false)
             writer.tag(28, WireType.Varint).bool(message.bsSolarianSapphire);
@@ -1669,12 +1695,24 @@ class PartyBuffs$Type extends MessageType {
         /* bool snapshot_bs_t2 = 30; */
         if (message.snapshotBsT2 !== false)
             writer.tag(30, WireType.Varint).bool(message.snapshotBsT2);
-        /* int32 snapshot_bs_booming_voice_rank = 33; */
-        if (message.snapshotBsBoomingVoiceRank !== 0)
-            writer.tag(33, WireType.Varint).int32(message.snapshotBsBoomingVoiceRank);
+        /* bool snapshot_improved_strength_of_earth_totem = 31; */
+        if (message.snapshotImprovedStrengthOfEarthTotem !== false)
+            writer.tag(31, WireType.Varint).bool(message.snapshotImprovedStrengthOfEarthTotem);
         /* proto.TristateEffect commanding_shout = 32; */
         if (message.commandingShout !== 0)
             writer.tag(32, WireType.Varint).int32(message.commandingShout);
+        /* int32 snapshot_bs_booming_voice_rank = 33; */
+        if (message.snapshotBsBoomingVoiceRank !== 0)
+            writer.tag(33, WireType.Varint).int32(message.snapshotBsBoomingVoiceRank);
+        /* proto.TristateEffect blood_pact = 34; */
+        if (message.bloodPact !== 0)
+            writer.tag(34, WireType.Varint).int32(message.bloodPact);
+        /* proto.TristateEffect devotion_aura = 35; */
+        if (message.devotionAura !== 0)
+            writer.tag(35, WireType.Varint).int32(message.devotionAura);
+        /* proto.TristateEffect retribution_aura = 36; */
+        if (message.retributionAura !== 0)
+            writer.tag(36, WireType.Varint).int32(message.retributionAura);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1702,8 +1740,17 @@ class IndividualBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfSanctuary: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0, inspirationUptime: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.blessingOfKings = false;
+        message.blessingOfSalvation = false;
+        message.blessingOfSanctuary = false;
+        message.blessingOfWisdom = 0;
+        message.blessingOfMight = 0;
+        message.shadowPriestDps = 0;
+        message.unleashedRage = false;
+        message.innervates = 0;
+        message.powerInfusions = 0;
+        message.inspirationUptime = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -1758,12 +1805,6 @@ class IndividualBuffs$Type extends MessageType {
         /* bool blessing_of_kings = 1; */
         if (message.blessingOfKings !== false)
             writer.tag(1, WireType.Varint).bool(message.blessingOfKings);
-        /* bool blessing_of_salvation = 8; */
-        if (message.blessingOfSalvation !== false)
-            writer.tag(8, WireType.Varint).bool(message.blessingOfSalvation);
-        /* bool blessing_of_sanctuary = 9; */
-        if (message.blessingOfSanctuary !== false)
-            writer.tag(9, WireType.Varint).bool(message.blessingOfSanctuary);
         /* proto.TristateEffect blessing_of_wisdom = 2; */
         if (message.blessingOfWisdom !== 0)
             writer.tag(2, WireType.Varint).int32(message.blessingOfWisdom);
@@ -1773,15 +1814,21 @@ class IndividualBuffs$Type extends MessageType {
         /* int32 shadow_priest_dps = 4; */
         if (message.shadowPriestDps !== 0)
             writer.tag(4, WireType.Varint).int32(message.shadowPriestDps);
-        /* bool unleashed_rage = 7; */
-        if (message.unleashedRage !== false)
-            writer.tag(7, WireType.Varint).bool(message.unleashedRage);
         /* int32 innervates = 5; */
         if (message.innervates !== 0)
             writer.tag(5, WireType.Varint).int32(message.innervates);
         /* int32 power_infusions = 6; */
         if (message.powerInfusions !== 0)
             writer.tag(6, WireType.Varint).int32(message.powerInfusions);
+        /* bool unleashed_rage = 7; */
+        if (message.unleashedRage !== false)
+            writer.tag(7, WireType.Varint).bool(message.unleashedRage);
+        /* bool blessing_of_salvation = 8; */
+        if (message.blessingOfSalvation !== false)
+            writer.tag(8, WireType.Varint).bool(message.blessingOfSalvation);
+        /* bool blessing_of_sanctuary = 9; */
+        if (message.blessingOfSanctuary !== false)
+            writer.tag(9, WireType.Varint).bool(message.blessingOfSanctuary);
         /* double inspiration_uptime = 10; */
         if (message.inspirationUptime !== 0)
             writer.tag(10, WireType.Bit64).double(message.inspirationUptime);
@@ -1826,8 +1873,31 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, scrollOfProtection: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, superSapper: false, goblinSapper: false, fillerExplosive: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.flask = 0;
+        message.battleElixir = 0;
+        message.guardianElixir = 0;
+        message.mainHandImbue = 0;
+        message.offHandImbue = 0;
+        message.food = 0;
+        message.petFood = 0;
+        message.alchohol = 0;
+        message.scrollOfAgility = 0;
+        message.scrollOfStrength = 0;
+        message.scrollOfSpirit = 0;
+        message.scrollOfProtection = 0;
+        message.petScrollOfAgility = 0;
+        message.petScrollOfStrength = 0;
+        message.defaultPotion = 0;
+        message.startingPotion = 0;
+        message.numStartingPotions = 0;
+        message.defaultConjured = 0;
+        message.startingConjured = 0;
+        message.numStartingConjured = 0;
+        message.drums = 0;
+        message.superSapper = false;
+        message.goblinSapper = false;
+        message.fillerExplosive = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -1921,48 +1991,6 @@ class Consumes$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.Flask flask = 38; */
-        if (message.flask !== 0)
-            writer.tag(38, WireType.Varint).int32(message.flask);
-        /* proto.BattleElixir battle_elixir = 39; */
-        if (message.battleElixir !== 0)
-            writer.tag(39, WireType.Varint).int32(message.battleElixir);
-        /* proto.GuardianElixir guardian_elixir = 40; */
-        if (message.guardianElixir !== 0)
-            writer.tag(40, WireType.Varint).int32(message.guardianElixir);
-        /* proto.WeaponImbue main_hand_imbue = 32; */
-        if (message.mainHandImbue !== 0)
-            writer.tag(32, WireType.Varint).int32(message.mainHandImbue);
-        /* proto.WeaponImbue off_hand_imbue = 33; */
-        if (message.offHandImbue !== 0)
-            writer.tag(33, WireType.Varint).int32(message.offHandImbue);
-        /* proto.Food food = 41; */
-        if (message.food !== 0)
-            writer.tag(41, WireType.Varint).int32(message.food);
-        /* proto.PetFood pet_food = 37; */
-        if (message.petFood !== 0)
-            writer.tag(37, WireType.Varint).int32(message.petFood);
-        /* proto.Alchohol alchohol = 42; */
-        if (message.alchohol !== 0)
-            writer.tag(42, WireType.Varint).int32(message.alchohol);
-        /* int32 scroll_of_agility = 44; */
-        if (message.scrollOfAgility !== 0)
-            writer.tag(44, WireType.Varint).int32(message.scrollOfAgility);
-        /* int32 scroll_of_strength = 43; */
-        if (message.scrollOfStrength !== 0)
-            writer.tag(43, WireType.Varint).int32(message.scrollOfStrength);
-        /* int32 scroll_of_spirit = 45; */
-        if (message.scrollOfSpirit !== 0)
-            writer.tag(45, WireType.Varint).int32(message.scrollOfSpirit);
-        /* int32 scroll_of_protection = 53; */
-        if (message.scrollOfProtection !== 0)
-            writer.tag(53, WireType.Varint).int32(message.scrollOfProtection);
-        /* int32 pet_scroll_of_agility = 46; */
-        if (message.petScrollOfAgility !== 0)
-            writer.tag(46, WireType.Varint).int32(message.petScrollOfAgility);
-        /* int32 pet_scroll_of_strength = 47; */
-        if (message.petScrollOfStrength !== 0)
-            writer.tag(47, WireType.Varint).int32(message.petScrollOfStrength);
         /* proto.Potions default_potion = 15; */
         if (message.defaultPotion !== 0)
             writer.tag(15, WireType.Varint).int32(message.defaultPotion);
@@ -1972,18 +2000,57 @@ class Consumes$Type extends MessageType {
         /* int32 num_starting_potions = 17; */
         if (message.numStartingPotions !== 0)
             writer.tag(17, WireType.Varint).int32(message.numStartingPotions);
+        /* proto.Drums drums = 19; */
+        if (message.drums !== 0)
+            writer.tag(19, WireType.Varint).int32(message.drums);
         /* proto.Conjured default_conjured = 27; */
         if (message.defaultConjured !== 0)
             writer.tag(27, WireType.Varint).int32(message.defaultConjured);
+        /* proto.WeaponImbue main_hand_imbue = 32; */
+        if (message.mainHandImbue !== 0)
+            writer.tag(32, WireType.Varint).int32(message.mainHandImbue);
+        /* proto.WeaponImbue off_hand_imbue = 33; */
+        if (message.offHandImbue !== 0)
+            writer.tag(33, WireType.Varint).int32(message.offHandImbue);
+        /* proto.PetFood pet_food = 37; */
+        if (message.petFood !== 0)
+            writer.tag(37, WireType.Varint).int32(message.petFood);
+        /* proto.Flask flask = 38; */
+        if (message.flask !== 0)
+            writer.tag(38, WireType.Varint).int32(message.flask);
+        /* proto.BattleElixir battle_elixir = 39; */
+        if (message.battleElixir !== 0)
+            writer.tag(39, WireType.Varint).int32(message.battleElixir);
+        /* proto.GuardianElixir guardian_elixir = 40; */
+        if (message.guardianElixir !== 0)
+            writer.tag(40, WireType.Varint).int32(message.guardianElixir);
+        /* proto.Food food = 41; */
+        if (message.food !== 0)
+            writer.tag(41, WireType.Varint).int32(message.food);
+        /* proto.Alchohol alchohol = 42; */
+        if (message.alchohol !== 0)
+            writer.tag(42, WireType.Varint).int32(message.alchohol);
+        /* int32 scroll_of_strength = 43; */
+        if (message.scrollOfStrength !== 0)
+            writer.tag(43, WireType.Varint).int32(message.scrollOfStrength);
+        /* int32 scroll_of_agility = 44; */
+        if (message.scrollOfAgility !== 0)
+            writer.tag(44, WireType.Varint).int32(message.scrollOfAgility);
+        /* int32 scroll_of_spirit = 45; */
+        if (message.scrollOfSpirit !== 0)
+            writer.tag(45, WireType.Varint).int32(message.scrollOfSpirit);
+        /* int32 pet_scroll_of_agility = 46; */
+        if (message.petScrollOfAgility !== 0)
+            writer.tag(46, WireType.Varint).int32(message.petScrollOfAgility);
+        /* int32 pet_scroll_of_strength = 47; */
+        if (message.petScrollOfStrength !== 0)
+            writer.tag(47, WireType.Varint).int32(message.petScrollOfStrength);
         /* proto.Conjured starting_conjured = 48; */
         if (message.startingConjured !== 0)
             writer.tag(48, WireType.Varint).int32(message.startingConjured);
         /* int32 num_starting_conjured = 49; */
         if (message.numStartingConjured !== 0)
             writer.tag(49, WireType.Varint).int32(message.numStartingConjured);
-        /* proto.Drums drums = 19; */
-        if (message.drums !== 0)
-            writer.tag(19, WireType.Varint).int32(message.drums);
         /* bool super_sapper = 50; */
         if (message.superSapper !== false)
             writer.tag(50, WireType.Varint).bool(message.superSapper);
@@ -1993,6 +2060,9 @@ class Consumes$Type extends MessageType {
         /* proto.Explosive filler_explosive = 52; */
         if (message.fillerExplosive !== 0)
             writer.tag(52, WireType.Varint).int32(message.fillerExplosive);
+        /* int32 scroll_of_protection = 53; */
+        if (message.scrollOfProtection !== 0)
+            writer.tag(53, WireType.Varint).int32(message.scrollOfProtection);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2036,8 +2106,33 @@ class Debuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, judgementOfLight: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false, screech: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.judgementOfWisdom = false;
+        message.judgementOfLight = false;
+        message.improvedSealOfTheCrusader = false;
+        message.misery = false;
+        message.curseOfElements = 0;
+        message.isbUptime = 0;
+        message.shadowWeaving = false;
+        message.improvedScorch = false;
+        message.wintersChill = false;
+        message.bloodFrenzy = false;
+        message.giftOfArthas = false;
+        message.mangle = false;
+        message.exposeArmor = 0;
+        message.faerieFire = 0;
+        message.sunderArmor = false;
+        message.curseOfRecklessness = false;
+        message.huntersMark = 0;
+        message.exposeWeaknessUptime = 0;
+        message.exposeWeaknessHunterAgility = 0;
+        message.demoralizingRoar = 0;
+        message.demoralizingShout = 0;
+        message.thunderClap = 0;
+        message.insectSwarm = false;
+        message.scorpidSting = false;
+        message.shadowEmbrace = false;
+        message.screech = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2140,9 +2235,6 @@ class Debuffs$Type extends MessageType {
         /* bool judgement_of_wisdom = 1; */
         if (message.judgementOfWisdom !== false)
             writer.tag(1, WireType.Varint).bool(message.judgementOfWisdom);
-        /* bool judgement_of_light = 25; */
-        if (message.judgementOfLight !== false)
-            writer.tag(25, WireType.Varint).bool(message.judgementOfLight);
         /* bool improved_seal_of_the_crusader = 2; */
         if (message.improvedSealOfTheCrusader !== false)
             writer.tag(2, WireType.Varint).bool(message.improvedSealOfTheCrusader);
@@ -2155,9 +2247,6 @@ class Debuffs$Type extends MessageType {
         /* double isb_uptime = 5; */
         if (message.isbUptime !== 0)
             writer.tag(5, WireType.Bit64).double(message.isbUptime);
-        /* bool shadow_weaving = 18; */
-        if (message.shadowWeaving !== false)
-            writer.tag(18, WireType.Varint).bool(message.shadowWeaving);
         /* bool improved_scorch = 6; */
         if (message.improvedScorch !== false)
             writer.tag(6, WireType.Varint).bool(message.improvedScorch);
@@ -2167,12 +2256,6 @@ class Debuffs$Type extends MessageType {
         /* bool blood_frenzy = 8; */
         if (message.bloodFrenzy !== false)
             writer.tag(8, WireType.Varint).bool(message.bloodFrenzy);
-        /* bool gift_of_arthas = 17; */
-        if (message.giftOfArthas !== false)
-            writer.tag(17, WireType.Varint).bool(message.giftOfArthas);
-        /* bool mangle = 16; */
-        if (message.mangle !== false)
-            writer.tag(16, WireType.Varint).bool(message.mangle);
         /* proto.TristateEffect expose_armor = 9; */
         if (message.exposeArmor !== 0)
             writer.tag(9, WireType.Varint).int32(message.exposeArmor);
@@ -2185,15 +2268,24 @@ class Debuffs$Type extends MessageType {
         /* bool curse_of_recklessness = 12; */
         if (message.curseOfRecklessness !== false)
             writer.tag(12, WireType.Varint).bool(message.curseOfRecklessness);
-        /* proto.TristateEffect hunters_mark = 15; */
-        if (message.huntersMark !== 0)
-            writer.tag(15, WireType.Varint).int32(message.huntersMark);
         /* double expose_weakness_uptime = 13; */
         if (message.exposeWeaknessUptime !== 0)
             writer.tag(13, WireType.Bit64).double(message.exposeWeaknessUptime);
         /* double expose_weakness_hunter_agility = 14; */
         if (message.exposeWeaknessHunterAgility !== 0)
             writer.tag(14, WireType.Bit64).double(message.exposeWeaknessHunterAgility);
+        /* proto.TristateEffect hunters_mark = 15; */
+        if (message.huntersMark !== 0)
+            writer.tag(15, WireType.Varint).int32(message.huntersMark);
+        /* bool mangle = 16; */
+        if (message.mangle !== false)
+            writer.tag(16, WireType.Varint).bool(message.mangle);
+        /* bool gift_of_arthas = 17; */
+        if (message.giftOfArthas !== false)
+            writer.tag(17, WireType.Varint).bool(message.giftOfArthas);
+        /* bool shadow_weaving = 18; */
+        if (message.shadowWeaving !== false)
+            writer.tag(18, WireType.Varint).bool(message.shadowWeaving);
         /* proto.TristateEffect demoralizing_roar = 19; */
         if (message.demoralizingRoar !== 0)
             writer.tag(19, WireType.Varint).int32(message.demoralizingRoar);
@@ -2212,6 +2304,9 @@ class Debuffs$Type extends MessageType {
         /* bool shadow_embrace = 24; */
         if (message.shadowEmbrace !== false)
             writer.tag(24, WireType.Varint).bool(message.shadowEmbrace);
+        /* bool judgement_of_light = 25; */
+        if (message.judgementOfLight !== false)
+            writer.tag(25, WireType.Varint).bool(message.judgementOfLight);
         /* bool screech = 26; */
         if (message.screech !== false)
             writer.tag(26, WireType.Varint).bool(message.screech);
@@ -2246,8 +2341,21 @@ class Target$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, dualWield: false, dualWieldPenalty: false, canCrush: false, parryHaste: false, suppressDodge: false, spellSchool: 0, tankIndex: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = 0;
+        message.name = "";
+        message.level = 0;
+        message.mobType = 0;
+        message.stats = [];
+        message.minBaseDamage = 0;
+        message.swingSpeed = 0;
+        message.dualWield = false;
+        message.dualWieldPenalty = false;
+        message.canCrush = false;
+        message.parryHaste = false;
+        message.suppressDodge = false;
+        message.spellSchool = 0;
+        message.tankIndex = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2315,18 +2423,12 @@ class Target$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* int32 id = 14; */
-        if (message.id !== 0)
-            writer.tag(14, WireType.Varint).int32(message.id);
-        /* string name = 15; */
-        if (message.name !== "")
-            writer.tag(15, WireType.LengthDelimited).string(message.name);
-        /* int32 level = 4; */
-        if (message.level !== 0)
-            writer.tag(4, WireType.Varint).int32(message.level);
         /* proto.MobType mob_type = 3; */
         if (message.mobType !== 0)
             writer.tag(3, WireType.Varint).int32(message.mobType);
+        /* int32 level = 4; */
+        if (message.level !== 0)
+            writer.tag(4, WireType.Varint).int32(message.level);
         /* repeated double stats = 5; */
         if (message.stats.length) {
             writer.tag(5, WireType.LengthDelimited).fork();
@@ -2334,6 +2436,9 @@ class Target$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
+        /* int32 tank_index = 6; */
+        if (message.tankIndex !== 0)
+            writer.tag(6, WireType.Varint).int32(message.tankIndex);
         /* double min_base_damage = 7; */
         if (message.minBaseDamage !== 0)
             writer.tag(7, WireType.Bit64).double(message.minBaseDamage);
@@ -2352,15 +2457,18 @@ class Target$Type extends MessageType {
         /* bool parry_haste = 12; */
         if (message.parryHaste !== false)
             writer.tag(12, WireType.Varint).bool(message.parryHaste);
-        /* bool suppress_dodge = 16; */
-        if (message.suppressDodge !== false)
-            writer.tag(16, WireType.Varint).bool(message.suppressDodge);
         /* proto.SpellSchool spell_school = 13; */
         if (message.spellSchool !== 0)
             writer.tag(13, WireType.Varint).int32(message.spellSchool);
-        /* int32 tank_index = 6; */
-        if (message.tankIndex !== 0)
-            writer.tag(6, WireType.Varint).int32(message.tankIndex);
+        /* int32 id = 14; */
+        if (message.id !== 0)
+            writer.tag(14, WireType.Varint).int32(message.id);
+        /* string name = 15; */
+        if (message.name !== "")
+            writer.tag(15, WireType.LengthDelimited).string(message.name);
+        /* bool suppress_dodge = 16; */
+        if (message.suppressDodge !== false)
+            writer.tag(16, WireType.Varint).bool(message.suppressDodge);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2379,12 +2487,16 @@ class Encounter$Type extends MessageType {
             { no: 4, name: "duration_variation", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "execute_proportion", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "use_health", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Target }
+            { no: 2, name: "targets", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => Target }
         ]);
     }
     create(value) {
-        const message = { duration: 0, durationVariation: 0, executeProportion: 0, useHealth: false, targets: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.duration = 0;
+        message.durationVariation = 0;
+        message.executeProportion = 0;
+        message.useHealth = false;
+        message.targets = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2424,18 +2536,18 @@ class Encounter$Type extends MessageType {
         /* double duration = 1; */
         if (message.duration !== 0)
             writer.tag(1, WireType.Bit64).double(message.duration);
-        /* double duration_variation = 4; */
-        if (message.durationVariation !== 0)
-            writer.tag(4, WireType.Bit64).double(message.durationVariation);
-        /* double execute_proportion = 3; */
-        if (message.executeProportion !== 0)
-            writer.tag(3, WireType.Bit64).double(message.executeProportion);
-        /* bool use_health = 5; */
-        if (message.useHealth !== false)
-            writer.tag(5, WireType.Varint).bool(message.useHealth);
         /* repeated proto.Target targets = 2; */
         for (let i = 0; i < message.targets.length; i++)
             Target.internalBinaryWrite(message.targets[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* double execute_proportion = 3; */
+        if (message.executeProportion !== 0)
+            writer.tag(3, WireType.Bit64).double(message.executeProportion);
+        /* double duration_variation = 4; */
+        if (message.durationVariation !== 0)
+            writer.tag(4, WireType.Bit64).double(message.durationVariation);
+        /* bool use_health = 5; */
+        if (message.useHealth !== false)
+            writer.tag(5, WireType.Varint).bool(message.useHealth);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2456,8 +2568,10 @@ class ItemSpec$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, enchant: 0, gems: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = 0;
+        message.enchant = 0;
+        message.gems = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2519,12 +2633,12 @@ export const ItemSpec = new ItemSpec$Type();
 class EquipmentSpec$Type extends MessageType {
     constructor() {
         super("proto.EquipmentSpec", [
-            { no: 1, name: "items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ItemSpec }
+            { no: 1, name: "items", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => ItemSpec }
         ]);
     }
     create(value) {
-        const message = { items: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.items = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2588,8 +2702,26 @@ class Item$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, wowheadId: 0, name: "", classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], weaponDamageMin: 0, weaponDamageMax: 0, weaponSpeed: 0, phase: 0, quality: 0, unique: false, ilvl: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = 0;
+        message.wowheadId = 0;
+        message.name = "";
+        message.classAllowlist = [];
+        message.type = 0;
+        message.armorType = 0;
+        message.weaponType = 0;
+        message.handType = 0;
+        message.rangedWeaponType = 0;
+        message.stats = [];
+        message.gemSockets = [];
+        message.socketBonus = [];
+        message.weaponDamageMin = 0;
+        message.weaponDamageMax = 0;
+        message.weaponSpeed = 0;
+        message.phase = 0;
+        message.quality = 0;
+        message.unique = false;
+        message.ilvl = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2687,19 +2819,9 @@ class Item$Type extends MessageType {
         /* int32 id = 1; */
         if (message.id !== 0)
             writer.tag(1, WireType.Varint).int32(message.id);
-        /* int32 wowhead_id = 16; */
-        if (message.wowheadId !== 0)
-            writer.tag(16, WireType.Varint).int32(message.wowheadId);
         /* string name = 2; */
         if (message.name !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.name);
-        /* repeated proto.Class class_allowlist = 15; */
-        if (message.classAllowlist.length) {
-            writer.tag(15, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.classAllowlist.length; i++)
-                writer.int32(message.classAllowlist[i]);
-            writer.join();
-        }
         /* proto.ItemType type = 3; */
         if (message.type !== 0)
             writer.tag(3, WireType.Varint).int32(message.type);
@@ -2736,15 +2858,6 @@ class Item$Type extends MessageType {
                 writer.double(message.socketBonus[i]);
             writer.join();
         }
-        /* double weapon_damage_min = 17; */
-        if (message.weaponDamageMin !== 0)
-            writer.tag(17, WireType.Bit64).double(message.weaponDamageMin);
-        /* double weapon_damage_max = 18; */
-        if (message.weaponDamageMax !== 0)
-            writer.tag(18, WireType.Bit64).double(message.weaponDamageMax);
-        /* double weapon_speed = 19; */
-        if (message.weaponSpeed !== 0)
-            writer.tag(19, WireType.Bit64).double(message.weaponSpeed);
         /* int32 phase = 11; */
         if (message.phase !== 0)
             writer.tag(11, WireType.Varint).int32(message.phase);
@@ -2754,6 +2867,25 @@ class Item$Type extends MessageType {
         /* bool unique = 13; */
         if (message.unique !== false)
             writer.tag(13, WireType.Varint).bool(message.unique);
+        /* repeated proto.Class class_allowlist = 15; */
+        if (message.classAllowlist.length) {
+            writer.tag(15, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.classAllowlist.length; i++)
+                writer.int32(message.classAllowlist[i]);
+            writer.join();
+        }
+        /* int32 wowhead_id = 16; */
+        if (message.wowheadId !== 0)
+            writer.tag(16, WireType.Varint).int32(message.wowheadId);
+        /* double weapon_damage_min = 17; */
+        if (message.weaponDamageMin !== 0)
+            writer.tag(17, WireType.Bit64).double(message.weaponDamageMin);
+        /* double weapon_damage_max = 18; */
+        if (message.weaponDamageMax !== 0)
+            writer.tag(18, WireType.Bit64).double(message.weaponDamageMax);
+        /* double weapon_speed = 19; */
+        if (message.weaponSpeed !== 0)
+            writer.tag(19, WireType.Bit64).double(message.weaponSpeed);
         /* int32 ilvl = 20; */
         if (message.ilvl !== 0)
             writer.tag(20, WireType.Varint).int32(message.ilvl);
@@ -2784,8 +2916,17 @@ class Enchant$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, effectId: 0, name: "", isSpellId: false, type: 0, enchantType: 0, stats: [], quality: 0, phase: 0, classAllowlist: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = 0;
+        message.effectId = 0;
+        message.name = "";
+        message.isSpellId = false;
+        message.type = 0;
+        message.enchantType = 0;
+        message.stats = [];
+        message.quality = 0;
+        message.phase = 0;
+        message.classAllowlist = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2854,15 +2995,9 @@ class Enchant$Type extends MessageType {
         /* string name = 3; */
         if (message.name !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.name);
-        /* bool is_spell_id = 10; */
-        if (message.isSpellId !== false)
-            writer.tag(10, WireType.Varint).bool(message.isSpellId);
         /* proto.ItemType type = 4; */
         if (message.type !== 0)
             writer.tag(4, WireType.Varint).int32(message.type);
-        /* proto.EnchantType enchant_type = 9; */
-        if (message.enchantType !== 0)
-            writer.tag(9, WireType.Varint).int32(message.enchantType);
         /* repeated double stats = 7; */
         if (message.stats.length) {
             writer.tag(7, WireType.LengthDelimited).fork();
@@ -2873,6 +3008,12 @@ class Enchant$Type extends MessageType {
         /* proto.ItemQuality quality = 8; */
         if (message.quality !== 0)
             writer.tag(8, WireType.Varint).int32(message.quality);
+        /* proto.EnchantType enchant_type = 9; */
+        if (message.enchantType !== 0)
+            writer.tag(9, WireType.Varint).int32(message.enchantType);
+        /* bool is_spell_id = 10; */
+        if (message.isSpellId !== false)
+            writer.tag(10, WireType.Varint).bool(message.isSpellId);
         /* int32 phase = 11; */
         if (message.phase !== 0)
             writer.tag(11, WireType.Varint).int32(message.phase);
@@ -2907,8 +3048,14 @@ class Gem$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", stats: [], color: 0, phase: 0, quality: 0, unique: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.id = 0;
+        message.name = "";
+        message.stats = [];
+        message.color = 0;
+        message.phase = 0;
+        message.quality = 0;
+        message.unique = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -2998,8 +3145,8 @@ class RaidTarget$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { targetIndex: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.targetIndex = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -3048,8 +3195,9 @@ class ActionID$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { rawId: { oneofKind: undefined }, tag: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.rawId = { oneofKind: undefined };
+        message.tag = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -3123,8 +3271,8 @@ class Cooldown$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { timings: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.timings = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -3180,13 +3328,14 @@ export const Cooldown = new Cooldown$Type();
 class Cooldowns$Type extends MessageType {
     constructor() {
         super("proto.Cooldowns", [
-            { no: 1, name: "cooldowns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Cooldown },
+            { no: 1, name: "cooldowns", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => Cooldown },
             { no: 2, name: "hp_percent_for_defensives", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { cooldowns: [], hpPercentForDefensives: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.cooldowns = [];
+        message.hpPercentForDefensives = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -3239,8 +3388,9 @@ class HealingModel$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { hps: 0, cadenceSeconds: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.hps = 0;
+        message.cadenceSeconds = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

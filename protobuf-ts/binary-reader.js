@@ -1,9 +1,18 @@
 import { WireType } from './binary-format-contract.js';
 import { PbLong, PbULong } from './pb-long.js';
-import { utf8read } from './protobufjs-utf8.js';
 import { varint32read, varint64read } from './goog-varint.js';
+const defaultsRead = {
+    readUnknownField: true,
+    readerFactory: bytes => new BinaryReader(bytes),
+};
+/**
+ * Make options for reading binary data form partial options.
+ */
+export function binaryReadOptions(options) {
+    return options ? Object.assign(Object.assign({}, defaultsRead), options) : defaultsRead;
+}
 export class BinaryReader {
-    constructor(buf) {
+    constructor(buf, textDecoder) {
         this.varint64 = varint64read; // dirty cast for `this`
         /**
          * Read a `uint32` field, an unsigned 32 bit varint.
@@ -13,6 +22,10 @@ export class BinaryReader {
         this.len = buf.length;
         this.pos = 0;
         this.view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+        this.textDecoder = textDecoder !== null && textDecoder !== void 0 ? textDecoder : new TextDecoder("utf-8", {
+            fatal: true,
+            ignoreBOM: true,
+        });
     }
     /**
      * Reads a tag - field number and wire type.
@@ -160,6 +173,6 @@ export class BinaryReader {
      * Read a `string` field, length-delimited data converted to UTF-8 text.
      */
     string() {
-        return utf8read(this.bytes());
+        return this.textDecoder.decode(this.bytes());
     }
 }

@@ -1,7 +1,6 @@
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 // @generated message type with reflection information, may provide speed optimized methods
 class CharacterStatsTestResult$Type extends MessageType {
@@ -11,8 +10,8 @@ class CharacterStatsTestResult$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { finalStats: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.finalStats = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -66,8 +65,8 @@ class StatWeightsTestResult$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { weights: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.weights = [];
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -123,8 +122,10 @@ class DpsTestResult$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { dps: 0, tps: 0, dtps: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.dps = 0;
+        message.tps = 0;
+        message.dtps = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -184,8 +185,10 @@ class TestSuiteResult$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { characterStatsResults: {}, statWeightsResults: {}, dpsResults: {} };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.characterStatsResults = {};
+        message.statWeightsResults = {};
+        message.dpsResults = {};
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -226,7 +229,7 @@ class TestSuiteResult$Type extends MessageType {
                 case 2:
                     val = CharacterStatsTestResult.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.TestSuiteResult.character_stats_results");
+                default: throw new globalThis.Error("unknown map entry field for proto.TestSuiteResult.character_stats_results");
             }
         }
         map[key ?? ""] = val ?? CharacterStatsTestResult.create();
@@ -242,7 +245,7 @@ class TestSuiteResult$Type extends MessageType {
                 case 2:
                     val = StatWeightsTestResult.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.TestSuiteResult.stat_weights_results");
+                default: throw new globalThis.Error("unknown map entry field for proto.TestSuiteResult.stat_weights_results");
             }
         }
         map[key ?? ""] = val ?? StatWeightsTestResult.create();
@@ -258,31 +261,31 @@ class TestSuiteResult$Type extends MessageType {
                 case 2:
                     val = DpsTestResult.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.TestSuiteResult.dps_results");
+                default: throw new globalThis.Error("unknown map entry field for proto.TestSuiteResult.dps_results");
             }
         }
         map[key ?? ""] = val ?? DpsTestResult.create();
     }
     internalBinaryWrite(message, writer, options) {
+        /* map<string, proto.DpsTestResult> dps_results = 1; */
+        for (let k of globalThis.Object.keys(message.dpsResults)) {
+            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            DpsTestResult.internalBinaryWrite(message.dpsResults[k], writer, options);
+            writer.join().join();
+        }
         /* map<string, proto.CharacterStatsTestResult> character_stats_results = 2; */
-        for (let k of Object.keys(message.characterStatsResults)) {
+        for (let k of globalThis.Object.keys(message.characterStatsResults)) {
             writer.tag(2, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
             CharacterStatsTestResult.internalBinaryWrite(message.characterStatsResults[k], writer, options);
             writer.join().join();
         }
         /* map<string, proto.StatWeightsTestResult> stat_weights_results = 3; */
-        for (let k of Object.keys(message.statWeightsResults)) {
+        for (let k of globalThis.Object.keys(message.statWeightsResults)) {
             writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
             StatWeightsTestResult.internalBinaryWrite(message.statWeightsResults[k], writer, options);
-            writer.join().join();
-        }
-        /* map<string, proto.DpsTestResult> dps_results = 1; */
-        for (let k of Object.keys(message.dpsResults)) {
-            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
-            writer.tag(2, WireType.LengthDelimited).fork();
-            DpsTestResult.internalBinaryWrite(message.dpsResults[k], writer, options);
             writer.join().join();
         }
         let u = options.writeUnknownFields;

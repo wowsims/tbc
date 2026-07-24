@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { RaidTarget } from './common.js';
 /**
@@ -116,8 +115,50 @@ class DruidTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { starlightWrath: 0, focusedStarlight: 0, improvedMoonfire: 0, brambles: 0, insectSwarm: false, vengeance: 0, lunarGuidance: 0, naturesGrace: false, moonglow: 0, moonfury: 0, balanceOfPower: 0, dreamstate: 0, moonkinForm: false, improvedFaerieFire: 0, wrathOfCenarius: 0, forceOfNature: false, ferocity: 0, feralAggression: 0, feralInstinct: 0, thickHide: 0, feralSwiftness: 0, sharpenedClaws: 0, shreddingAttacks: 0, predatoryStrikes: 0, primalFury: 0, savageFury: 0, faerieFire: false, heartOfTheWild: 0, survivalOfTheFittest: 0, leaderOfThePack: false, improvedLeaderOfThePack: 0, predatoryInstincts: 0, mangle: false, improvedMarkOfTheWild: 0, furor: 0, naturalist: 0, naturalShapeshifter: 0, intensity: 0, subtlety: 0, omenOfClarity: false, naturesSwiftness: false, livingSpirit: 0, naturalPerfection: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.starlightWrath = 0;
+        message.focusedStarlight = 0;
+        message.improvedMoonfire = 0;
+        message.brambles = 0;
+        message.insectSwarm = false;
+        message.vengeance = 0;
+        message.lunarGuidance = 0;
+        message.naturesGrace = false;
+        message.moonglow = 0;
+        message.moonfury = 0;
+        message.balanceOfPower = 0;
+        message.dreamstate = 0;
+        message.moonkinForm = false;
+        message.improvedFaerieFire = 0;
+        message.wrathOfCenarius = 0;
+        message.forceOfNature = false;
+        message.ferocity = 0;
+        message.feralAggression = 0;
+        message.feralInstinct = 0;
+        message.thickHide = 0;
+        message.feralSwiftness = 0;
+        message.sharpenedClaws = 0;
+        message.shreddingAttacks = 0;
+        message.predatoryStrikes = 0;
+        message.primalFury = 0;
+        message.savageFury = 0;
+        message.faerieFire = false;
+        message.heartOfTheWild = 0;
+        message.survivalOfTheFittest = 0;
+        message.leaderOfThePack = false;
+        message.improvedLeaderOfThePack = 0;
+        message.predatoryInstincts = 0;
+        message.mangle = false;
+        message.improvedMarkOfTheWild = 0;
+        message.furor = 0;
+        message.naturalist = 0;
+        message.naturalShapeshifter = 0;
+        message.intensity = 0;
+        message.subtlety = 0;
+        message.omenOfClarity = false;
+        message.naturesSwiftness = false;
+        message.livingSpirit = 0;
+        message.naturalPerfection = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -322,15 +363,6 @@ class DruidTalents$Type extends MessageType {
         /* int32 feral_aggression = 18; */
         if (message.feralAggression !== 0)
             writer.tag(18, WireType.Varint).int32(message.feralAggression);
-        /* int32 feral_instinct = 41; */
-        if (message.feralInstinct !== 0)
-            writer.tag(41, WireType.Varint).int32(message.feralInstinct);
-        /* int32 thick_hide = 42; */
-        if (message.thickHide !== 0)
-            writer.tag(42, WireType.Varint).int32(message.thickHide);
-        /* int32 feral_swiftness = 43; */
-        if (message.feralSwiftness !== 0)
-            writer.tag(43, WireType.Varint).int32(message.feralSwiftness);
         /* int32 sharpened_claws = 19; */
         if (message.sharpenedClaws !== 0)
             writer.tag(19, WireType.Varint).int32(message.sharpenedClaws);
@@ -382,9 +414,6 @@ class DruidTalents$Type extends MessageType {
         /* int32 intensity = 35; */
         if (message.intensity !== 0)
             writer.tag(35, WireType.Varint).int32(message.intensity);
-        /* int32 subtlety = 40; */
-        if (message.subtlety !== 0)
-            writer.tag(40, WireType.Varint).int32(message.subtlety);
         /* bool omen_of_clarity = 36; */
         if (message.omenOfClarity !== false)
             writer.tag(36, WireType.Varint).bool(message.omenOfClarity);
@@ -397,6 +426,18 @@ class DruidTalents$Type extends MessageType {
         /* int32 natural_perfection = 39; */
         if (message.naturalPerfection !== 0)
             writer.tag(39, WireType.Varint).int32(message.naturalPerfection);
+        /* int32 subtlety = 40; */
+        if (message.subtlety !== 0)
+            writer.tag(40, WireType.Varint).int32(message.subtlety);
+        /* int32 feral_instinct = 41; */
+        if (message.feralInstinct !== 0)
+            writer.tag(41, WireType.Varint).int32(message.feralInstinct);
+        /* int32 thick_hide = 42; */
+        if (message.thickHide !== 0)
+            writer.tag(42, WireType.Varint).int32(message.thickHide);
+        /* int32 feral_swiftness = 43; */
+        if (message.feralSwiftness !== 0)
+            writer.tag(43, WireType.Varint).int32(message.feralSwiftness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -417,8 +458,7 @@ class BalanceDruid$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -480,8 +520,12 @@ class BalanceDruid_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false, hurricane: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.primarySpell = 0;
+        message.faerieFire = false;
+        message.insectSwarm = false;
+        message.moonfire = false;
+        message.hurricane = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -552,8 +596,8 @@ class BalanceDruid_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { battleRes: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.battleRes = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -607,8 +651,7 @@ class FeralDruid$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -673,8 +716,15 @@ class FeralDruid_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { finishingMove: 0, mangleTrick: false, biteweave: false, ripweave: false, ripMinComboPoints: 0, biteMinComboPoints: 0, rakeTrick: false, maintainFaerieFire: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.finishingMove = 0;
+        message.mangleTrick = false;
+        message.biteweave = false;
+        message.ripweave = false;
+        message.ripMinComboPoints = 0;
+        message.biteMinComboPoints = 0;
+        message.rakeTrick = false;
+        message.maintainFaerieFire = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -729,9 +779,6 @@ class FeralDruid_Rotation$Type extends MessageType {
         /* bool biteweave = 3; */
         if (message.biteweave !== false)
             writer.tag(3, WireType.Varint).bool(message.biteweave);
-        /* bool ripweave = 8; */
-        if (message.ripweave !== false)
-            writer.tag(8, WireType.Varint).bool(message.ripweave);
         /* int32 rip_min_combo_points = 5; */
         if (message.ripMinComboPoints !== 0)
             writer.tag(5, WireType.Varint).int32(message.ripMinComboPoints);
@@ -741,6 +788,9 @@ class FeralDruid_Rotation$Type extends MessageType {
         /* bool rake_trick = 7; */
         if (message.rakeTrick !== false)
             writer.tag(7, WireType.Varint).bool(message.rakeTrick);
+        /* bool ripweave = 8; */
+        if (message.ripweave !== false)
+            writer.tag(8, WireType.Varint).bool(message.ripweave);
         /* bool maintain_faerie_fire = 9; */
         if (message.maintainFaerieFire !== false)
             writer.tag(9, WireType.Varint).bool(message.maintainFaerieFire);
@@ -763,8 +813,8 @@ class FeralDruid_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { latencyMs: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.latencyMs = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -818,8 +868,7 @@ class FeralTankDruid$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -881,8 +930,12 @@ class FeralTankDruid_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { maulRageThreshold: 0, maintainDemoralizingRoar: false, maintainFaerieFire: false, swipe: 0, swipeApThreshold: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.maulRageThreshold = 0;
+        message.maintainDemoralizingRoar = false;
+        message.maintainFaerieFire = false;
+        message.swipe = 0;
+        message.swipeApThreshold = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -953,8 +1006,8 @@ class FeralTankDruid_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { startingRage: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.startingRage = 0;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

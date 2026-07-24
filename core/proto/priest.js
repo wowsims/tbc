@@ -1,7 +1,6 @@
 import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { RaidTarget } from './common.js';
 /**
@@ -85,8 +84,41 @@ class PriestTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { wandSpecialization: 0, silentResolve: 0, improvedPowerWordFortitude: 0, innerFocus: false, meditation: 0, mentalAgility: 0, mentalStrength: 0, divineSpirit: false, improvedDivineSpirit: 0, focusedPower: 0, forceOfWill: 0, powerInfusion: false, enlightenment: 0, holySpecialization: 0, divineFury: 0, holyNova: false, searingLight: 0, spiritualGuidance: 0, surgeOfLight: 0, spiritOfRedemption: false, shadowAffinity: 0, improvedShadowWordPain: 0, shadowFocus: 0, improvedMindBlast: 0, mindFlay: false, shadowWeaving: 0, vampiricEmbrace: false, improvedVampiricEmbrace: 0, focusedMind: 0, darkness: 0, shadowform: false, shadowPower: 0, misery: 0, vampiricTouch: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.wandSpecialization = 0;
+        message.silentResolve = 0;
+        message.improvedPowerWordFortitude = 0;
+        message.innerFocus = false;
+        message.meditation = 0;
+        message.mentalAgility = 0;
+        message.mentalStrength = 0;
+        message.divineSpirit = false;
+        message.improvedDivineSpirit = 0;
+        message.focusedPower = 0;
+        message.forceOfWill = 0;
+        message.powerInfusion = false;
+        message.enlightenment = 0;
+        message.holySpecialization = 0;
+        message.divineFury = 0;
+        message.holyNova = false;
+        message.searingLight = 0;
+        message.spiritualGuidance = 0;
+        message.surgeOfLight = 0;
+        message.spiritOfRedemption = false;
+        message.shadowAffinity = 0;
+        message.improvedShadowWordPain = 0;
+        message.shadowFocus = 0;
+        message.improvedMindBlast = 0;
+        message.mindFlay = false;
+        message.shadowWeaving = 0;
+        message.vampiricEmbrace = false;
+        message.improvedVampiricEmbrace = 0;
+        message.focusedMind = 0;
+        message.darkness = 0;
+        message.shadowform = false;
+        message.shadowPower = 0;
+        message.misery = 0;
+        message.vampiricTouch = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -213,12 +245,6 @@ class PriestTalents$Type extends MessageType {
         /* int32 wand_specialization = 1; */
         if (message.wandSpecialization !== 0)
             writer.tag(1, WireType.Varint).int32(message.wandSpecialization);
-        /* int32 silent_resolve = 31; */
-        if (message.silentResolve !== 0)
-            writer.tag(31, WireType.Varint).int32(message.silentResolve);
-        /* int32 improved_power_word_fortitude = 34; */
-        if (message.improvedPowerWordFortitude !== 0)
-            writer.tag(34, WireType.Varint).int32(message.improvedPowerWordFortitude);
         /* bool inner_focus = 2; */
         if (message.innerFocus !== false)
             writer.tag(2, WireType.Varint).bool(message.innerFocus);
@@ -267,12 +293,6 @@ class PriestTalents$Type extends MessageType {
         /* int32 surge_of_light = 17; */
         if (message.surgeOfLight !== 0)
             writer.tag(17, WireType.Varint).int32(message.surgeOfLight);
-        /* bool spirit_of_redemption = 33; */
-        if (message.spiritOfRedemption !== false)
-            writer.tag(33, WireType.Varint).bool(message.spiritOfRedemption);
-        /* int32 shadow_affinity = 32; */
-        if (message.shadowAffinity !== 0)
-            writer.tag(32, WireType.Varint).int32(message.shadowAffinity);
         /* int32 improved_shadow_word_pain = 18; */
         if (message.improvedShadowWordPain !== 0)
             writer.tag(18, WireType.Varint).int32(message.improvedShadowWordPain);
@@ -312,6 +332,18 @@ class PriestTalents$Type extends MessageType {
         /* bool vampiric_touch = 30; */
         if (message.vampiricTouch !== false)
             writer.tag(30, WireType.Varint).bool(message.vampiricTouch);
+        /* int32 silent_resolve = 31; */
+        if (message.silentResolve !== 0)
+            writer.tag(31, WireType.Varint).int32(message.silentResolve);
+        /* int32 shadow_affinity = 32; */
+        if (message.shadowAffinity !== 0)
+            writer.tag(32, WireType.Varint).int32(message.shadowAffinity);
+        /* bool spirit_of_redemption = 33; */
+        if (message.spiritOfRedemption !== false)
+            writer.tag(33, WireType.Varint).bool(message.spiritOfRedemption);
+        /* int32 improved_power_word_fortitude = 34; */
+        if (message.improvedPowerWordFortitude !== 0)
+            writer.tag(34, WireType.Varint).int32(message.improvedPowerWordFortitude);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -332,8 +364,7 @@ class ShadowPriest$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -395,8 +426,12 @@ class ShadowPriest_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { rotationType: 0, useDevPlague: false, precastVt: false, latency: 0, useStarshards: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.rotationType = 0;
+        message.useDevPlague = false;
+        message.precastVt = false;
+        message.latency = 0;
+        message.useStarshards = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -466,8 +501,8 @@ class ShadowPriest_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useShadowfiend: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.useShadowfiend = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -515,8 +550,7 @@ class SmitePriest$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -578,8 +612,12 @@ class SmitePriest_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { rotationType: 0, useDevPlague: false, useStarshards: false, useMindBlast: false, useShadowWordDeath: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.rotationType = 0;
+        message.useDevPlague = false;
+        message.useStarshards = false;
+        message.useMindBlast = false;
+        message.useShadowWordDeath = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
@@ -650,8 +688,8 @@ class SmitePriest_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useShadowfiend: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        const message = globalThis.Object.create((this.messagePrototype));
+        message.useShadowfiend = false;
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;

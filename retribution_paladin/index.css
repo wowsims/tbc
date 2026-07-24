@@ -282,6 +282,106 @@
   text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
 }
 
+.outdated-sim-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  background: #6b0f0f;
+  border-bottom: 2px solid #e03535;
+  color: #ffb3b3;
+  font-weight: bold;
+}
+.outdated-sim-bar a {
+  color: #ffd100;
+  margin: 0 4px;
+}
+
+body.has-outdated-sim-bar .sim-root {
+  height: calc(100% - 40px);
+  margin-top: 40px;
+}
+
+.outdated-sim-sidebar-warning {
+  margin: 15px 10px 0 10px;
+  padding: 10px;
+  border: 2px solid #e03535;
+  background: rgba(224, 53, 53, 0.15);
+  color: #ffb3b3;
+  text-align: left;
+  font-size: 14px;
+}
+.outdated-sim-sidebar-warning a {
+  color: #ffd100;
+}
+.outdated-sim-sidebar-warning ol {
+  margin: 5px 0 0;
+  padding-left: 25px;
+}
+.outdated-sim-sidebar-warning ol li {
+  margin-top: 5px;
+}
+
+.outdated-sim-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+}
+.outdated-sim-modal-overlay .outdated-sim-modal {
+  max-width: 500px;
+  margin: 20px;
+  padding: 20px 30px;
+  background: #1e2633;
+  border: 2px solid #e03535;
+  color: var(--main-text-color);
+  text-align: center;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal h2 {
+  color: #ffb3b3;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal a {
+  color: #ffd100;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-countdown {
+  font-weight: bold;
+  color: #ffb3b3;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-buttons button {
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-buttons .outdated-sim-modal-go {
+  background: #ffd100;
+  color: black;
+}
+.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-buttons .outdated-sim-modal-dismiss {
+  background: #373e58;
+  color: var(--main-text-color);
+}
+
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;

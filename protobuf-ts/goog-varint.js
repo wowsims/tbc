@@ -133,7 +133,7 @@ export function int64fromString(dec) {
         const digit1e6 = Number(dec.slice(begin, end));
         highBits *= base;
         lowBits = lowBits * base + digit1e6;
-        // Carry bits from lowBits to
+        // Carry bits from lowBits to highBits
         if (lowBits >= TWO_PWR_32_DBL) {
             highBits = highBits + ((lowBits / TWO_PWR_32_DBL) | 0);
             lowBits = lowBits % TWO_PWR_32_DBL;
@@ -153,8 +153,8 @@ export function int64fromString(dec) {
 export function int64toString(bitsLow, bitsHigh) {
     // Skip the expensive conversion if the number is small enough to use the
     // built-in conversions.
-    if (bitsHigh <= 0x1FFFFF) {
-        return '' + (TWO_PWR_32_DBL * bitsHigh + bitsLow);
+    if ((bitsHigh >>> 0) <= 0x1FFFFF) {
+        return '' + (TWO_PWR_32_DBL * bitsHigh + (bitsLow >>> 0));
     }
     // What this code is doing is essentially converting the input number from
     // base-2 to base-1e7, which allows us to represent the 64-bit range with

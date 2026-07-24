@@ -12,179 +12,179 @@ export interface DruidTalents {
     /**
      * Balance
      *
-     * @generated from protobuf field: int32 starlight_wrath = 1;
+     * @generated from protobuf field: int32 starlight_wrath = 1
      */
     starlightWrath: number;
     /**
-     * @generated from protobuf field: int32 focused_starlight = 2;
+     * @generated from protobuf field: int32 focused_starlight = 2
      */
     focusedStarlight: number;
     /**
-     * @generated from protobuf field: int32 improved_moonfire = 3;
+     * @generated from protobuf field: int32 improved_moonfire = 3
      */
     improvedMoonfire: number;
     /**
-     * @generated from protobuf field: int32 brambles = 4;
+     * @generated from protobuf field: int32 brambles = 4
      */
     brambles: number;
     /**
-     * @generated from protobuf field: bool insect_swarm = 5;
+     * @generated from protobuf field: bool insect_swarm = 5
      */
     insectSwarm: boolean;
     /**
-     * @generated from protobuf field: int32 vengeance = 6;
+     * @generated from protobuf field: int32 vengeance = 6
      */
     vengeance: number;
     /**
-     * @generated from protobuf field: int32 lunar_guidance = 7;
+     * @generated from protobuf field: int32 lunar_guidance = 7
      */
     lunarGuidance: number;
     /**
-     * @generated from protobuf field: bool natures_grace = 8;
+     * @generated from protobuf field: bool natures_grace = 8
      */
     naturesGrace: boolean;
     /**
-     * @generated from protobuf field: int32 moonglow = 9;
+     * @generated from protobuf field: int32 moonglow = 9
      */
     moonglow: number;
     /**
-     * @generated from protobuf field: int32 moonfury = 10;
+     * @generated from protobuf field: int32 moonfury = 10
      */
     moonfury: number;
     /**
-     * @generated from protobuf field: int32 balance_of_power = 11;
+     * @generated from protobuf field: int32 balance_of_power = 11
      */
     balanceOfPower: number;
     /**
-     * @generated from protobuf field: int32 dreamstate = 12;
+     * @generated from protobuf field: int32 dreamstate = 12
      */
     dreamstate: number;
     /**
-     * @generated from protobuf field: bool moonkin_form = 13;
+     * @generated from protobuf field: bool moonkin_form = 13
      */
     moonkinForm: boolean;
     /**
-     * @generated from protobuf field: int32 improved_faerie_fire = 14;
+     * @generated from protobuf field: int32 improved_faerie_fire = 14
      */
     improvedFaerieFire: number;
     /**
-     * @generated from protobuf field: int32 wrath_of_cenarius = 15;
+     * @generated from protobuf field: int32 wrath_of_cenarius = 15
      */
     wrathOfCenarius: number;
     /**
-     * @generated from protobuf field: bool force_of_nature = 16;
+     * @generated from protobuf field: bool force_of_nature = 16
      */
     forceOfNature: boolean;
     /**
      * Feral Combat
      *
-     * @generated from protobuf field: int32 ferocity = 17;
+     * @generated from protobuf field: int32 ferocity = 17
      */
     ferocity: number;
     /**
-     * @generated from protobuf field: int32 feral_aggression = 18;
+     * @generated from protobuf field: int32 feral_aggression = 18
      */
     feralAggression: number;
     /**
-     * @generated from protobuf field: int32 feral_instinct = 41;
+     * @generated from protobuf field: int32 feral_instinct = 41
      */
     feralInstinct: number;
     /**
-     * @generated from protobuf field: int32 thick_hide = 42;
+     * @generated from protobuf field: int32 thick_hide = 42
      */
     thickHide: number;
     /**
-     * @generated from protobuf field: int32 feral_swiftness = 43;
+     * @generated from protobuf field: int32 feral_swiftness = 43
      */
     feralSwiftness: number;
     /**
-     * @generated from protobuf field: int32 sharpened_claws = 19;
+     * @generated from protobuf field: int32 sharpened_claws = 19
      */
     sharpenedClaws: number;
     /**
-     * @generated from protobuf field: int32 shredding_attacks = 20;
+     * @generated from protobuf field: int32 shredding_attacks = 20
      */
     shreddingAttacks: number;
     /**
-     * @generated from protobuf field: int32 predatory_strikes = 21;
+     * @generated from protobuf field: int32 predatory_strikes = 21
      */
     predatoryStrikes: number;
     /**
-     * @generated from protobuf field: int32 primal_fury = 22;
+     * @generated from protobuf field: int32 primal_fury = 22
      */
     primalFury: number;
     /**
-     * @generated from protobuf field: int32 savage_fury = 23;
+     * @generated from protobuf field: int32 savage_fury = 23
      */
     savageFury: number;
     /**
-     * @generated from protobuf field: bool faerie_fire = 24;
+     * @generated from protobuf field: bool faerie_fire = 24
      */
     faerieFire: boolean;
     /**
-     * @generated from protobuf field: int32 heart_of_the_wild = 25;
+     * @generated from protobuf field: int32 heart_of_the_wild = 25
      */
     heartOfTheWild: number;
     /**
-     * @generated from protobuf field: int32 survival_of_the_fittest = 26;
+     * @generated from protobuf field: int32 survival_of_the_fittest = 26
      */
     survivalOfTheFittest: number;
     /**
-     * @generated from protobuf field: bool leader_of_the_pack = 27;
+     * @generated from protobuf field: bool leader_of_the_pack = 27
      */
     leaderOfThePack: boolean;
     /**
-     * @generated from protobuf field: int32 improved_leader_of_the_pack = 28;
+     * @generated from protobuf field: int32 improved_leader_of_the_pack = 28
      */
     improvedLeaderOfThePack: number;
     /**
-     * @generated from protobuf field: int32 predatory_instincts = 29;
+     * @generated from protobuf field: int32 predatory_instincts = 29
      */
     predatoryInstincts: number;
     /**
-     * @generated from protobuf field: bool mangle = 30;
+     * @generated from protobuf field: bool mangle = 30
      */
     mangle: boolean;
     /**
      * Restoration
      *
-     * @generated from protobuf field: int32 improved_mark_of_the_wild = 31;
+     * @generated from protobuf field: int32 improved_mark_of_the_wild = 31
      */
     improvedMarkOfTheWild: number;
     /**
-     * @generated from protobuf field: int32 furor = 32;
+     * @generated from protobuf field: int32 furor = 32
      */
     furor: number;
     /**
-     * @generated from protobuf field: int32 naturalist = 33;
+     * @generated from protobuf field: int32 naturalist = 33
      */
     naturalist: number;
     /**
-     * @generated from protobuf field: int32 natural_shapeshifter = 34;
+     * @generated from protobuf field: int32 natural_shapeshifter = 34
      */
     naturalShapeshifter: number;
     /**
-     * @generated from protobuf field: int32 intensity = 35;
+     * @generated from protobuf field: int32 intensity = 35
      */
     intensity: number;
     /**
-     * @generated from protobuf field: int32 subtlety = 40;
+     * @generated from protobuf field: int32 subtlety = 40
      */
     subtlety: number;
     /**
-     * @generated from protobuf field: bool omen_of_clarity = 36;
+     * @generated from protobuf field: bool omen_of_clarity = 36
      */
     omenOfClarity: boolean;
     /**
-     * @generated from protobuf field: bool natures_swiftness = 37;
+     * @generated from protobuf field: bool natures_swiftness = 37
      */
     naturesSwiftness: boolean;
     /**
-     * @generated from protobuf field: int32 living_spirit = 38;
+     * @generated from protobuf field: int32 living_spirit = 38
      */
     livingSpirit: number;
     /**
-     * @generated from protobuf field: int32 natural_perfection = 39;
+     * @generated from protobuf field: int32 natural_perfection = 39
      */
     naturalPerfection: number;
 }
@@ -193,15 +193,15 @@ export interface DruidTalents {
  */
 export interface BalanceDruid {
     /**
-     * @generated from protobuf field: proto.BalanceDruid.Rotation rotation = 1;
+     * @generated from protobuf field: proto.BalanceDruid.Rotation rotation = 1
      */
     rotation?: BalanceDruid_Rotation;
     /**
-     * @generated from protobuf field: proto.DruidTalents talents = 2;
+     * @generated from protobuf field: proto.DruidTalents talents = 2
      */
     talents?: DruidTalents;
     /**
-     * @generated from protobuf field: proto.BalanceDruid.Options options = 3;
+     * @generated from protobuf field: proto.BalanceDruid.Options options = 3
      */
     options?: BalanceDruid_Options;
 }
@@ -210,23 +210,23 @@ export interface BalanceDruid {
  */
 export interface BalanceDruid_Rotation {
     /**
-     * @generated from protobuf field: proto.BalanceDruid.Rotation.PrimarySpell primary_spell = 1;
+     * @generated from protobuf field: proto.BalanceDruid.Rotation.PrimarySpell primary_spell = 1
      */
     primarySpell: BalanceDruid_Rotation_PrimarySpell;
     /**
-     * @generated from protobuf field: bool faerie_fire = 2;
+     * @generated from protobuf field: bool faerie_fire = 2
      */
     faerieFire: boolean;
     /**
-     * @generated from protobuf field: bool insect_swarm = 3;
+     * @generated from protobuf field: bool insect_swarm = 3
      */
     insectSwarm: boolean;
     /**
-     * @generated from protobuf field: bool moonfire = 4;
+     * @generated from protobuf field: bool moonfire = 4
      */
     moonfire: boolean;
     /**
-     * @generated from protobuf field: bool hurricane = 5;
+     * @generated from protobuf field: bool hurricane = 5
      */
     hurricane: boolean;
 }
@@ -260,11 +260,11 @@ export declare enum BalanceDruid_Rotation_PrimarySpell {
  */
 export interface BalanceDruid_Options {
     /**
-     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1
      */
     innervateTarget?: RaidTarget;
     /**
-     * @generated from protobuf field: bool battle_res = 2;
+     * @generated from protobuf field: bool battle_res = 2
      */
     battleRes: boolean;
 }
@@ -273,15 +273,15 @@ export interface BalanceDruid_Options {
  */
 export interface FeralDruid {
     /**
-     * @generated from protobuf field: proto.FeralDruid.Rotation rotation = 1;
+     * @generated from protobuf field: proto.FeralDruid.Rotation rotation = 1
      */
     rotation?: FeralDruid_Rotation;
     /**
-     * @generated from protobuf field: proto.DruidTalents talents = 2;
+     * @generated from protobuf field: proto.DruidTalents talents = 2
      */
     talents?: DruidTalents;
     /**
-     * @generated from protobuf field: proto.FeralDruid.Options options = 3;
+     * @generated from protobuf field: proto.FeralDruid.Options options = 3
      */
     options?: FeralDruid_Options;
 }
@@ -290,35 +290,35 @@ export interface FeralDruid {
  */
 export interface FeralDruid_Rotation {
     /**
-     * @generated from protobuf field: proto.FeralDruid.Rotation.FinishingMove finishing_move = 1;
+     * @generated from protobuf field: proto.FeralDruid.Rotation.FinishingMove finishing_move = 1
      */
     finishingMove: FeralDruid_Rotation_FinishingMove;
     /**
-     * @generated from protobuf field: bool mangle_trick = 2;
+     * @generated from protobuf field: bool mangle_trick = 2
      */
     mangleTrick: boolean;
     /**
-     * @generated from protobuf field: bool biteweave = 3;
+     * @generated from protobuf field: bool biteweave = 3
      */
     biteweave: boolean;
     /**
-     * @generated from protobuf field: bool ripweave = 8;
+     * @generated from protobuf field: bool ripweave = 8
      */
     ripweave: boolean;
     /**
-     * @generated from protobuf field: int32 rip_min_combo_points = 5;
+     * @generated from protobuf field: int32 rip_min_combo_points = 5
      */
     ripMinComboPoints: number;
     /**
-     * @generated from protobuf field: int32 bite_min_combo_points = 6;
+     * @generated from protobuf field: int32 bite_min_combo_points = 6
      */
     biteMinComboPoints: number;
     /**
-     * @generated from protobuf field: bool rake_trick = 7;
+     * @generated from protobuf field: bool rake_trick = 7
      */
     rakeTrick: boolean;
     /**
-     * @generated from protobuf field: bool maintain_faerie_fire = 9;
+     * @generated from protobuf field: bool maintain_faerie_fire = 9
      */
     maintainFaerieFire: boolean;
 }
@@ -344,11 +344,11 @@ export declare enum FeralDruid_Rotation_FinishingMove {
  */
 export interface FeralDruid_Options {
     /**
-     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1
      */
     innervateTarget?: RaidTarget;
     /**
-     * @generated from protobuf field: int32 latency_ms = 2;
+     * @generated from protobuf field: int32 latency_ms = 2
      */
     latencyMs: number;
 }
@@ -357,15 +357,15 @@ export interface FeralDruid_Options {
  */
 export interface FeralTankDruid {
     /**
-     * @generated from protobuf field: proto.FeralTankDruid.Rotation rotation = 1;
+     * @generated from protobuf field: proto.FeralTankDruid.Rotation rotation = 1
      */
     rotation?: FeralTankDruid_Rotation;
     /**
-     * @generated from protobuf field: proto.DruidTalents talents = 2;
+     * @generated from protobuf field: proto.DruidTalents talents = 2
      */
     talents?: DruidTalents;
     /**
-     * @generated from protobuf field: proto.FeralTankDruid.Options options = 3;
+     * @generated from protobuf field: proto.FeralTankDruid.Options options = 3
      */
     options?: FeralTankDruid_Options;
 }
@@ -376,23 +376,23 @@ export interface FeralTankDruid_Rotation {
     /**
      * Minimum rage to queue HS or Cleave.
      *
-     * @generated from protobuf field: int32 maul_rage_threshold = 1;
+     * @generated from protobuf field: int32 maul_rage_threshold = 1
      */
     maulRageThreshold: number;
     /**
-     * @generated from protobuf field: bool maintain_demoralizing_roar = 2;
+     * @generated from protobuf field: bool maintain_demoralizing_roar = 2
      */
     maintainDemoralizingRoar: boolean;
     /**
-     * @generated from protobuf field: bool maintain_faerie_fire = 3;
+     * @generated from protobuf field: bool maintain_faerie_fire = 3
      */
     maintainFaerieFire: boolean;
     /**
-     * @generated from protobuf field: proto.FeralTankDruid.Rotation.Swipe swipe = 4;
+     * @generated from protobuf field: proto.FeralTankDruid.Rotation.Swipe swipe = 4
      */
     swipe: FeralTankDruid_Rotation_Swipe;
     /**
-     * @generated from protobuf field: double swipe_ap_threshold = 5;
+     * @generated from protobuf field: double swipe_ap_threshold = 5
      */
     swipeApThreshold: number;
 }
@@ -418,11 +418,11 @@ export declare enum FeralTankDruid_Rotation_Swipe {
  */
 export interface FeralTankDruid_Options {
     /**
-     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1
      */
     innervateTarget?: RaidTarget;
     /**
-     * @generated from protobuf field: double starting_rage = 2;
+     * @generated from protobuf field: double starting_rage = 2
      */
     startingRage: number;
 }
