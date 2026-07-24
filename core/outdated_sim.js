@@ -62,9 +62,8 @@ export function makeOutdatedSimSidebarWarning(parentElem) {
 	`;
     parentElem.appendChild(warning);
 }
-// Modal shown on page load which redirects to the new sim after a few
-// seconds, unless dismissed. Not shown when running locally (dev).
-const REDIRECT_SECONDS = 10;
+// Modal shown on page load with links to the new sim. Not shown when
+// running locally (dev).
 export function showOutdatedSimModal() {
     const hostname = window.location.hostname;
     const isLocal = hostname == 'localhost' || hostname == '127.0.0.1' || hostname == '0.0.0.0';
@@ -84,9 +83,6 @@ export function showOutdatedSimModal() {
 			<p>
 				A new, actively maintained version is available at <a href="${newSimUrl}">wowsims.com</a>.
 			</p>
-			<p class="outdated-sim-modal-countdown">
-				Redirecting to the new sim in <span class="outdated-sim-modal-seconds">${REDIRECT_SECONDS}</span> seconds...
-			</p>
 			<div class="outdated-sim-modal-buttons">
 				<button class="outdated-sim-modal-go">Go to the new sim now</button>
 				<button class="outdated-sim-modal-dismiss">Dismiss (stay on the old sim)</button>
@@ -94,24 +90,12 @@ export function showOutdatedSimModal() {
 		</div>
 	`;
     document.body.appendChild(overlay);
-    const secondsElem = overlay.getElementsByClassName('outdated-sim-modal-seconds')[0];
-    let secondsLeft = REDIRECT_SECONDS;
-    const countdownTimer = window.setInterval(() => {
-        secondsLeft--;
-        secondsElem.textContent = String(secondsLeft);
-        if (secondsLeft <= 0) {
-            window.clearInterval(countdownTimer);
-            window.location.href = newSimUrl;
-        }
-    }, 1000);
     const goButton = overlay.getElementsByClassName('outdated-sim-modal-go')[0];
     goButton.addEventListener('click', () => {
-        window.clearInterval(countdownTimer);
         window.location.href = newSimUrl;
     });
     const dismissButton = overlay.getElementsByClassName('outdated-sim-modal-dismiss')[0];
     dismissButton.addEventListener('click', () => {
-        window.clearInterval(countdownTimer);
         overlay.remove();
     });
 }

@@ -357,10 +357,6 @@ body.has-outdated-sim-bar .sim-root {
 .outdated-sim-modal-overlay .outdated-sim-modal a {
   color: #ffd100;
 }
-.outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-countdown {
-  font-weight: bold;
-  color: #ffb3b3;
-}
 .outdated-sim-modal-overlay .outdated-sim-modal .outdated-sim-modal-buttons {
   display: flex;
   flex-direction: column;
