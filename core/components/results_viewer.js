@@ -1,4 +1,5 @@
 import { Component } from '/tbc/core/components/component.js';
+import { hideOutdatedSimSidebarWarning } from '/tbc/core/outdated_sim.js';
 export class ResultsViewer extends Component {
     constructor(parentElem) {
         super(parentElem, 'results-viewer');
@@ -18,6 +19,7 @@ export class ResultsViewer extends Component {
         this.pendingElem.style.display = 'none';
     }
     setPending() {
+        hideOutdatedSimSidebarWarning();
         this.contentElem.style.display = 'none';
         this.pendingElem.style.display = 'initial';
     }

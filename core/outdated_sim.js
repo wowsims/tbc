@@ -62,6 +62,12 @@ export function makeOutdatedSimSidebarWarning(parentElem) {
 	`;
     parentElem.appendChild(warning);
 }
+// Hides the sidebar warning until the next page load. Called when the user
+// runs a sim, since the results would otherwise overlap the warning.
+export function hideOutdatedSimSidebarWarning() {
+    const warnings = document.getElementsByClassName('outdated-sim-sidebar-warning');
+    Array.from(warnings).forEach(warning => warning.style.display = 'none');
+}
 // Modal shown on page load with links to the new sim. Not shown when
 // running locally (dev).
 export function showOutdatedSimModal() {
