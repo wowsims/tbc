@@ -60,7 +60,7 @@ var Enchants = []Enchant{
 	{ID: 28271, EffectID: 2935, Name: "Gloves - Spell Strike", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellHit: 15}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 28272, EffectID: 2937, Name: "Gloves - Major Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 20}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 33995, EffectID: 684, Name: "Gloves - Major Strength", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 15}, ItemType: proto.ItemType_ItemTypeHands},
-	{ID: 33152, EffectID: 2564, Name: "Gloves - Major Agility", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Agility: 15}, ItemType: proto.ItemType_ItemTypeHands},
+	{ID: 33152, EffectID: 2564, Name: "Gloves - Superior Agility", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Agility: 15}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 33153, EffectID: 2613, Name: "Gloves - Threat", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeHands},
 
 	// Legs
